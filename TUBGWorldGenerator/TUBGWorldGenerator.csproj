@@ -61,6 +61,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -80,11 +81,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Utils\PerlinNoise.cs" />
+    <Compile Include="Utils\WorldToImage.cs" />
     <Compile Include="WorldGeneration\ActionContext.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Caverns.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Desert.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Tunnel.cs" />
-    <Compile Include="WorldGeneration\Actions\Reset.cs" />
     <Compile Include="WorldGeneration\GlobalContext.cs" />
     <Compile Include="WorldGeneration\TypeMismatchException.cs" />
     <Compile Include="WorldGeneration\IWorldGenerationAction.cs" />
@@ -127,7 +128,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="stylecop.json" />
+    <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

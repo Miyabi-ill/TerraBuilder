@@ -32,12 +32,7 @@
                 isInitializedTerrariaInstance = true;
             }
 
-            // Setup Properties
-            Tiles = Main.tile;
-            Chests = Main.chest;
-
-            TileCountX = Main.maxTilesX;
-            TileCountY = Main.maxTilesY;
+            Reset();
         }
 
         /// <summary>
@@ -59,5 +54,13 @@
         /// ワールドの縦。
         /// </summary>
         public int TileCountY { get; }
+
+        /// <summary>
+        /// プロパティをリセットして読み込みなおす
+        /// </summary>
+        public void Reset()
+        {
+
+        }
     }
 }

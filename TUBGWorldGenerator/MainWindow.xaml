@@ -11,7 +11,7 @@
 			<DockPanel x:Name="ToolBarDock" DockPanel.Dock="Left">
 				<ListView x:Name="ActionList"></ListView>
 			</DockPanel>
-			<Canvas x:Name="MapCanvas"></Canvas>
+			<Image x:Name="MapImage"></Image>
 		</DockPanel>
 		
     </Grid>

@@ -1,7 +1,5 @@
 ﻿namespace TUBGWorldGenerator.WorldGeneration.Actions.Biomes
 {
-    using System;
-    using System.Linq;
     using TUBGWorldGenerator.Utils;
 
     /// <summary>
