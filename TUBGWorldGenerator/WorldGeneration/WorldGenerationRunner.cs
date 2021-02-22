@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace TUBGWorldGenerator.WorldGeneration
+﻿namespace TUBGWorldGenerator.WorldGeneration
 {
+    using System.Collections.Generic;
+
     /// <summary>
     /// ワールド生成を行うクラス。
     /// </summary>

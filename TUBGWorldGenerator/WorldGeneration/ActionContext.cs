@@ -4,20 +4,33 @@
     using System.Collections.Generic;
     using System.Reflection;
 
+    /// <summary>
+    /// 各アクション毎の設定項目の基底クラス。
+    /// </summary>
     public abstract class ActionContext
     {
-        private Dictionary<string, PropertyInfo> PropertyDictionary { get; } = new Dictionary<string, PropertyInfo>();
+        private readonly Dictionary<string, PropertyInfo> propertyDictionary = new Dictionary<string, PropertyInfo>();
 
-        private Dictionary<string, object> OuterPropertyDictionary { get; } = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> outerPropertyDictionary = new Dictionary<string, object>();
 
+        /// <summary>
+        /// コンストラクタ。
+        /// プロパティを全て辞書に追加する。
+        /// </summary>
         public ActionContext()
         {
-            foreach (var property in this.GetType().GetProperties())
+            foreach (PropertyInfo property in this.GetType().GetProperties())
             {
-                PropertyDictionary.Add(property.Name, property);
+                propertyDictionary.Add(property.Name, property);
             }
         }
 
+        /// <summary>
+        /// プロパティの値を名前から取得する。
+        /// 必要性は不明。
+        /// </summary>
+        /// <param name="name">プロパティ名</param>
+        /// <returns>プロパティの値</returns>
         public object this[string name]
         {
             get
@@ -27,13 +40,13 @@
                     throw new KeyNotFoundException(name);
                 }
 
-                if (PropertyDictionary.ContainsKey(name))
+                if (propertyDictionary.ContainsKey(name))
                 {
-                    return PropertyDictionary[name].GetValue(this);
+                    return propertyDictionary[name].GetValue(this);
                 }
-                else if (OuterPropertyDictionary.ContainsKey(name))
+                else if (outerPropertyDictionary.ContainsKey(name))
                 {
-                    return OuterPropertyDictionary[name];
+                    return outerPropertyDictionary[name];
                 }
 
                 throw new KeyNotFoundException(name);
@@ -46,26 +59,27 @@
                     throw new KeyNotFoundException(name);
                 }
 
-                if (PropertyDictionary.ContainsKey(name))
+                if (propertyDictionary.ContainsKey(name))
                 {
                     try
                     {
-                        var setValue = Convert.ChangeType(value, PropertyDictionary[name].PropertyType);
-                        PropertyDictionary[name].SetValue(this, setValue);
+                        // 設定する値が型と合っている場合のみ設定。
+                        propertyDictionary[name].SetValue(this, value);
                     }
                     catch
                     {
                         throw new TypeMismatchException(
-                            string.Format("Type is mismatched during conversion. Expected type: {0}, Real type: {1}", PropertyDictionary[name].PropertyType.Name, value.GetType()));
+                            string.Format("Type is mismatched during conversion. Expected type: {0}, Real type: {1}", propertyDictionary[name].PropertyType.Name, value.GetType()));
                     }
                 }
-                else if (OuterPropertyDictionary.ContainsKey(name))
+                else if (outerPropertyDictionary.ContainsKey(name))
                 {
-                    OuterPropertyDictionary[name] = value;
+                    outerPropertyDictionary[name] = value;
                 }
                 else
                 {
-                    OuterPropertyDictionary.Add(name, value);
+                    // キーがない場合、辞書に追加する。Pythonの辞書の挙動の模倣
+                    outerPropertyDictionary.Add(name, value);
                 }
             }
         }

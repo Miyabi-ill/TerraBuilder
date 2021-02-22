@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TUBGWorldGenerator.WorldGeneration
+﻿namespace TUBGWorldGenerator.WorldGeneration
 {
+    /// <summary>
+    /// ワールド生成の全体を通じて使われる設定。
+    /// </summary>
     public class GlobalContext : ActionContext
     {
     }

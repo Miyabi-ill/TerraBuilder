@@ -87,7 +87,7 @@
     <Compile Include="WorldGeneration\Actions\Reset.cs" />
     <Compile Include="WorldGeneration\GlobalContext.cs" />
     <Compile Include="WorldGeneration\TypeMismatchException.cs" />
-    <Compile Include="WorldGeneration\WorldGenerationAction.cs" />
+    <Compile Include="WorldGeneration\IWorldGenerationAction.cs" />
     <Compile Include="WorldGeneration\WorldGenerationRunner.cs" />
     <Compile Include="WorldGeneration\WorldSandbox.cs" />
     <Page Include="MainWindow.xaml">

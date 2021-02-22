@@ -4,28 +4,21 @@
     using System.Linq;
     using TUBGWorldGenerator.Utils;
 
-
+    /// <summary>
+    /// 洞窟(第二層)の生成を行う。
+    /// </summary>
     public class Caverns : IWorldGenerationAction<Caverns.CavernContext>
     {
+        /// <inheritdoc/>
         public string Name => nameof(Caverns);
 
+        /// <inheritdoc/>
         public string Description => "Generate Caverns.";
 
+        /// <inheritdoc/>
         public CavernContext Context { get; private set; }
 
-        public class CavernContext : ActionContext
-        {
-            public int CavernMinHeight { get; }
-
-            public int CavernMaxHeight { get; }
-
-            public int CavernMinDistanceFromSurface { get; }
-
-            public int CavernMaxDistanceFromSurface { get; }
-
-            public int CavernMaxDiffToNextTile { get; }
-        }
-
+        /// <inheritdoc/>
         public bool Run(WorldSandbox sandbox)
         {
             if (Context == null)
@@ -68,9 +61,35 @@
 
             int bottomPerlinBaseTopLine = (int)(topPerlin[minIndex] + minValue);
 
-            
+            // TODO:実際にタイルを置く
 
             return true;
+        }
+
+        /// <summary>
+        /// 洞窟の生成に使われるコンテキスト。
+        /// </summary>
+        public class CavernContext : ActionContext
+        {
+            /// <summary>
+            /// 洞窟の最小の高さ。
+            /// </summary>
+            public int CavernMinHeight { get; }
+
+            /// <summary>
+            /// 洞窟の最大の高さ。
+            /// </summary>
+            public int CavernMaxHeight { get; }
+
+            /// <summary>
+            /// 地表からの最小距離。
+            /// </summary>
+            public int CavernMinDistanceFromSurface { get; }
+
+            /// <summary>
+            /// 地表からの最大距離。
+            /// </summary>
+            public int CavernMaxDistanceFromSurface { get; }
         }
     }
 }

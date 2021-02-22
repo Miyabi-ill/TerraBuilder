@@ -8,11 +8,13 @@ namespace TUBGWorldGenerator.WorldGeneration
         {
         }
 
-        public TypeMismatchException(string message) : base(message)
+        public TypeMismatchException(string message)
+            : base(message)
         {
         }
 
-        public TypeMismatchException(string message, Exception innerException) : base(message, innerException)
+        public TypeMismatchException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
     }
