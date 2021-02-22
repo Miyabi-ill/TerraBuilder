@@ -38,29 +38,36 @@
         /// <summary>
         /// ワールドに存在するタイル
         /// </summary>
-        public ITileCollection Tiles { get; }
+        public ITileCollection Tiles { get; private set; }
 
         /// <summary>
         /// ワールドにあるチェスト
         /// </summary>
-        public Chest[] Chests { get; }
+        public Chest[] Chests { get; private set; }
 
         /// <summary>
         /// ワールドの横幅。
         /// </summary>
-        public int TileCountX { get; }
+        public int TileCountX { get; private set; }
 
         /// <summary>
         /// ワールドの縦。
         /// </summary>
-        public int TileCountY { get; }
+        public int TileCountY { get; private set; }
 
         /// <summary>
         /// プロパティをリセットして読み込みなおす
         /// </summary>
         public void Reset()
         {
+            TileCountX = 4200;
+            TileCountY = 1200;
+            Main.treeX[0] = TileCountX;
+            Main.treeX[1] = TileCountX;
+            Main.treeX[2] = TileCountX;
 
+            Tiles = Main.tile;
+            Chests = Main.chest;
         }
     }
 }

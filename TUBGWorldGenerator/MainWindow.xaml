@@ -13,6 +13,5 @@
 			</DockPanel>
 			<Image x:Name="MapImage"></Image>
 		</DockPanel>
-		
-    </Grid>
+	</Grid>
 </Window>

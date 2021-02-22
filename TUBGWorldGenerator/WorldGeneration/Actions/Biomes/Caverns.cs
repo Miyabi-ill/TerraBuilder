@@ -1,5 +1,8 @@
 ﻿namespace TUBGWorldGenerator.WorldGeneration.Actions.Biomes
 {
+    using System;
+    using Terraria;
+    using Terraria.ID;
     using TUBGWorldGenerator.Utils;
 
     /// <summary>
@@ -24,42 +27,72 @@
                 Context = new CavernContext();
             }
 
+            GlobalContext globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
+
             int tileLengthX = sandbox.TileCountX;
 
             // Surface: topPerlinの振幅
             int diffSurface = Context.CavernMaxDistanceFromSurface - Context.CavernMinDistanceFromSurface;
 
-            var topPerlin = PerlinNoise.GenerateOctave1D(128, tileLengthX, 1, 8, 2);
-            var bottomPerlin = PerlinNoise.GenerateOctave1D(128, tileLengthX, 1, 8, 2);
+            var rand = new Random(42);
+            var topPerlin = PerlinNoise.GenerateOctave1D(128, tileLengthX, 1, 8, 2, rand.Next());
+            var bottomPerlin = PerlinNoise.GenerateOctave1D(128, tileLengthX, 1, 8, 2, rand.Next());
 
             int minIndex = 0;
             double minValue = double.MaxValue;
             double maxValue = double.MinValue;
             for (int i = 0; i < tileLengthX; i++)
             {
-                if (bottomPerlin[i] > maxValue)
+                double diff = Math.Abs(topPerlin[i] - bottomPerlin[i]);
+                if (diff > maxValue)
                 {
-                    maxValue = bottomPerlin[i];
+                    maxValue = diff;
                 }
 
-                if (bottomPerlin[i] < minValue)
+                if (diff < minValue)
                 {
-                    minValue = bottomPerlin[i];
+                    minValue = diff;
                     minIndex = i;
                 }
             }
 
-            // 空間のminとmaxから波の増幅量を決定、適用
-            double bottomAmplifier = maxValue - minValue;
+            // 空間のminとmaxから波の増幅量を決定、適用。タイルで使うために四捨五入しておく。
+            double bottomAmplifier = (maxValue - minValue) * (Context.CavernMaxHeight - Context.CavernMinHeight);
             for (int i = 0; i < tileLengthX; i++)
             {
-                topPerlin[i] *= diffSurface;
-                bottomPerlin[i] *= bottomAmplifier;
+                topPerlin[i] = Math.Round(topPerlin[i] * diffSurface);
+                bottomPerlin[i] = Math.Round(bottomPerlin[i] * bottomAmplifier);
             }
 
-            int bottomPerlinBaseTopLine = (int)(topPerlin[minIndex] + minValue);
+            int bottomPerlinBaseTopLine = (int)(topPerlin[minIndex] + (minValue * bottomAmplifier));
+            var tiles = sandbox.Tiles;
+
+            int cavernStart = globalContext.SurfaceLevel + Context.CavernMinDistanceFromSurface;
 
             // TODO:実際にタイルを置く
+            for (int x = 0; x < sandbox.TileCountX; x++)
+            {
+                for (int y = globalContext.SurfaceLevel; y < sandbox.TileCountY; y++)
+                {
+                    if (y < cavernStart + topPerlin[x])
+                    {
+                        tiles[x, y] = new Tile()
+                        {
+                            type = TileID.Stone,
+                        };
+                        tiles[x, y].active(true);
+                    }
+
+                    if (y > cavernStart + bottomPerlinBaseTopLine + bottomPerlin[x])
+                    {
+                        tiles[x, y] = new Tile()
+                        {
+                            type = TileID.Stone,
+                        };
+                        tiles[x, y].active(true);
+                    }
+                }
+            }
 
             return true;
         }
@@ -72,22 +105,22 @@
             /// <summary>
             /// 洞窟の最小の高さ。
             /// </summary>
-            public int CavernMinHeight { get; }
+            public int CavernMinHeight { get; } = 5;
 
             /// <summary>
             /// 洞窟の最大の高さ。
             /// </summary>
-            public int CavernMaxHeight { get; }
+            public int CavernMaxHeight { get; } = 100;
 
             /// <summary>
             /// 地表からの最小距離。
             /// </summary>
-            public int CavernMinDistanceFromSurface { get; }
+            public int CavernMinDistanceFromSurface { get; } = 0;
 
             /// <summary>
             /// 地表からの最大距離。
             /// </summary>
-            public int CavernMaxDistanceFromSurface { get; }
+            public int CavernMaxDistanceFromSurface { get; } = 100;
         }
     }
 }

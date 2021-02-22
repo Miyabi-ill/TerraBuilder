@@ -135,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="WorldGeneration\Actions\Buildings\" />
+    <Folder Include="WorldGeneration\Enums\" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">

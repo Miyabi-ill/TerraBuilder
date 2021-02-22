@@ -1,6 +1,7 @@
 ﻿namespace TUBGWorldGenerator.Utils
 {
     using System;
+    using System.Diagnostics;
     using System.Linq;
 
     public class PerlinNoise
@@ -20,19 +21,25 @@
             LookupTable = noLoopLookupTable.Concat(noLoopLookupTable).ToArray();
         }
 
-        private static double Interpolate(double a, double b, double x)
+        private static double InterpolateCos(double a, double b, double x)
         {
             double ft = x * Math.PI;
             double f = (1 - Math.Cos(ft)) * 0.5;
             return (a * (1 - f)) + (b * f);
         }
 
+        private static double InterpolateLinear(double a, double b, double x)
+        {
+            return (a * (1 - x)) + (b * x);
+        }
+
         public static double[] Generate1D(
             int waveLength,
             int width,
-            double amplifier)
+            double amplifier,
+            int seed = 42)
         {
-            var rand = new Random();
+            var rand = new Random(seed);
             double a = 0;
             double b = rand.NextDouble();
             double[] array = new double[width];
@@ -46,7 +53,7 @@
                 }
                 else
                 {
-                    array[x] = Interpolate(a, b, x % waveLength) * amplifier;
+                    array[x] = InterpolateCos(a, b, (x % waveLength) / (double)waveLength) * amplifier;
                 }
             }
 
@@ -58,12 +65,14 @@
             int width,
             double amplifier,
             int octaves,
-            int diviser)
+            int diviser,
+            int seed = 42)
         {
+            var rand = new Random(seed);
             double[] result = new double[width];
             for (int i = 0; i < octaves; i++)
             {
-                double[] perlin = Generate1D(waveLength, width, amplifier);
+                double[] perlin = Generate1D(waveLength, width, amplifier, rand.Next());
                 for (int j = 0; j < width; j++)
                 {
                     result[j] += perlin[j];

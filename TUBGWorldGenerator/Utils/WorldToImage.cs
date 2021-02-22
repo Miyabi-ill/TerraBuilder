@@ -6,7 +6,6 @@
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Windows.Media.Imaging;
-    using Terraria;
     using Terraria.Map;
     using TUBGWorldGenerator.WorldGeneration;
 
@@ -15,16 +14,16 @@
         public static BitmapImage CreateMapImage(WorldSandbox sandbox)
         {
             int arrayIndex = 0;
-            var array = new byte[Main.maxTilesX * Main.maxTilesY * 3];
+            var array = new byte[sandbox.TileCountX * sandbox.TileCountY * 3];
 
-            WorldMap worldMap = new WorldMap(Main.maxTilesX, Main.maxTilesY)
+            WorldMap worldMap = new WorldMap(sandbox.TileCountX, sandbox.TileCountY)
             {
-                _tiles = new MapTile[Main.maxTilesX, Main.maxTilesY],
+                _tiles = new MapTile[sandbox.TileCountX, sandbox.TileCountY],
             };
 
-            for (int y = 0; y < Main.maxTilesY; y++)
+            for (int y = 0; y < sandbox.TileCountY; y++)
             {
-                for (int x = 0; x < Main.maxTilesX; x++)
+                for (int x = 0; x < sandbox.TileCountX; x++)
                 {
                     var mapTile = MapHelper.CreateMapTile(x, y, 255);
                     var color = MapHelper.GetMapTileXnaColor(ref mapTile);
@@ -38,7 +37,7 @@
                 }
             }
 
-            Bitmap bitmap = CreateBitmap(Main.maxTilesX, Main.maxTilesY, array);
+            Bitmap bitmap = CreateBitmap(sandbox.TileCountX, sandbox.TileCountY, array);
             return Convert(bitmap);
         }
 
@@ -56,7 +55,7 @@
 
         private static Bitmap CreateBitmap(int width, int height, byte[] datas)
         {
-            var b = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            var b = new Bitmap(width, height, PixelFormat.Format24bppRgb);
 
             var boundsRect = new Rectangle(0, 0, width, height);
             BitmapData bmpData = b.LockBits(

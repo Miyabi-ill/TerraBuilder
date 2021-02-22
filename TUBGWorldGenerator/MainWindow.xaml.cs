@@ -15,9 +15,9 @@
         {
             InitializeComponent();
             Sandbox = new WorldSandbox();
-            UpdateMapView();
             var runner = new WorldGenerationRunner();
-            //runner.Run();
+            runner.Run(Sandbox);
+            UpdateMapView();
         }
 
         /// <summary>
@@ -25,8 +25,7 @@
         /// </summary>
         public void UpdateMapView()
         {
-            BitmapImage image = Utils.WorldToImage.CreateMapImage(Sandbox);
-            MapImage.Source = image;
+            MapImage.Source = Utils.WorldToImage.CreateMapImage(Sandbox);
         }
     }
 }
