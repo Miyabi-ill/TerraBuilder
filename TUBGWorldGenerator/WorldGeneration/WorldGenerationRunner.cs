@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace TUBGWorldGenerator.WorldGeneration
+﻿namespace TUBGWorldGenerator.WorldGeneration
 {
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+
     /// <summary>
     /// ワールド生成を行うクラス。
     /// </summary>
@@ -16,6 +17,8 @@ namespace TUBGWorldGenerator.WorldGeneration
             CurrentRunner = this;
 
             WorldGenerationActions.Add(new Actions.Biomes.Caverns());
+            WorldGenerationActions.Add(new Actions.Biomes.Surface());
+            WorldGenerationActions.Add(new Actions.Biomes.SpawnArea());
 
             // TODO: Load from json
             GlobalContext = new GlobalContext();
@@ -29,24 +32,34 @@ namespace TUBGWorldGenerator.WorldGeneration
         /// <summary>
         /// ワールド生成アクションリスト。このリスト順で生成が実行される。
         /// </summary>
-        public List<IWorldGenerationAction<ActionContext>> WorldGenerationActions { get; } = new List<IWorldGenerationAction<ActionContext>>();
+        public ObservableCollection<IWorldGenerationAction<ActionContext>> WorldGenerationActions { get; } = new ObservableCollection<IWorldGenerationAction<ActionContext>>();
 
         /// <summary>
         /// 全体から参照されるコンテキスト。
         /// 通常は`WorldGenerationRunner.CurrentRunner.GlobalContext`でアクセスされる。
         /// </summary>
-        public GlobalContext GlobalContext { get; private set; }
+        public GlobalContext GlobalContext { get; }
 
         /// <summary>
         /// 登録されている全てのアクションを実行し、ワールド生成を行う。
         /// </summary>
         /// <param name="sandbox">ワールド生成を行うサンドボックス</param>
-        public void Run(WorldSandbox sandbox)
+        /// <returns>アクションが全て成功すればtrue</returns>
+        public bool Run(WorldSandbox sandbox)
         {
             foreach (var action in WorldGenerationActions)
             {
-                action.Run(sandbox);
+                lock (sandbox)
+                {
+                    bool success = action.Run(sandbox);
+                    if (!success)
+                    {
+                        return false;
+                    }
+                }
             }
+
+            return true;
         }
     }
 }
