@@ -85,6 +85,7 @@
     <Compile Include="WorldGeneration\ActionContext.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Caverns.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Desert.cs" />
+    <Compile Include="WorldGeneration\Actions\Biomes\Surface.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Tunnel.cs" />
     <Compile Include="WorldGeneration\GlobalContext.cs" />
     <Compile Include="WorldGeneration\TypeMismatchException.cs" />

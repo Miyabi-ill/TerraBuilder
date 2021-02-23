@@ -16,6 +16,7 @@
             CurrentRunner = this;
 
             WorldGenerationActions.Add(new Actions.Biomes.Caverns());
+            WorldGenerationActions.Add(new Actions.Biomes.Surface());
 
             // TODO: Load from json
             GlobalContext = new GlobalContext();
