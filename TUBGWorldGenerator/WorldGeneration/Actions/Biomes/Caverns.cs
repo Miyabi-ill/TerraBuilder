@@ -34,9 +34,9 @@
             // Surface: topPerlinの振幅
             int diffSurface = Context.CavernMaxDistanceFromSurface - Context.CavernMinDistanceFromSurface;
 
-            var rand = new Random(42);
-            var topPerlin = PerlinNoise.GenerateOctave1D(128, tileLengthX, 1, 8, 2, rand.Next());
-            var bottomPerlin = PerlinNoise.GenerateOctave1D(128, tileLengthX, 1, 8, 2, rand.Next());
+            var rand = globalContext.Random;
+            var topPerlin = PerlinNoise.GenerateOctave1D(128, tileLengthX, 1, 8, 2, rand);
+            var bottomPerlin = PerlinNoise.GenerateOctave1D(128, tileLengthX, 1, 8, 2, rand);
 
             int minIndex = 0;
             double minValue = double.MaxValue;

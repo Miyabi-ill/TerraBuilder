@@ -35,7 +35,7 @@
         {
             // Terraria.GameContent.Biomes.TerrainPassに近い生成を行う。
             GlobalContext globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
-            Random rand = new Random(42);
+            Random rand = globalContext.Random;
 
             int maxSurfaceLevel = Context.SurfaceLevel - Context.SurfaceMaxHeight;
 
