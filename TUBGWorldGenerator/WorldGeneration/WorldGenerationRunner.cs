@@ -44,12 +44,22 @@
         /// 登録されている全てのアクションを実行し、ワールド生成を行う。
         /// </summary>
         /// <param name="sandbox">ワールド生成を行うサンドボックス</param>
-        public void Run(WorldSandbox sandbox)
+        /// <returns>アクションが全て成功すればtrue</returns>
+        public bool Run(WorldSandbox sandbox)
         {
             foreach (var action in WorldGenerationActions)
             {
-                action.Run(sandbox);
+                lock (sandbox)
+                {
+                    bool success = action.Run(sandbox);
+                    if (!success)
+                    {
+                        return false;
+                    }
+                }
             }
+
+            return true;
         }
     }
 }

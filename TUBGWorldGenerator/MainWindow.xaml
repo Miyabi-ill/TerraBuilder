@@ -60,7 +60,7 @@
 					<ListView.ItemTemplate>
 						<DataTemplate>
 							<DockPanel LastChildFill="True">
-								<Button>
+								<Button Click="RunActionButton_Click">
 									<TextBlock>Run</TextBlock>
 								</Button>
 								<Grid MouseDown="Action_MouseDown">

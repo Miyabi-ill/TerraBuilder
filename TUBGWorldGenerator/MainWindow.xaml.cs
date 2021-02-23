@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Reflection;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media.Imaging;
@@ -50,20 +51,31 @@
             }
         }
 
-        private void RunAllButton_Click(object sender, RoutedEventArgs e)
+        private async void RunAllButton_Click(object sender, RoutedEventArgs e)
         {
             RunningOverlay.Visibility = Visibility.Visible;
-            Runner.Run(Sandbox);
+            bool success = await Task.Run(() => Runner.Run(Sandbox)).ConfigureAwait(true);
             UpdateMapView();
             RunningOverlay.Visibility = Visibility.Collapsed;
         }
 
-        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        private async void ResetButton_Click(object sender, RoutedEventArgs e)
         {
             RunningOverlay.Visibility = Visibility.Visible;
-            Sandbox.Reset();
+            bool success = await Task.Run(() => Sandbox.Reset()).ConfigureAwait(true);
             UpdateMapView();
             RunningOverlay.Visibility = Visibility.Collapsed;
+        }
+
+        private async void RunActionButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is IWorldGenerationAction<ActionContext> generationAction)
+            {
+                RunningOverlay.Visibility = Visibility.Visible;
+                bool success = await Task.Run(() => generationAction.Run(Sandbox)).ConfigureAwait(true);
+                UpdateMapView();
+                RunningOverlay.Visibility = Visibility.Collapsed;
+            }
         }
     }
 }

@@ -15,6 +15,8 @@
     {
         private static bool isInitializedTerrariaInstance = false;
 
+        private readonly string locker = string.Empty;
+
         /// <summary>
         /// コンストラクタ。
         /// もしテラリアのクラスが初期化されていなければ初期化し、
@@ -87,17 +89,31 @@
         /// <summary>
         /// プロパティをリセットして読み込みなおす
         /// </summary>
-        public void Reset()
+        /// <returns>リセットに成功したらtrue</returns>
+        public bool Reset()
         {
-            TileCountX = 4200;
-            TileCountY = 1200;
-
-            Tiles = Main.tile;
-            Chests = Main.chest;
-
-            for (int i = 0; i < Main.maxNPCs; i++)
+            lock (locker)
             {
-                Main.npc[i] = new NPC();
+                TileCountX = 4200;
+                TileCountY = 1200;
+
+                Tiles = Main.tile;
+                Chests = Main.chest;
+
+                for (int i = 0; i < Main.maxNPCs; i++)
+                {
+                    Main.npc[i] = new NPC();
+                }
+
+                for (int x = 0; x < TileCountX; x++)
+                {
+                    for (int y = 0; y < TileCountY; y++)
+                    {
+                        Main.tile[x, y] = null;
+                    }
+                }
+
+                return true;
             }
         }
 
