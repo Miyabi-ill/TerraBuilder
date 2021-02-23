@@ -104,7 +104,6 @@
     <Compile Include="WorldGeneration\Actions\Biomes\Surface.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Tunnel.cs" />
     <Compile Include="WorldGeneration\GlobalContext.cs" />
-    <Compile Include="WorldGeneration\TypeMismatchException.cs" />
     <Compile Include="WorldGeneration\IWorldGenerationAction.cs" />
     <Compile Include="WorldGeneration\WorldGenerationRunner.cs" />
     <Compile Include="WorldGeneration\WorldSandbox.cs" />

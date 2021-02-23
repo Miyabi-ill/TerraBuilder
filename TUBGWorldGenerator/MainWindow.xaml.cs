@@ -17,12 +17,18 @@
 
         private Dictionary<string, UIElement> localContextElementDict = new Dictionary<string, UIElement>();
 
+        /// <summary>
+        /// コンストラクタ。
+        /// </summary>
         public MainWindow()
         {
             Sandbox = new WorldSandbox();
             Runner = new WorldGenerationRunner();
             InitializeComponent();
+
+            // グローバルコンテキストをプロパティグリッドに表示
             GlobalContextProperty.SelectedObject = Runner.GlobalContext;
+
             ActionList.ItemsSource = Runner.WorldGenerationActions;
 
             UpdateMapView();

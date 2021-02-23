@@ -1,38 +1,21 @@
 ﻿namespace TUBGWorldGenerator.Utils
 {
     using System;
-    using System.Diagnostics;
     using System.Linq;
 
-    public class PerlinNoise
+    /// <summary>
+    /// パーリンノイズを生成するクラス
+    /// </summary>
+    public static class PerlinNoise
     {
-        private static readonly int[] LookupTable;
-
-        static PerlinNoise()
-        {
-            int[] noLoopLookupTable = new int[256];
-            for (int i = 0; i < 256; i++)
-            {
-                noLoopLookupTable[i] = i;
-            }
-
-            Random rand = new Random(42);
-            noLoopLookupTable = noLoopLookupTable.OrderBy(x => rand.NextDouble()).ToArray();
-            LookupTable = noLoopLookupTable.Concat(noLoopLookupTable).ToArray();
-        }
-
-        private static double InterpolateCos(double a, double b, double x)
-        {
-            double ft = x * Math.PI;
-            double f = (1 - Math.Cos(ft)) * 0.5;
-            return (a * (1 - f)) + (b * f);
-        }
-
-        private static double InterpolateLinear(double a, double b, double x)
-        {
-            return (a * (1 - x)) + (b * x);
-        }
-
+        /// <summary>
+        /// 1次パーリンノイズを生成する。
+        /// </summary>
+        /// <param name="waveLength">波長</param>
+        /// <param name="width">全体の波の長さ</param>
+        /// <param name="amplifier">波の増幅量</param>
+        /// <param name="seed">シード値</param>
+        /// <returns>1次パーリンノイズの配列</returns>
         public static double[] Generate1D(
             int waveLength,
             int width,
@@ -43,6 +26,14 @@
             return Generate1D(waveLength, width, amplifier, random);
         }
 
+        /// <summary>
+        /// 1次パーリンノイズを生成する。
+        /// </summary>
+        /// <param name="waveLength">波長</param>
+        /// <param name="width">全体の波の長さ</param>
+        /// <param name="amplifier">波の増幅量</param>
+        /// <param name="random">ランダムインスタンス</param>
+        /// <returns>1次パーリンノイズの配列</returns>
         public static double[] Generate1D(
             int waveLength,
             int width,
@@ -69,6 +60,16 @@
             return array;
         }
 
+        /// <summary>
+        /// 異なるオクターブ(粒度)の1次パーリンノイズを合成したパーリンノイズを生成する。
+        /// </summary>
+        /// <param name="waveLength">波長</param>
+        /// <param name="width">全体の波の長さ</param>
+        /// <param name="amplifier">波の増幅量</param>
+        /// <param name="octaves">オクターブ。重ねる波の数</param>
+        /// <param name="diviser">波の増幅量と波長を割り算する値</param>
+        /// <param name="seed">シード値</param>
+        /// <returns>1次パーリンノイズの配列</returns>
         public static double[] GenerateOctave1D(
             int waveLength,
             int width,
@@ -81,6 +82,16 @@
             return GenerateOctave1D(waveLength, width, amplifier, octaves, diviser, random);
         }
 
+        /// <summary>
+        /// 異なるオクターブ(粒度)の1次パーリンノイズを合成したパーリンノイズを生成する。
+        /// </summary>
+        /// <param name="waveLength">波長</param>
+        /// <param name="width">全体の波の長さ</param>
+        /// <param name="amplifier">波の増幅量</param>
+        /// <param name="octaves">オクターブ。重ねる波の数</param>
+        /// <param name="diviser">波の増幅量と波長を割り算する値</param>
+        /// <param name="random">ランダムインスタンス</param>
+        /// <returns>1次パーリンノイズの配列</returns>
         public static double[] GenerateOctave1D(
             int waveLength,
             int width,
@@ -103,6 +114,18 @@
             }
 
             return result;
+        }
+
+        private static double InterpolateCos(double a, double b, double x)
+        {
+            double ft = x * Math.PI;
+            double f = (1 - Math.Cos(ft)) * 0.5;
+            return (a * (1 - f)) + (b * f);
+        }
+
+        private static double InterpolateLinear(double a, double b, double x)
+        {
+            return (a * (1 - x)) + (b * x);
         }
     }
 }
