@@ -38,7 +38,7 @@
         /// 全体から参照されるコンテキスト。
         /// 通常は`WorldGenerationRunner.CurrentRunner.GlobalContext`でアクセスされる。
         /// </summary>
-        public GlobalContext GlobalContext { get; private set; }
+        public GlobalContext GlobalContext { get; }
 
         /// <summary>
         /// 登録されている全てのアクションを実行し、ワールド生成を行う。

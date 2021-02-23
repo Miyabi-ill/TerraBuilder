@@ -17,16 +17,11 @@
         public string Description => "Generate Caverns.";
 
         /// <inheritdoc/>
-        public CavernContext Context { get; private set; }
+        public CavernContext Context { get; } = new CavernContext();
 
         /// <inheritdoc/>
         public bool Run(WorldSandbox sandbox)
         {
-            if (Context == null)
-            {
-                Context = new CavernContext();
-            }
-
             GlobalContext globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
 
             int tileLengthX = sandbox.TileCountX;
@@ -105,22 +100,22 @@
             /// <summary>
             /// 洞窟の最小の高さ。
             /// </summary>
-            public int CavernMinHeight { get; } = 5;
+            public int CavernMinHeight { get; set; } = 5;
 
             /// <summary>
             /// 洞窟の最大の高さ。
             /// </summary>
-            public int CavernMaxHeight { get; } = 100;
+            public int CavernMaxHeight { get; set; } = 100;
 
             /// <summary>
             /// 地表からの最小距離。
             /// </summary>
-            public int CavernMinDistanceFromSurface { get; } = 0;
+            public int CavernMinDistanceFromSurface { get; set; } = 0;
 
             /// <summary>
             /// 地表からの最大距離。
             /// </summary>
-            public int CavernMaxDistanceFromSurface { get; } = 100;
+            public int CavernMaxDistanceFromSurface { get; set; } = 100;
         }
     }
 }

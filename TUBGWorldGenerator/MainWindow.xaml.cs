@@ -26,7 +26,6 @@
             ActionList.ItemsSource = Runner.WorldGenerationActions;
 
             UpdateMapView();
-            Sandbox.Save(null);
         }
 
         private WorldSandbox Sandbox { get; }
@@ -39,16 +38,6 @@
         public void UpdateMapView()
         {
             MapImage.Source = Utils.WorldToImage.CreateMapImage(Sandbox);
-        }
-
-        private void Action_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            // LocalContextを設定
-            if (sender is Grid grid && grid.DataContext is IWorldGenerationAction<ActionContext> generationAction)
-            {
-                LocalContextProperty.SelectedObject = generationAction.Context;
-                LocalContextExpander.Header = generationAction.Name;
-            }
         }
 
         private async void RunAllButton_Click(object sender, RoutedEventArgs e)
@@ -75,6 +64,26 @@
                 bool success = await Task.Run(() => generationAction.Run(Sandbox)).ConfigureAwait(true);
                 UpdateMapView();
                 RunningOverlay.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void SettingButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is IWorldGenerationAction<ActionContext> generationAction)
+            {
+                LocalContextProperty.SelectedObject = generationAction.Context;
+                LocalContextExpander.Header = generationAction.Name;
+                LocalContextExpander.IsExpanded = true;
+            }
+        }
+
+        private void SaveWorldButton_Click(object sender, RoutedEventArgs e)
+        {
+            lock (Sandbox)
+            {
+                string path = Sandbox.Save(null);
+                MessageTextBlock.Text = string.Format("{0}に保存しました。", path);
+                UpdateMapView();
             }
         }
     }

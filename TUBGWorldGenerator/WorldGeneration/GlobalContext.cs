@@ -1,6 +1,7 @@
 ﻿namespace TUBGWorldGenerator.WorldGeneration
 {
     using System;
+    using System.ComponentModel;
 
     /// <summary>
     /// ワールド生成の全体を通じて使われる設定。
@@ -23,6 +24,7 @@
             }
         }
 
-        public Random Random { get; private set; }
+        [Browsable(false)]
+        public Random Random { get; private set; } = new Random(42);
     }
 }

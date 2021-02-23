@@ -113,6 +113,12 @@
                     }
                 }
 
+                // Seedの再設定により、Randomインスタンスを生成しなおす。
+                if (WorldGenerationRunner.CurrentRunner != null)
+                {
+                    WorldGenerationRunner.CurrentRunner.GlobalContext.Seed = WorldGenerationRunner.CurrentRunner.GlobalContext.Seed;
+                }
+
                 return true;
             }
         }
@@ -121,7 +127,8 @@
         /// ワールドを保存する。
         /// </summary>
         /// <param name="path">保存先のパス。指定しない場合はテラリアのワールドフォルダに保存される</param>
-        public void Save(string path)
+        /// <returns>保存したパス</returns>
+        public string Save(string path)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -172,6 +179,8 @@
                     WorldFile.SaveWorld_Version2(binaryWriter);
                 }
             }
+
+            return path;
         }
     }
 }

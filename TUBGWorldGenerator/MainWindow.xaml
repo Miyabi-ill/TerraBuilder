@@ -8,6 +8,9 @@
         mc:Ignorable="d"
 		DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="MainWindow" Height="720" Width="1280">
+	<Window.Resources>
+		<ResourceDictionary Source="ResourceDict.xaml"/>
+	</Window.Resources>
     <Grid>
 		<DockPanel LastChildFill="True">
 			<DockPanel x:Name="ContextDock" DockPanel.Dock="Right" Width="200" LastChildFill="False">
@@ -32,6 +35,16 @@
 						ShowSummary="False"
 						DockPanel.Dock="Top"/>
 				</Expander>
+
+				<Grid DockPanel.Dock="Bottom">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+					<Button Margin="5" Grid.Column="1" Click="SaveWorldButton_Click">
+						<TextBlock>Save World</TextBlock>
+					</Button>
+				</Grid>
 			</DockPanel>
 			<DockPanel x:Name="ToolBarDock" DockPanel.Dock="Right" Width="200" LastChildFill="True">
 				<Grid DockPanel.Dock="Top">
@@ -40,7 +53,10 @@
 						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
 					<Button Margin="5" Click="RunAllButton_Click">
-						<TextBlock>Run All</TextBlock>
+						<StackPanel Orientation="Horizontal" Height="20">
+							<Path Margin="2" Data="{StaticResource ResourceKey=RunIcon}" Stroke="Black" Fill="LightGreen" Stretch="Uniform"></Path>
+							<TextBlock VerticalAlignment="Center">Run All</TextBlock>
+						</StackPanel>
 					</Button>
 					<Button Margin="5" Grid.Column="1" Click="ResetButton_Click">
 						<TextBlock>Reset</TextBlock>
@@ -57,25 +73,34 @@
 				</Grid>
 				<!-- ItemsSourceの設定はxaml.csにて -->
 				<ListView x:Name="ActionList">
+					<ListView.ItemContainerStyle>
+						<Style TargetType="ListViewItem">
+							<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+						</Style>
+					</ListView.ItemContainerStyle>
 					<ListView.ItemTemplate>
 						<DataTemplate>
 							<DockPanel LastChildFill="True">
-								<Button Click="RunActionButton_Click">
-									<TextBlock>Run</TextBlock>
+								<Button Click="RunActionButton_Click" Height="20" Background="Transparent" BorderThickness="0">
+									<Path Data="{StaticResource ResourceKey=RunIcon}" Stroke="Black" Fill="LightGreen" Stretch="Uniform"></Path>
 								</Button>
-								<Grid MouseDown="Action_MouseDown">
-									<TextBlock Text="{Binding Name}" ToolTip="{Binding Description}"/>
-								</Grid>
+								<Button Click="SettingButton_Click" Height="20" Background="Transparent" BorderThickness="0" DockPanel.Dock="Right">
+									<Path Data="{StaticResource ResourceKey=GearIcon}" Stroke="Black" Stretch="Uniform"></Path>
+								</Button>
+								<TextBlock Margin="5 0" Text="{Binding Name}" ToolTip="{Binding Description}"/>
 							</DockPanel>
 						</DataTemplate>
 					</ListView.ItemTemplate>
 				</ListView>
 			</DockPanel>
-			<Image x:Name="MapImage"></Image>
+			<DockPanel LastChildFill="True">
+				<TextBlock x:Name="MessageTextBlock" DockPanel.Dock="Bottom"/>
+				<Image x:Name="MapImage"></Image>
+			</DockPanel>
 		</DockPanel>
 		<Grid x:Name="RunningOverlay" Visibility="Collapsed">
 			<Rectangle Fill="White" Opacity="0.7"></Rectangle>
-			<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48">生成を実行中...</TextBlock>
+			<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48">実行中...</TextBlock>
 		</Grid>
 	</Grid>
 </Window>
