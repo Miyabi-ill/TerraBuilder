@@ -18,6 +18,7 @@
             var runner = new WorldGenerationRunner();
             runner.Run(Sandbox);
             UpdateMapView();
+            Sandbox.Save(null);
         }
 
         /// <summary>
