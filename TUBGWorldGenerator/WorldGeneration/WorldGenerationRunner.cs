@@ -1,6 +1,7 @@
 ﻿namespace TUBGWorldGenerator.WorldGeneration
 {
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
 
     /// <summary>
     /// ワールド生成を行うクラス。
@@ -31,7 +32,7 @@
         /// <summary>
         /// ワールド生成アクションリスト。このリスト順で生成が実行される。
         /// </summary>
-        public List<IWorldGenerationAction<ActionContext>> WorldGenerationActions { get; } = new List<IWorldGenerationAction<ActionContext>>();
+        public ObservableCollection<IWorldGenerationAction<ActionContext>> WorldGenerationActions { get; } = new ObservableCollection<IWorldGenerationAction<ActionContext>>();
 
         /// <summary>
         /// 全体から参照されるコンテキスト。

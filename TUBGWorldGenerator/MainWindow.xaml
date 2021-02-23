@@ -4,14 +4,78 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TUBGWorldGenerator"
+		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+		DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
+        Title="MainWindow" Height="720" Width="1280">
     <Grid>
 		<DockPanel LastChildFill="True">
-			<DockPanel x:Name="ToolBarDock" DockPanel.Dock="Left">
-				<ListView x:Name="ActionList"></ListView>
+			<DockPanel x:Name="ContextDock" DockPanel.Dock="Right" Width="200" LastChildFill="False">
+				<Expander DockPanel.Dock="Top" Header="Global Config">
+					<xctk:PropertyGrid
+						x:Name="GlobalContextProperty"
+						ShowTitle="False"
+						ShowDescriptionByTooltip="False"
+						ShowSearchBox="False"
+						ShowSortOptions="False"
+						ShowSummary="False"
+						DockPanel.Dock="Top"/>
+				</Expander>
+
+				<Expander x:Name="LocalContextExpander" DockPanel.Dock="Top" Header="Local Config">
+					<xctk:PropertyGrid
+						x:Name="LocalContextProperty"
+						ShowTitle="False"
+						ShowDescriptionByTooltip="False"
+						ShowSearchBox="False"
+						ShowSortOptions="False"
+						ShowSummary="False"
+						DockPanel.Dock="Top"/>
+				</Expander>
+			</DockPanel>
+			<DockPanel x:Name="ToolBarDock" DockPanel.Dock="Right" Width="200" LastChildFill="True">
+				<Grid DockPanel.Dock="Top">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+					<Button Margin="5" Click="RunAllButton_Click">
+						<TextBlock>Run All</TextBlock>
+					</Button>
+					<Button Margin="5" Grid.Column="1" Click="ResetButton_Click">
+						<TextBlock>Reset</TextBlock>
+					</Button>
+				</Grid>
+				<Grid DockPanel.Dock="Bottom">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+					<Button Margin="5" Grid.Column="1">
+						<TextBlock>Add Action</TextBlock>
+					</Button>
+				</Grid>
+				<!-- ItemsSourceの設定はxaml.csにて -->
+				<ListView x:Name="ActionList">
+					<ListView.ItemTemplate>
+						<DataTemplate>
+							<DockPanel LastChildFill="True">
+								<Button>
+									<TextBlock>Run</TextBlock>
+								</Button>
+								<Grid MouseDown="Action_MouseDown">
+									<TextBlock Text="{Binding Name}" ToolTip="{Binding Description}"/>
+								</Grid>
+							</DockPanel>
+						</DataTemplate>
+					</ListView.ItemTemplate>
+				</ListView>
 			</DockPanel>
 			<Image x:Name="MapImage"></Image>
 		</DockPanel>
+		<Grid x:Name="RunningOverlay" Visibility="Collapsed">
+			<Rectangle Fill="White" Opacity="0.7"></Rectangle>
+			<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48">生成を実行中...</TextBlock>
+		</Grid>
 	</Grid>
 </Window>
