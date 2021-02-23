@@ -15,9 +15,6 @@
     {
         private static bool isInitializedTerrariaInstance = false;
 
-        private int tileCountX;
-        private int tileCountY;
-
         /// <summary>
         /// コンストラクタ。
         /// もしテラリアのクラスが初期化されていなければ初期化し、
@@ -56,12 +53,8 @@
         /// </summary>
         public int TileCountX
         {
-            get => tileCountX;
-            set
-            {
-                tileCountX = value;
-                Main.maxTilesX = value;
-            }
+            get => Main.maxTilesX;
+            set => Main.maxTilesX = value;
         }
 
         /// <summary>
@@ -69,12 +62,26 @@
         /// </summary>
         public int TileCountY
         {
-            get => tileCountY;
-            set
-            {
-                tileCountY = value;
-                Main.maxTilesY = value;
-            }
+            get => Main.maxTilesY;
+            set => Main.maxTilesY = value;
+        }
+
+        /// <summary>
+        /// リスポーン地点X
+        /// </summary>
+        public int SpawnTileX
+        {
+            get => Main.spawnTileX;
+            set => Main.spawnTileX = value;
+        }
+
+        /// <summary>
+        /// リスポーン地点Y
+        /// </summary>
+        public int SpawnTileY
+        {
+            get => Main.spawnTileY;
+            set => Main.spawnTileY = value;
         }
 
         /// <summary>
@@ -141,9 +148,6 @@
             Main.rockLayer = 800;
 
             Main.worldName = "TUBG";
-
-            Main.spawnTileX = TileCountX / 2;
-            Main.spawnTileY = TileCountY / 2;
 
             using (FileStream stream = File.OpenWrite(path))
             {
