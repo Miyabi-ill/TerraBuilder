@@ -216,7 +216,14 @@
             /// <summary>
             /// 地表の高さ。この高さ以上(数値的には以下)が地表。
             /// </summary>
-            public int SurfaceLevel => WorldGenerationRunner.CurrentRunner.GlobalContext.SurfaceLevel;
+            public int SurfaceLevel
+            {
+                get => WorldGenerationRunner.CurrentRunner.GlobalContext.SurfaceLevel;
+                set
+                {
+                    WorldGenerationRunner.CurrentRunner.GlobalContext.SurfaceLevel = value;
+                }
+            }
 
             /// <summary>
             /// 地表生成を行う最大の高さ。

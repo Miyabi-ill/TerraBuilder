@@ -59,14 +59,16 @@
                 bottomPerlin[i] = Math.Round(bottomPerlin[i] * bottomAmplifier);
             }
 
-            int bottomPerlinBaseTopLine = (int)(topPerlin[minIndex] + (minValue * bottomAmplifier));
+            int bottomPerlinBaseTopLine = (int)(topPerlin[minIndex] + Context.CavernMinHeight);
             var tiles = sandbox.Tiles;
 
             int cavernStart = globalContext.SurfaceLevel + Context.CavernMinDistanceFromSurface;
+            double[] cavernTop = new double[topPerlin.Length];
 
             // TODO:実際にタイルを置く
             for (int x = 0; x < sandbox.TileCountX; x++)
             {
+                cavernTop[x] = cavernStart + topPerlin[x];
                 for (int y = globalContext.SurfaceLevel; y < sandbox.TileCountY; y++)
                 {
                     if (y < cavernStart + topPerlin[x])
@@ -88,6 +90,8 @@
                     }
                 }
             }
+
+            globalContext["CavernTop"] = cavernTop;
 
             return true;
         }

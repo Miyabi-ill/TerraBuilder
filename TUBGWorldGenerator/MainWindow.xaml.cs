@@ -13,10 +13,6 @@
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Dictionary<string, UIElement> globalContextElementDict = new Dictionary<string, UIElement>();
-
-        private Dictionary<string, UIElement> localContextElementDict = new Dictionary<string, UIElement>();
-
         /// <summary>
         /// コンストラクタ。
         /// </summary>

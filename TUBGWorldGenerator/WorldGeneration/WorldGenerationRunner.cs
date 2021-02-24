@@ -18,6 +18,7 @@
 
             WorldGenerationActions.Add(new Actions.Biomes.Caverns());
             WorldGenerationActions.Add(new Actions.Biomes.Surface());
+            WorldGenerationActions.Add(new Actions.Biomes.Tunnel());
             WorldGenerationActions.Add(new Actions.Biomes.SpawnArea());
 
             // TODO: Load from json
