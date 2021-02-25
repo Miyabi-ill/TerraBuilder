@@ -73,5 +73,13 @@
                 }
             }
         }
+
+        /// <summary>
+        /// クラスに元から存在しないプロパティ情報をクリアする
+        /// </summary>
+        public void ClearAdditionalContext()
+        {
+            outerPropertyDictionary.Clear();
+        }
     }
 }

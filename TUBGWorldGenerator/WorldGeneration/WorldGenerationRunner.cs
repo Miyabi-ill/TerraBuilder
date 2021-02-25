@@ -48,6 +48,7 @@
         /// <returns>アクションが全て成功すればtrue</returns>
         public bool Run(WorldSandbox sandbox)
         {
+            sandbox.Reset();
             foreach (var action in WorldGenerationActions)
             {
                 lock (sandbox)

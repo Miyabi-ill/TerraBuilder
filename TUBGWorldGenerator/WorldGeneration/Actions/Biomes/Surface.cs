@@ -1,6 +1,7 @@
 ﻿namespace TUBGWorldGenerator.WorldGeneration.Actions.Biomes
 {
     using System;
+    using System.ComponentModel;
     using Terraria;
     using Terraria.ID;
 
@@ -216,14 +217,8 @@
             /// <summary>
             /// 地表の高さ。この高さ以上(数値的には以下)が地表。
             /// </summary>
-            public int SurfaceLevel
-            {
-                get => WorldGenerationRunner.CurrentRunner.GlobalContext.SurfaceLevel;
-                set
-                {
-                    WorldGenerationRunner.CurrentRunner.GlobalContext.SurfaceLevel = value;
-                }
-            }
+            [Browsable(false)]
+            public int SurfaceLevel => WorldGenerationRunner.CurrentRunner.GlobalContext.SurfaceLevel;
 
             /// <summary>
             /// 地表生成を行う最大の高さ。
