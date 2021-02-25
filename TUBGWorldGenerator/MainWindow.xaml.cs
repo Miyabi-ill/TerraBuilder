@@ -99,5 +99,29 @@
                 WorldGenerationRunner.CurrentRunner.WorldGenerationActions.Add(dialog.Action);
             }
         }
+
+        private void RemoveActionButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ActionList.SelectedIndex != -1)
+            {
+                WorldGenerationRunner.CurrentRunner.WorldGenerationActions.RemoveAt(ActionList.SelectedIndex);
+            }
+        }
+
+        private void UpActionButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ActionList.SelectedIndex >= 1)
+            {
+                WorldGenerationRunner.CurrentRunner.WorldGenerationActions.Move(ActionList.SelectedIndex, ActionList.SelectedIndex - 1);
+            }
+        }
+
+        private void DownActionButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ActionList.SelectedIndex != -1 && ActionList.SelectedIndex != WorldGenerationRunner.CurrentRunner.WorldGenerationActions.Count - 1)
+            {
+                WorldGenerationRunner.CurrentRunner.WorldGenerationActions.Move(ActionList.SelectedIndex, ActionList.SelectedIndex + 1);
+            }
+        }
     }
 }

@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TUBGWorldGenerator.Views"
         mc:Ignorable="d"
-        Title="AddActionWindow" Height="200" Width="300">
+        Title="アクションを追加" Height="200" Width="300">
     <Grid>
 		<DockPanel>
 			<Grid>
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition/>
+					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition/>
 				</Grid.ColumnDefinitions>
 				<Grid.RowDefinitions>
