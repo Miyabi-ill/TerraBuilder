@@ -45,6 +45,11 @@ namespace TUBGWorldGenerator.WorldGeneration.Actions.Biomes
                     }
                 }
 
+                if (check)
+                {
+                    continue;
+                }
+
                 for (int y = 0; y < sandbox.TileCountY; y++)
                 {
                     if (sandbox.Tiles[x, y] != null && sandbox.Tiles[x, y].active())
@@ -67,7 +72,7 @@ namespace TUBGWorldGenerator.WorldGeneration.Actions.Biomes
         private bool GenerateTunnel(WorldSandbox sandbox, int i, int j, GlobalContext context)
         {
             Random random = context.Random;
-            double[] cavernTop = null;
+            double[] cavernTop;
             try
             {
                 cavernTop = (double[])context["CavernTop"];
@@ -140,14 +145,17 @@ namespace TUBGWorldGenerator.WorldGeneration.Actions.Biomes
                 {
                     endPos.X = (float)tunnelDirection + 0.5f;
                 }
+
                 if (endPos.X < (float)tunnelDirection - 0.5f)
                 {
                     endPos.X = (float)tunnelDirection - 0.5f;
                 }
+
                 if (endPos.Y > 2f)
                 {
                     endPos.Y = 2f;
                 }
+
                 if (endPos.Y < 0f)
                 {
                     endPos.Y = 0f;
@@ -169,8 +177,9 @@ namespace TUBGWorldGenerator.WorldGeneration.Actions.Biomes
             /// </summary>
             public int TunnelCount { get; set; } = 10;
 
-            public int TunnelDepth { get; set; } = 300;
-
+            /// <summary>
+            /// 近くのトンネルとの最小距離
+            /// </summary>
             public int MinDistanceFromNearbyTunnel { get; set; } = 100;
         }
     }

@@ -116,6 +116,34 @@
             return result;
         }
 
+        /// <summary>
+        /// オクターブの異なるパーリンノイズを合成した後、正規化したパーリンノイズを生成する。
+        /// </summary>
+        /// <param name="waveLength">波長</param>
+        /// <param name="width">全体の波の長さ</param>
+        /// <param name="octaves">オクターブ。重ねる波の数</param>
+        /// <param name="diviser">波の増幅量と波長を割り算する値</param>
+        /// <param name="random">ランダムインスタンス</param>
+        /// <returns>0から1に正規化された1次パーリンノイズ</returns>
+        public static double[] NormalizeOctave1D(
+            int waveLength,
+            int width,
+            int octaves,
+            int diviser,
+            Random random)
+        {
+            double[] perlin1D = GenerateOctave1D(waveLength, width, 1, octaves, diviser, random);
+            double min = perlin1D.Min();
+            double max = perlin1D.Max();
+            double diff = max - min;
+            for (int i = 0; i < width; i++)
+            {
+                perlin1D[i] = (perlin1D[i] - min) / diff;
+            }
+
+            return perlin1D;
+        }
+
         private static double InterpolateCos(double a, double b, double x)
         {
             double ft = x * Math.PI;
