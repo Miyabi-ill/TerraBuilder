@@ -97,6 +97,9 @@
     </ApplicationDefinition>
     <Compile Include="Utils\PerlinNoise.cs" />
     <Compile Include="Utils\WorldToImage.cs" />
+    <Compile Include="Views\AddActionWindow.xaml.cs">
+      <DependentUpon>AddActionWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WorldGeneration\ActionContext.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Caverns.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Desert.cs" />
@@ -120,6 +123,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="ResourceDict.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AddActionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -154,7 +161,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="UIElements\" />
     <Folder Include="WorldGeneration\Actions\Buildings\" />
     <Folder Include="WorldGeneration\Enums\" />
   </ItemGroup>

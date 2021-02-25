@@ -67,7 +67,7 @@
 						<ColumnDefinition/>
 						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
-					<Button Margin="5" Grid.Column="1">
+					<Button Margin="5" Grid.Column="1" Click="AddActionButton_Click">
 						<TextBlock>Add Action</TextBlock>
 					</Button>
 				</Grid>
@@ -95,11 +95,11 @@
 			</DockPanel>
 			<DockPanel LastChildFill="True">
 				<TextBlock x:Name="MessageTextBlock" DockPanel.Dock="Bottom"/>
-				<Image x:Name="MapImage"></Image>
+				<Image x:Name="MapImage"/>
 			</DockPanel>
 		</DockPanel>
 		<Grid x:Name="RunningOverlay" Visibility="Collapsed">
-			<Rectangle Fill="White" Opacity="0.7"></Rectangle>
+			<Rectangle Fill="White" Opacity="0.7"/>
 			<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48">実行中...</TextBlock>
 		</Grid>
 	</Grid>

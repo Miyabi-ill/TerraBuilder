@@ -6,6 +6,7 @@
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media.Imaging;
+    using TUBGWorldGenerator.Views;
     using TUBGWorldGenerator.WorldGeneration;
 
     /// <summary>
@@ -86,6 +87,16 @@
                 string path = Sandbox.Save(null);
                 MessageTextBlock.Text = string.Format("{0}に保存しました。", path);
                 UpdateMapView();
+            }
+        }
+
+        private void AddActionButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new AddActionWindow();
+            if (dialog.ShowDialog().GetValueOrDefault())
+            {
+                // ダイアログがtrueを返せば、dialog.Actionはnon-nullを保証する
+                WorldGenerationRunner.CurrentRunner.WorldGenerationActions.Add(dialog.Action);
             }
         }
     }
