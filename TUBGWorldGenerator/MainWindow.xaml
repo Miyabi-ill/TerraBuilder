@@ -7,7 +7,7 @@
 		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
 		DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
-        Title="MainWindow" Height="720" Width="1280">
+        Title="TUBGワールドジェネレータ" Height="720" Width="1280">
 	<Window.Resources>
 		<ResourceDictionary Source="ResourceDict.xaml"/>
 	</Window.Resources>
@@ -66,9 +66,20 @@
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition/>
 						<ColumnDefinition/>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
-					<Button Margin="5" Grid.Column="1">
-						<TextBlock>Add Action</TextBlock>
+					<Button Margin="5" Click="AddActionButton_Click">
+						<TextBlock>+</TextBlock>
+					</Button>
+					<Button Margin="5" Grid.Column="1" Click="RemoveActionButton_Click">
+						<TextBlock>-</TextBlock>
+					</Button>
+					<Button Margin="5" Grid.Column="2" Click="UpActionButton_Click">
+						<TextBlock>↑</TextBlock>
+					</Button>
+					<Button Margin="5" Grid.Column="3" Click="DownActionButton_Click">
+						<TextBlock>↓</TextBlock>
 					</Button>
 				</Grid>
 				<!-- ItemsSourceの設定はxaml.csにて -->
@@ -95,11 +106,11 @@
 			</DockPanel>
 			<DockPanel LastChildFill="True">
 				<TextBlock x:Name="MessageTextBlock" DockPanel.Dock="Bottom"/>
-				<Image x:Name="MapImage"></Image>
+				<Image x:Name="MapImage"/>
 			</DockPanel>
 		</DockPanel>
 		<Grid x:Name="RunningOverlay" Visibility="Collapsed">
-			<Rectangle Fill="White" Opacity="0.7"></Rectangle>
+			<Rectangle Fill="White" Opacity="0.7"/>
 			<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48">実行中...</TextBlock>
 		</Grid>
 	</Grid>

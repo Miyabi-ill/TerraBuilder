@@ -10,10 +10,19 @@
     {
         private int seed = 42;
 
+        /// <summary>
+        /// 地表の高さ
+        /// </summary>
         public int SurfaceLevel { get; set; } = 250;
 
+        /// <summary>
+        /// リスポーン地点の高さ
+        /// </summary>
         public int RespawnLevel { get; set; } = 100;
 
+        /// <summary>
+        /// シード値
+        /// </summary>
         public int Seed
         {
             get => seed;
@@ -24,6 +33,9 @@
             }
         }
 
+        /// <summary>
+        /// ワールド生成に使われるランダムインスタンス
+        /// </summary>
         [Browsable(false)]
         public Random Random { get; private set; } = new Random(42);
     }

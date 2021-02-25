@@ -1,6 +1,7 @@
 ﻿namespace TUBGWorldGenerator.WorldGeneration.Actions.Biomes
 {
     using System;
+    using System.Linq;
     using Terraria;
     using Terraria.ID;
     using TUBGWorldGenerator.Utils;
@@ -30,15 +31,15 @@
             int diffSurface = Context.CavernMaxDistanceFromSurface - Context.CavernMinDistanceFromSurface;
 
             var rand = globalContext.Random;
-            var topPerlin = PerlinNoise.GenerateOctave1D(128, tileLengthX, 1, 8, 2, rand);
-            var bottomPerlin = PerlinNoise.GenerateOctave1D(128, tileLengthX, 1, 8, 2, rand);
+            var topPerlin = PerlinNoise.NormalizeOctave1D(128, tileLengthX, 8, 2, rand);
+            var bottomPerlin = PerlinNoise.NormalizeOctave1D(128, tileLengthX, 8, 2, rand);
 
             int minIndex = 0;
             double minValue = double.MaxValue;
             double maxValue = double.MinValue;
             for (int i = 0; i < tileLengthX; i++)
             {
-                double diff = Math.Abs(topPerlin[i] - bottomPerlin[i]);
+                double diff = Math.Abs(topPerlin[i] - 1) + bottomPerlin[i];
                 if (diff > maxValue)
                 {
                     maxValue = diff;
@@ -52,21 +53,28 @@
             }
 
             // 空間のminとmaxから波の増幅量を決定、適用。タイルで使うために四捨五入しておく。
-            double bottomAmplifier = (maxValue - minValue) * (Context.CavernMaxHeight - Context.CavernMinHeight);
+            double bottomAmplifier = Context.CavernMaxHeight - diffSurface - Context.CavernMinHeight;
+            if (bottomAmplifier < 0)
+            {
+                return false;
+            }
+
             for (int i = 0; i < tileLengthX; i++)
             {
                 topPerlin[i] = Math.Round(topPerlin[i] * diffSurface);
                 bottomPerlin[i] = Math.Round(bottomPerlin[i] * bottomAmplifier);
             }
 
-            int bottomPerlinBaseTopLine = (int)(topPerlin[minIndex] + (minValue * bottomAmplifier));
             var tiles = sandbox.Tiles;
 
             int cavernStart = globalContext.SurfaceLevel + Context.CavernMinDistanceFromSurface;
+            int bottomPerlinBaseTopLine = (int)topPerlin[minIndex] - (int)bottomPerlin[minIndex] + Context.CavernMinHeight;
+            double[] cavernTop = new double[topPerlin.Length];
 
             // TODO:実際にタイルを置く
             for (int x = 0; x < sandbox.TileCountX; x++)
             {
+                cavernTop[x] = cavernStart + topPerlin[x];
                 for (int y = globalContext.SurfaceLevel; y < sandbox.TileCountY; y++)
                 {
                     if (y < cavernStart + topPerlin[x])
@@ -89,6 +97,8 @@
                 }
             }
 
+            globalContext["CavernTop"] = cavernTop;
+
             return true;
         }
 
@@ -105,7 +115,7 @@
             /// <summary>
             /// 洞窟の最大の高さ。
             /// </summary>
-            public int CavernMaxHeight { get; set; } = 100;
+            public int CavernMaxHeight { get; set; } = 200;
 
             /// <summary>
             /// 地表からの最小距離。

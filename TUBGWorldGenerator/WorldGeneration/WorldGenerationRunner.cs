@@ -1,5 +1,6 @@
 ﻿namespace TUBGWorldGenerator.WorldGeneration
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
@@ -8,6 +9,14 @@
     /// </summary>
     public class WorldGenerationRunner
     {
+        static WorldGenerationRunner()
+        {
+            AvailableActions.Add(nameof(Actions.Biomes.Caverns), () => new Actions.Biomes.Caverns());
+            AvailableActions.Add(nameof(Actions.Biomes.Surface), () => new Actions.Biomes.Surface());
+            AvailableActions.Add(nameof(Actions.Biomes.Tunnel), () => new Actions.Biomes.Tunnel());
+            AvailableActions.Add(nameof(Actions.Biomes.SpawnArea), () => new Actions.Biomes.SpawnArea());
+        }
+
         /// <summary>
         /// コンストラクタ。
         /// 自動的にコンテキストを読み込む。
@@ -18,11 +27,17 @@
 
             WorldGenerationActions.Add(new Actions.Biomes.Caverns());
             WorldGenerationActions.Add(new Actions.Biomes.Surface());
+            WorldGenerationActions.Add(new Actions.Biomes.Tunnel());
             WorldGenerationActions.Add(new Actions.Biomes.SpawnArea());
 
             // TODO: Load from json
             GlobalContext = new GlobalContext();
         }
+
+        /// <summary>
+        /// 利用可能なアクションの名前と生成用関数の辞書。
+        /// </summary>
+        public static Dictionary<string, Func<IWorldGenerationAction<ActionContext>>> AvailableActions { get; } = new Dictionary<string, Func<IWorldGenerationAction<ActionContext>>>();
 
         /// <summary>
         /// 現在のインスタンス
@@ -47,6 +62,7 @@
         /// <returns>アクションが全て成功すればtrue</returns>
         public bool Run(WorldSandbox sandbox)
         {
+            sandbox.Reset();
             foreach (var action in WorldGenerationActions)
             {
                 lock (sandbox)

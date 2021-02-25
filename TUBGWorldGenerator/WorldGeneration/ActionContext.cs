@@ -60,16 +60,7 @@
 
                 if (propertyDictionary.ContainsKey(name))
                 {
-                    try
-                    {
-                        // 設定する値が型と合っている場合のみ設定。
-                        propertyDictionary[name].SetValue(this, value);
-                    }
-                    catch
-                    {
-                        throw new TypeMismatchException(
-                            string.Format("Type is mismatched during conversion. Expected type: {0}, Real type: {1}", propertyDictionary[name].PropertyType.Name, value.GetType()));
-                    }
+                    propertyDictionary[name].SetValue(this, value);
                 }
                 else if (outerPropertyDictionary.ContainsKey(name))
                 {
@@ -81,6 +72,14 @@
                     outerPropertyDictionary.Add(name, value);
                 }
             }
+        }
+
+        /// <summary>
+        /// クラスに元から存在しないプロパティ情報をクリアする
+        /// </summary>
+        public void ClearAdditionalContext()
+        {
+            outerPropertyDictionary.Clear();
         }
     }
 }

@@ -114,9 +114,11 @@
                 }
 
                 // Seedの再設定により、Randomインスタンスを生成しなおす。
+                // 追加のコンテキストもクリアしておく
                 if (WorldGenerationRunner.CurrentRunner != null)
                 {
                     WorldGenerationRunner.CurrentRunner.GlobalContext.Seed = WorldGenerationRunner.CurrentRunner.GlobalContext.Seed;
+                    WorldGenerationRunner.CurrentRunner.GlobalContext.ClearAdditionalContext();
                 }
 
                 return true;

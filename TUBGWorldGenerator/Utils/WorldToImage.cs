@@ -9,8 +9,16 @@
     using Terraria.Map;
     using TUBGWorldGenerator.WorldGeneration;
 
-    public class WorldToImage
+    /// <summary>
+    /// ワールドを画像に変換する。
+    /// </summary>
+    public static class WorldToImage
     {
+        /// <summary>
+        /// ワールドを画像にする。
+        /// </summary>
+        /// <param name="sandbox">ワールドサンドボックス</param>
+        /// <returns>画像</returns>
         public static BitmapImage CreateMapImage(WorldSandbox sandbox)
         {
             int arrayIndex = 0;
