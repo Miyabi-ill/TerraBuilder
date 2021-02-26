@@ -106,6 +106,8 @@
     <Compile Include="WorldGeneration\Actions\Biomes\SpawnArea.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Surface.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Tunnel.cs" />
+    <Compile Include="WorldGeneration\Actions\Buildings\RandomSizeBlocks.cs" />
+    <Compile Include="WorldGeneration\Actions\Buildings\RandomSizeBlockWithArea.cs" />
     <Compile Include="WorldGeneration\GlobalContext.cs" />
     <Compile Include="WorldGeneration\IWorldGenerationAction.cs" />
     <Compile Include="WorldGeneration\WorldGenerationRunner.cs" />
@@ -161,8 +163,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="WorldGeneration\Actions\Buildings\" />
-    <Folder Include="WorldGeneration\Enums\" />
+    <Folder Include="WorldGeneration\Actions\Chests\" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
