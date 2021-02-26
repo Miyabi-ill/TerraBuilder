@@ -4,6 +4,7 @@
     using Terraria;
     using Terraria.DataStructures;
     using Terraria.ID;
+    using TUBGWorldGenerator.Utils;
     using TUBGWorldGenerator.WorldGeneration;
 
     /// <summary>
@@ -181,6 +182,20 @@
                 }
             }
 
+            if (random.NextDouble() < Context.ChestProbability)
+            {
+                int chestX = random.Next(x + 1, x + sizeX - 1);
+                int chestIndex = WorldGen.PlaceChest(chestX, y + sizeY - 2);
+                if (chestIndex != -1)
+                {
+                    int frame = sandbox.Chests[chestIndex].frame;
+                    sandbox.Chests[chestIndex] = GenerateChest.GenerateChestByRandom(random, new Chests.ChestContext());
+                    sandbox.Chests[chestIndex].x = chestX;
+                    sandbox.Chests[chestIndex].y = y + sizeY - 2;
+                    sandbox.Chests[chestIndex].frame = frame;
+                }
+            }
+
             return true;
         }
 
@@ -192,6 +207,7 @@
             public RandomSizeBlockWithAreaContext()
             {
                 BlockCount = 100;
+                ChestProbability = 0.03;
             }
 
             public int AreaCount { get; set; } = 5;

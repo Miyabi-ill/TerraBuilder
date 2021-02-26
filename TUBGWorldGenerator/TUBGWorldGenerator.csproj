@@ -95,6 +95,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Configs.cs" />
     <Compile Include="Utils\GenerateChest.cs" />
     <Compile Include="Utils\PerlinNoise.cs" />
     <Compile Include="Utils\WeightedRandom.cs" />
@@ -111,9 +112,11 @@
     <Compile Include="WorldGeneration\Actions\Buildings\RandomSizeBlocks.cs" />
     <Compile Include="WorldGeneration\Actions\Buildings\RandomSizeBlockWithArea.cs" />
     <Compile Include="WorldGeneration\Chests\ChestContext.cs" />
+    <Compile Include="WorldGeneration\Chests\ChestProbably.cs" />
     <Compile Include="WorldGeneration\Chests\ItemContext.cs" />
+    <Compile Include="WorldGeneration\Chests\ItemProbablyAndStack.cs" />
     <Compile Include="WorldGeneration\Chests\ItemSlotContext.cs" />
-    <Compile Include="WorldGeneration\Chests\ProbablyAndStackContext.cs" />
+    <Compile Include="WorldGeneration\Chests\ItemSlotProbablyAndStack.cs" />
     <Compile Include="WorldGeneration\GlobalContext.cs" />
     <Compile Include="WorldGeneration\IWorldGenerationAction.cs" />
     <Compile Include="WorldGeneration\WorldGenerationRunner.cs" />

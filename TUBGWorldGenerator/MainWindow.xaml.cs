@@ -19,6 +19,8 @@
         /// </summary>
         public MainWindow()
         {
+            Configs.LoadAll("Configs");
+
             Sandbox = new WorldSandbox();
             Runner = new WorldGenerationRunner();
             InitializeComponent();

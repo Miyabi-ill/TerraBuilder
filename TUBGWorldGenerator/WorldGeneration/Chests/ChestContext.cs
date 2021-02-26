@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using Newtonsoft.Json;
     using Terraria.ID;
 
     /// <summary>
@@ -12,6 +14,7 @@
         /// <summary>
         /// チェスト名
         /// </summary>
+        [JsonIgnore]
         public string Name { get; set; }
 
         /// <summary>
@@ -27,6 +30,6 @@
         /// <summary>
         /// チェストに入れるアイテムのスロット。
         /// </summary>
-        public List<ProbablyAndStackContext<ItemSlotContext>> ItemSlots { get; private set; } = new List<ProbablyAndStackContext<ItemSlotContext>>();
+        public List<ItemSlotProbablyAndStack> ItemSlots { get; private set; } = new List<ItemSlotProbablyAndStack>();
     }
 }
