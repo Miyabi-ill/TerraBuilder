@@ -28,6 +28,11 @@
         public int TileStyle { get; set; } = 0;
 
         /// <summary>
+        /// チェストに塗るペンキの色
+        /// </summary>
+        public int Paint { get; set; }
+
+        /// <summary>
         /// チェストに入れるアイテムのスロット。
         /// </summary>
         public List<ItemSlotProbablyAndStack> ItemSlots { get; private set; } = new List<ItemSlotProbablyAndStack>();

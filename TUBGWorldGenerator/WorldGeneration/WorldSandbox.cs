@@ -113,6 +113,11 @@
                     }
                 }
 
+                for (int i = 0; i < Main.chest.Length; i++)
+                {
+                    Main.chest[i] = null;
+                }
+
                 // Seedの再設定により、Randomインスタンスを生成しなおす。
                 // 追加のコンテキストもクリアしておく
                 if (WorldGenerationRunner.CurrentRunner != null)

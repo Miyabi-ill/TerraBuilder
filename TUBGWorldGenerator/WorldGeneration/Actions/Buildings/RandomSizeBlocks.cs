@@ -145,17 +145,13 @@
                 }
             }
 
-            if (random.NextDouble() < Context.ChestProbability)
+            if (!string.IsNullOrEmpty(Context.ChestGroupName) && random.NextDouble() < Context.ChestProbably)
             {
-                int chestX = random.Next(x + 1, x + sizeX - 1);
-                int chestIndex = WorldGen.PlaceChest(chestX, y + sizeY - 2);
-                if (chestIndex != -1)
+                var chestContext = GenerateChest.GetChestContextByRandom(random, Context.ChestGroupName);
+                if (chestContext != null)
                 {
-                    int frame = sandbox.Chests[chestIndex].frame;
-                    sandbox.Chests[chestIndex] = GenerateChest.GenerateChestByRandom(random, new Chests.ChestContext());
-                    sandbox.Chests[chestIndex].x = chestX;
-                    sandbox.Chests[chestIndex].y = y + sizeY - 2;
-                    sandbox.Chests[chestIndex].frame = frame;
+                    int chestX = random.Next(x + 1, x + sizeX - 2);
+                    GenerateChest.PlaceChest(sandbox, chestX, y + sizeY - 3, random, chestContext);
                 }
             }
 
@@ -178,7 +174,9 @@
 
             public int MaxHeightFromSurface { get; set; } = 100;
 
-            public double ChestProbability { get; set; } = 0.3;
+            public double ChestProbably { get; set; } = 0.3;
+
+            public string ChestGroupName { get; set; }
         }
     }
 }
