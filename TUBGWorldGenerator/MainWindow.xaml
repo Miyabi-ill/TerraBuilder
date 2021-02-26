@@ -12,8 +12,16 @@
 		<ResourceDictionary Source="ResourceDict.xaml"/>
 	</Window.Resources>
     <Grid>
-		<DockPanel LastChildFill="True">
-			<DockPanel x:Name="ContextDock" DockPanel.Dock="Right" Width="200" LastChildFill="False">
+		<Grid x:Name="MainGrid">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition/>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition/>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition/>
+			</Grid.ColumnDefinitions>
+			<GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Background="Gray" Width="3"/>
+			<DockPanel Grid.Column="4" Margin="5" x:Name="ContextDock" DockPanel.Dock="Right" LastChildFill="False">
 				<Expander DockPanel.Dock="Top" Header="Global Config">
 					<xctk:PropertyGrid
 						x:Name="GlobalContextProperty"
@@ -46,7 +54,8 @@
 					</Button>
 				</Grid>
 			</DockPanel>
-			<DockPanel x:Name="ToolBarDock" DockPanel.Dock="Right" Width="200" LastChildFill="True">
+			<GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Background="Gray" Width="3"></GridSplitter>
+			<DockPanel Grid.Column="2" x:Name="ToolBarDock" DockPanel.Dock="Right" LastChildFill="True">
 				<Grid DockPanel.Dock="Top">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition/>
@@ -108,7 +117,7 @@
 				<TextBlock x:Name="MessageTextBlock" DockPanel.Dock="Bottom"/>
 				<Image x:Name="MapImage"/>
 			</DockPanel>
-		</DockPanel>
+		</Grid>
 		<Grid x:Name="RunningOverlay" Visibility="Collapsed">
 			<Rectangle Fill="White" Opacity="0.7"/>
 			<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="48">実行中...</TextBlock>
