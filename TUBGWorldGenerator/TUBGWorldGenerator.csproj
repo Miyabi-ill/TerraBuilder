@@ -95,7 +95,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Utils\GenerateChest.cs" />
     <Compile Include="Utils\PerlinNoise.cs" />
+    <Compile Include="Utils\WeightedRandom.cs" />
     <Compile Include="Utils\WorldToImage.cs" />
     <Compile Include="Views\AddActionWindow.xaml.cs">
       <DependentUpon>AddActionWindow.xaml</DependentUpon>
@@ -108,6 +110,10 @@
     <Compile Include="WorldGeneration\Actions\Biomes\Tunnel.cs" />
     <Compile Include="WorldGeneration\Actions\Buildings\RandomSizeBlocks.cs" />
     <Compile Include="WorldGeneration\Actions\Buildings\RandomSizeBlockWithArea.cs" />
+    <Compile Include="WorldGeneration\Chests\ChestContext.cs" />
+    <Compile Include="WorldGeneration\Chests\ItemContext.cs" />
+    <Compile Include="WorldGeneration\Chests\ItemSlotContext.cs" />
+    <Compile Include="WorldGeneration\Chests\ProbablyAndStackContext.cs" />
     <Compile Include="WorldGeneration\GlobalContext.cs" />
     <Compile Include="WorldGeneration\IWorldGenerationAction.cs" />
     <Compile Include="WorldGeneration\WorldGenerationRunner.cs" />
@@ -162,9 +168,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="WorldGeneration\Actions\Chests\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
       <Visible>False</Visible>
