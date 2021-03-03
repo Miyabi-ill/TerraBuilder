@@ -20,6 +20,8 @@
         /// </summary>
         public MainWindow()
         {
+            CurrentWindow = this;
+
             Configs.LoadAll("Configs");
 
             Sandbox = new WorldSandbox();
@@ -33,6 +35,8 @@
 
             UpdateMapView();
         }
+
+        public static MainWindow CurrentWindow { get; private set; }
 
         public string Message { get; set; }
 
