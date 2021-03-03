@@ -6,6 +6,7 @@
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media.Imaging;
+    using Microsoft.Win32;
     using TUBGWorldGenerator.Views;
     using TUBGWorldGenerator.WorldGeneration;
 
@@ -19,6 +20,10 @@
         /// </summary>
         public MainWindow()
         {
+            CurrentWindow = this;
+
+            Configs.LoadAll("Configs");
+
             Sandbox = new WorldSandbox();
             Runner = new WorldGenerationRunner();
             InitializeComponent();
@@ -30,6 +35,10 @@
 
             UpdateMapView();
         }
+
+        public static MainWindow CurrentWindow { get; private set; }
+
+        public string Message { get; set; }
 
         private WorldSandbox Sandbox { get; }
 
@@ -47,6 +56,7 @@
         {
             RunningOverlay.Visibility = Visibility.Visible;
             bool success = await Task.Run(() => Runner.Run(Sandbox)).ConfigureAwait(true);
+            Message = success ? "生成が正常に終了しました。" : "生成に失敗しました。";
             UpdateMapView();
             RunningOverlay.Visibility = Visibility.Collapsed;
         }
@@ -85,7 +95,7 @@
             lock (Sandbox)
             {
                 string path = Sandbox.Save(null);
-                MessageTextBlock.Text = string.Format("{0}に保存しました。", path);
+                Message = string.Format("{0}に保存しました。", path);
                 UpdateMapView();
             }
         }
@@ -121,6 +131,40 @@
             if (ActionList.SelectedIndex != -1 && ActionList.SelectedIndex != WorldGenerationRunner.CurrentRunner.WorldGenerationActions.Count - 1)
             {
                 WorldGenerationRunner.CurrentRunner.WorldGenerationActions.Move(ActionList.SelectedIndex, ActionList.SelectedIndex + 1);
+            }
+        }
+
+        private void LoadActionButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog()
+            {
+                Filter = "Jsonファイル(*.json)|*.json|すべてのファイル(*.*)|*.*",
+                RestoreDirectory = true,
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                Runner.Load(dialog.FileName);
+                ActionList.ItemsSource = Runner.WorldGenerationActions;
+                GlobalContextProperty.SelectedObject = Runner.GlobalContext;
+                LocalContextProperty.SelectedObject = null;
+                LocalContextExpander.Header = "Local Config";
+                Message = string.Format("アクションを{0}から読み込みました。", dialog.FileName);
+            }
+        }
+
+        private void SaveActionButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new SaveFileDialog()
+            {
+                Filter = "Jsonファイル(*.json)|*.json|すべてのファイル(*.*)|*.*",
+                FileName = "WorldGenerationActions.json",
+                RestoreDirectory = true,
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                Runner.Save(dialog.FileName);
             }
         }
     }

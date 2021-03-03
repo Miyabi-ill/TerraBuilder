@@ -20,18 +20,37 @@
         /// <inheritdoc/>
         public bool Run(WorldSandbox sandbox)
         {
+            var globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
+
             sandbox.SpawnTileX = sandbox.TileCountX / 2;
-            sandbox.SpawnTileY = Context.SpawnLevel;
+            sandbox.SpawnTileY = globalContext.RespawnLevel;
 
             for (int x = 0; x < sandbox.TileCountX; x++)
             {
-                sandbox.Tiles[x, Context.SpawnLevel] = new Tile()
+                var asphalt = new Tile()
+                {
+                    type = TileID.Asphalt,
+                };
+                asphalt.active(true);
+                asphalt.wire(true);
+                asphalt.actuator(true);
+
+                sandbox.Tiles[x, globalContext.RespawnLevel] = asphalt;
+
+                var nodestroy = new Tile()
                 {
                     type = TileID.Titanium,
                 };
+                nodestroy.active(true);
+                nodestroy.wire(true);
+                nodestroy.actuator(true);
 
-                sandbox.Tiles[x, Context.SpawnLevel].active(true);
+                sandbox.Tiles[x, globalContext.RespawnLevel + 1] = nodestroy;
             }
+
+            sandbox.Tiles[5, globalContext.RespawnLevel - 1] = new Tile() { wall = WallID.Wood };
+            WorldGen.PlaceTile(5, globalContext.RespawnLevel - 1, TileID.Switches, forced: true);
+            sandbox.Tiles[5, globalContext.RespawnLevel - 1].wire(true);
 
             return true;
         }
@@ -41,10 +60,6 @@
         /// </summary>
         public class SpawnAreaContext : ActionContext
         {
-            /// <summary>
-            /// スポーン地点の高さ
-            /// </summary>
-            public int SpawnLevel { get; set; } = 100;
         }
     }
 }
