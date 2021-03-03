@@ -114,7 +114,7 @@
 				</ListView>
 			</DockPanel>
 			<DockPanel LastChildFill="True">
-				<TextBlock x:Name="MessageTextBlock" DockPanel.Dock="Bottom"/>
+				<TextBlock x:Name="MessageTextBlock" DockPanel.Dock="Bottom" Text="{Binding Message}"/>
 				<Image x:Name="MapImage"/>
 			</DockPanel>
 		</Grid>

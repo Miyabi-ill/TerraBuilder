@@ -37,6 +37,8 @@
 
         private WorldGenerationRunner Runner { get; }
 
+        public string Message { get; set; }
+
         /// <summary>
         /// マップを更新する。
         /// </summary>
@@ -49,6 +51,7 @@
         {
             RunningOverlay.Visibility = Visibility.Visible;
             bool success = await Task.Run(() => Runner.Run(Sandbox)).ConfigureAwait(true);
+            Message = success ? "生成が正常に終了しました。" : "生成に失敗しました。";
             UpdateMapView();
             RunningOverlay.Visibility = Visibility.Collapsed;
         }
@@ -87,7 +90,7 @@
             lock (Sandbox)
             {
                 string path = Sandbox.Save(null);
-                MessageTextBlock.Text = string.Format("{0}に保存しました。", path);
+                Message = string.Format("{0}に保存しました。", path);
                 UpdateMapView();
             }
         }

@@ -109,6 +109,7 @@
     <Compile Include="WorldGeneration\Actions\Biomes\SpawnArea.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Surface.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Tunnel.cs" />
+    <Compile Include="WorldGeneration\Actions\Buildings\RandomCavernChests.cs" />
     <Compile Include="WorldGeneration\Actions\Buildings\RandomSizeBlocks.cs" />
     <Compile Include="WorldGeneration\Actions\Buildings\RandomSizeBlockWithArea.cs" />
     <Compile Include="WorldGeneration\Chests\ChestContext.cs" />

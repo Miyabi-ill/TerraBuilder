@@ -17,6 +17,7 @@
             AvailableActions.Add(nameof(Actions.Biomes.SpawnArea), () => new Actions.Biomes.SpawnArea());
             AvailableActions.Add(nameof(Actions.Buildings.RandomSizeBlocks), () => new Actions.Buildings.RandomSizeBlocks());
             AvailableActions.Add(nameof(Actions.Buildings.RandomSizeBlockWithArea), () => new Actions.Buildings.RandomSizeBlockWithArea());
+            AvailableActions.Add(nameof(Actions.Buildings.RandomCavernChests), () => new Actions.Buildings.RandomCavernChests());
         }
 
         /// <summary>
@@ -32,6 +33,7 @@
             WorldGenerationActions.Add(new Actions.Biomes.Tunnel());
             WorldGenerationActions.Add(new Actions.Buildings.RandomSizeBlocks());
             WorldGenerationActions.Add(new Actions.Buildings.RandomSizeBlockWithArea());
+            WorldGenerationActions.Add(new Actions.Buildings.RandomCavernChests());
             WorldGenerationActions.Add(new Actions.Biomes.SpawnArea());
 
             // TODO: Load from json
@@ -71,8 +73,15 @@
             {
                 lock (sandbox)
                 {
-                    bool success = action.Run(sandbox);
-                    if (!success)
+                    try
+                    {
+                        bool success = action.Run(sandbox);
+                        if (!success)
+                        {
+                            return false;
+                        }
+                    }
+                    catch
                     {
                         return false;
                     }
