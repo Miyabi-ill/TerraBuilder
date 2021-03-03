@@ -21,8 +21,17 @@
 				<ColumnDefinition/>
 			</Grid.ColumnDefinitions>
 			<GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Background="Gray" Width="3"/>
-			<DockPanel Grid.Column="4" Margin="5" x:Name="ContextDock" DockPanel.Dock="Right" LastChildFill="False">
-				<Expander DockPanel.Dock="Top" Header="Global Config">
+			<DockPanel Grid.Column="4" x:Name="ContextDock" DockPanel.Dock="Right" LastChildFill="False">
+				<Grid DockPanel.Dock="Top">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+
+					<Button Margin="5" Click="LoadActionButton_Click">アクションを読み込み</Button>
+					<Button Margin="5" Grid.Column="1" Click="SaveActionButton_Click">アクションを保存</Button>
+				</Grid>
+				<Expander Margin="5" DockPanel.Dock="Top" Header="Global Config" IsExpanded="True">
 					<xctk:PropertyGrid
 						x:Name="GlobalContextProperty"
 						ShowTitle="False"
@@ -33,7 +42,7 @@
 						DockPanel.Dock="Top"/>
 				</Expander>
 
-				<Expander x:Name="LocalContextExpander" DockPanel.Dock="Top" Header="Local Config">
+				<Expander Margin="5" x:Name="LocalContextExpander" DockPanel.Dock="Top" Header="Local Config">
 					<xctk:PropertyGrid
 						x:Name="LocalContextProperty"
 						ShowTitle="False"

@@ -6,6 +6,7 @@
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media.Imaging;
+    using Microsoft.Win32;
     using TUBGWorldGenerator.Views;
     using TUBGWorldGenerator.WorldGeneration;
 
@@ -33,11 +34,11 @@
             UpdateMapView();
         }
 
+        public string Message { get; set; }
+
         private WorldSandbox Sandbox { get; }
 
         private WorldGenerationRunner Runner { get; }
-
-        public string Message { get; set; }
 
         /// <summary>
         /// マップを更新する。
@@ -126,6 +127,40 @@
             if (ActionList.SelectedIndex != -1 && ActionList.SelectedIndex != WorldGenerationRunner.CurrentRunner.WorldGenerationActions.Count - 1)
             {
                 WorldGenerationRunner.CurrentRunner.WorldGenerationActions.Move(ActionList.SelectedIndex, ActionList.SelectedIndex + 1);
+            }
+        }
+
+        private void LoadActionButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog()
+            {
+                Filter = "Jsonファイル(*.json)|*.json|すべてのファイル(*.*)|*.*",
+                RestoreDirectory = true,
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                Runner.Load(dialog.FileName);
+                ActionList.ItemsSource = Runner.WorldGenerationActions;
+                GlobalContextProperty.SelectedObject = Runner.GlobalContext;
+                LocalContextProperty.SelectedObject = null;
+                LocalContextExpander.Header = "Local Config";
+                Message = string.Format("アクションを{0}から読み込みました。", dialog.FileName);
+            }
+        }
+
+        private void SaveActionButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new SaveFileDialog()
+            {
+                Filter = "Jsonファイル(*.json)|*.json|すべてのファイル(*.*)|*.*",
+                FileName = "WorldGenerationActions.json",
+                RestoreDirectory = true,
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                Runner.Save(dialog.FileName);
             }
         }
     }
