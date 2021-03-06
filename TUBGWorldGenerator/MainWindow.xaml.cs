@@ -7,6 +7,7 @@
     using System.Windows.Controls;
     using System.Windows.Media.Imaging;
     using Microsoft.Win32;
+    using TUBGWorldGenerator.ChestSimulator;
     using TUBGWorldGenerator.Views;
     using TUBGWorldGenerator.WorldGeneration;
 
@@ -20,8 +21,6 @@
         /// </summary>
         public MainWindow()
         {
-            CurrentWindow = this;
-
             Configs.LoadAll("Configs");
 
             Sandbox = new WorldSandbox();
@@ -35,8 +34,6 @@
 
             UpdateMapView();
         }
-
-        public static MainWindow CurrentWindow { get; private set; }
 
         public string Message { get; set; }
 
@@ -166,6 +163,12 @@
             {
                 Runner.Save(dialog.FileName);
             }
+        }
+
+        private void ChestSimulatorMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new ChestSimulatorWindow(Sandbox);
+            window.Show();
         }
     }
 }

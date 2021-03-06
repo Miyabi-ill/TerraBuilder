@@ -80,7 +80,6 @@
                         bool success = action.Run(sandbox);
                         if (!success)
                         {
-                            MainWindow.CurrentWindow.Message = string.Format("アクション`{0}`で生成に失敗しました。以降のアクションは全てキャンセルされました。", action.Name);
                             return false;
                         }
                     }

@@ -95,6 +95,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ChestSimulator\ChestAccumulateResult.cs" />
+    <Compile Include="ChestSimulator\ChestSimulatorWindow.xaml.cs">
+      <DependentUpon>ChestSimulatorWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Configs.cs" />
     <Compile Include="Utils\GenerateChest.cs" />
     <Compile Include="Utils\PerlinNoise.cs" />
@@ -122,6 +126,10 @@
     <Compile Include="WorldGeneration\IWorldGenerationAction.cs" />
     <Compile Include="WorldGeneration\WorldGenerationRunner.cs" />
     <Compile Include="WorldGeneration\WorldSandbox.cs" />
+    <Page Include="ChestSimulator\ChestSimulatorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
