@@ -20,8 +20,17 @@
 				<ColumnDefinition Width="Auto"/>
 				<ColumnDefinition/>
 			</Grid.ColumnDefinitions>
-			<GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Background="Gray" Width="3"/>
-			<DockPanel Grid.Column="4" x:Name="ContextDock" DockPanel.Dock="Right" LastChildFill="False">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition/>
+			</Grid.RowDefinitions> 
+			<Menu Grid.ColumnSpan="5">
+				<MenuItem Header="ツール">
+					<MenuItem Header="チェストシミュレータ" Click="ChestSimulatorMenuItem_Click"></MenuItem>
+				</MenuItem>
+			</Menu>
+			<GridSplitter Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Background="Gray" Width="3"/>
+			<DockPanel Grid.Row="1" Grid.Column="4" x:Name="ContextDock" DockPanel.Dock="Right" LastChildFill="False">
 				<Grid DockPanel.Dock="Top">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition/>
@@ -63,8 +72,8 @@
 					</Button>
 				</Grid>
 			</DockPanel>
-			<GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Background="Gray" Width="3"></GridSplitter>
-			<DockPanel Grid.Column="2" x:Name="ToolBarDock" DockPanel.Dock="Right" LastChildFill="True">
+			<GridSplitter Grid.Row="1" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Background="Gray" Width="3"></GridSplitter>
+			<DockPanel Grid.Row="1" Grid.Column="2" x:Name="ToolBarDock" DockPanel.Dock="Right" LastChildFill="True">
 				<Grid DockPanel.Dock="Top">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition/>
@@ -122,7 +131,7 @@
 					</ListView.ItemTemplate>
 				</ListView>
 			</DockPanel>
-			<DockPanel LastChildFill="True">
+			<DockPanel Grid.Row="1" LastChildFill="True">
 				<TextBlock Margin="5" x:Name="MessageTextBlock" DockPanel.Dock="Bottom" Text="{Binding Message}"/>
 				<Image x:Name="MapImage"/>
 			</DockPanel>
