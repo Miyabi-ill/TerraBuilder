@@ -20,6 +20,7 @@
             AvailableActions.Add(nameof(Actions.Buildings.RandomSizeBlocks), () => new Actions.Buildings.RandomSizeBlocks());
             AvailableActions.Add(nameof(Actions.Buildings.RandomSizeBlockWithArea), () => new Actions.Buildings.RandomSizeBlockWithArea());
             AvailableActions.Add(nameof(Actions.Buildings.RandomCavernChests), () => new Actions.Buildings.RandomCavernChests());
+            AvailableActions.Add(nameof(Actions.Buildings.Wells), () => new Actions.Buildings.Wells());
         }
 
         /// <summary>
@@ -32,6 +33,7 @@
 
             WorldGenerationActions.Add(new Actions.Biomes.Caverns());
             WorldGenerationActions.Add(new Actions.Biomes.Surface());
+            WorldGenerationActions.Add(new Actions.Buildings.Wells());
             WorldGenerationActions.Add(new Actions.Biomes.Tunnel());
             WorldGenerationActions.Add(new Actions.Buildings.RandomSizeBlocks());
             WorldGenerationActions.Add(new Actions.Buildings.RandomSizeBlockWithArea());
