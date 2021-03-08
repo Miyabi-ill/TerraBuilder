@@ -36,9 +36,14 @@
 						<ColumnDefinition/>
 						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition/>
+						<RowDefinition/>
+					</Grid.RowDefinitions>
 
 					<Button Margin="5" Click="LoadActionButton_Click">アクションを読み込み</Button>
 					<Button Margin="5" Grid.Column="1" Click="SaveActionButton_Click">アクションを保存</Button>
+					<Button Margin="5" Grid.Row="1" Click="LoadChestConfigButton_Click">チェストコンフィグを読み込み</Button>
 				</Grid>
 				<Expander Margin="5" DockPanel.Dock="Top" Header="Global Config" IsExpanded="True">
 					<xctk:PropertyGrid
