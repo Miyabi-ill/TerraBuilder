@@ -10,6 +10,11 @@
     {
         public static bool PlaceChest(WorldSandbox sandbox, int x, int y, Random random, ChestContext chestContext)
         {
+            if (chestContext == null)
+            {
+                return false;
+            }
+
             int chestIndex = WorldGen.PlaceChest(x, y + 1, (ushort)chestContext.TileType, style: chestContext.TileStyle);
             if (chestIndex != -1)
             {
@@ -62,7 +67,7 @@
 
         public static ChestContext GetChestContextByRandom(Random random, string chestGroupName)
         {
-            if (string.IsNullOrEmpty(chestGroupName))
+            if (string.IsNullOrEmpty(chestGroupName) || !Configs.ChestGroups.ContainsKey(chestGroupName))
             {
                 return null;
             }

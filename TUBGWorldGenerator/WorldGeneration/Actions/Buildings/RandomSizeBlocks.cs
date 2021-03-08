@@ -10,6 +10,12 @@
     /// </summary>
     public class RandomSizeBlocks : IWorldGenerationAction<RandomSizeBlocks.RandomSizeBlockContext>
     {
+        public enum PlaceBiome
+        {
+            Surface,
+            Cavern,
+        }
+
         private enum ActiveWallDirection : int
         {
             Top = 0,
@@ -22,7 +28,7 @@
         public string Name => nameof(RandomSizeBlocks);
 
         /// <inheritdoc/>
-        public string Description => "ランダムな大きさ、形のブロックをワールド地表に配置する";
+        public string Description => "ランダムな大きさ、形のブロックを配置する";
 
         /// <inheritdoc/>
         public RandomSizeBlockContext Context { get; } = new RandomSizeBlockContext();
@@ -32,19 +38,49 @@
         {
             GlobalContext globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
             var random = globalContext.Random;
-            for (int c = 0; c < Context.BlockCount; c++)
+
+            if (Context.PlaceBiome == PlaceBiome.Surface)
             {
-                for (int retry = 0; retry < Context.MaxPlaceRetry; retry++)
+                for (int c = 0; c < Context.BlockCount; c++)
                 {
-                    int x = random.Next(100, sandbox.TileCountX - 100);
-                    bool result = PlaceBlockToSurface(
-                        sandbox,
-                        sizeX: random.Next(Context.BlockMinX, Context.BlockMaxX),
-                        sizeY: random.Next(Context.BlockMinY, Context.BlockMaxY),
-                        x);
-                    if (result)
+                    for (int retry = 0; retry < Context.MaxPlaceRetry; retry++)
                     {
-                        break;
+                        int x = random.Next(100, sandbox.TileCountX - 100);
+                        bool success = PlaceBlockToSurface(
+                            sandbox,
+                            sizeX: random.Next(Context.BlockMinX, Context.BlockMaxX),
+                            sizeY: random.Next(Context.BlockMinY, Context.BlockMaxY),
+                            x);
+                        if (success)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (Context.PlaceBiome == PlaceBiome.Cavern)
+            {
+                double[] cavernTop = (double[])WorldGenerationRunner.CurrentRunner.GlobalContext["CavernTop"];
+                double[] cavernBottom = (double[])WorldGenerationRunner.CurrentRunner.GlobalContext["CavernBottom"];
+
+                for (int c = 0; c < Context.BlockCount; c++)
+                {
+                    for (int retry = 0; retry < Context.MaxPlaceRetry; retry++)
+                    {
+                        int x = random.Next(100, sandbox.TileCountX - 100);
+                        int y = random.Next((int)cavernTop[x], (int)cavernBottom[x]);
+                        bool placeToTop = random.Next(2) == 0 ? true : false;
+                        bool success = PlaceBlockToCavern(
+                            sandbox,
+                            sizeX: random.Next(Context.BlockMinX, Context.BlockMaxX),
+                            sizeY: random.Next(Context.BlockMinY, Context.BlockMaxY),
+                            x,
+                            y,
+                            placeToTop);
+                        if (success)
+                        {
+                            break;
+                        }
                     }
                 }
             }
@@ -83,6 +119,39 @@
             }
 
             return false;
+        }
+
+        private bool PlaceBlockToCavern(WorldSandbox sandbox, int sizeX, int sizeY, int x, int y, bool placeToTop = false)
+        {
+            if (sandbox.Tiles[x, y]?.active() == true)
+            {
+                return false;
+            }
+
+            if (placeToTop)
+            {
+                for (int cy = y; cy > 0; cy--)
+                {
+                    if (sandbox.Tiles[x, cy]?.active() == true)
+                    {
+                        return PlaceBlock(sandbox, sizeX, sizeY, x - (sizeX / 2), cy);
+                    }
+                }
+
+                return false;
+            }
+            else
+            {
+                for (int cy = y; cy < sandbox.TileCountY; cy++)
+                {
+                    if (sandbox.Tiles[x, cy]?.active() == true)
+                    {
+                        return PlaceBlock(sandbox, sizeX, sizeY, x - (sizeX / 2), cy - sizeY);
+                    }
+                }
+
+                return false;
+            }
         }
 
         private bool PlaceBlock(WorldSandbox sandbox, int sizeX, int sizeY, int x, int y)
@@ -135,12 +204,7 @@
                     }
                     else
                     {
-                        if (sandbox.Tiles[px, py] == null)
-                        {
-                            sandbox.Tiles[px, py] = new Tile();
-                        }
-
-                        sandbox.Tiles[px, py].wall = WallID.Wood;
+                        sandbox.Tiles[px, py] = new Tile() { wall = WallID.Wood };
                     }
                 }
             }
@@ -152,6 +216,22 @@
                 {
                     int chestX = random.Next(x + 1, x + sizeX - 2);
                     GenerateChest.PlaceChest(sandbox, chestX, y + sizeY - 3, random, chestContext);
+                }
+            }
+
+            if (random.NextDouble() < Context.TorchProbably)
+            {
+                for (int retry = 0; retry < Context.MaxPlaceRetry; retry++)
+                {
+                    int tx = random.Next(x + 1, x + sizeX - 1);
+                    int ty = random.Next(y + 1, y + sizeY - 1);
+                    if (!sandbox.Tiles[tx, ty].active())
+                    {
+                        sandbox.Tiles[tx, ty].type = TileID.Torches;
+                        sandbox.Tiles[tx, ty].frameX = 0;
+                        sandbox.Tiles[tx, ty].frameY = 0;
+                        break;
+                    }
                 }
             }
 
@@ -177,6 +257,10 @@
             public double ChestProbably { get; set; } = 0.3;
 
             public string ChestGroupName { get; set; }
+
+            public PlaceBiome PlaceBiome { get; set; } = PlaceBiome.Surface;
+
+            public double TorchProbably { get; set; } = 0.08;
         }
     }
 }

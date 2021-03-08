@@ -105,7 +105,7 @@
                     {
                         TypeNameHandling = TypeNameHandling.Auto,
                         Formatting = Formatting.Indented,
-                    })); ;
+                    }));
             }
         }
 
