@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using Microsoft.Xna.Framework;
     using Terraria;
     using Terraria.ID;
     using TUBGWorldGenerator.Utils;
@@ -70,11 +71,12 @@
             int cavernStart = globalContext.SurfaceLevel + Context.CavernMinDistanceFromSurface;
             int bottomPerlinBaseTopLine = (int)topPerlin[minIndex] - (int)bottomPerlin[minIndex] + Context.CavernMinHeight;
             double[] cavernTop = new double[topPerlin.Length];
+            double[] cavernBottom = new double[bottomPerlin.Length];
 
-            // TODO:実際にタイルを置く
             for (int x = 0; x < sandbox.TileCountX; x++)
             {
                 cavernTop[x] = cavernStart + topPerlin[x];
+                cavernBottom[x] = cavernStart + bottomPerlinBaseTopLine + bottomPerlin[x];
                 for (int y = globalContext.SurfaceLevel; y < sandbox.TileCountY; y++)
                 {
                     if (y < cavernStart + topPerlin[x])
@@ -82,24 +84,132 @@
                         tiles[x, y] = new Tile()
                         {
                             type = TileID.Stone,
+                            wall = WallID.Stone,
                         };
                         tiles[x, y].active(true);
                     }
-
-                    if (y > cavernStart + bottomPerlinBaseTopLine + bottomPerlin[x])
+                    else if (y > cavernStart + bottomPerlinBaseTopLine + bottomPerlin[x])
                     {
                         tiles[x, y] = new Tile()
                         {
                             type = TileID.Stone,
+                            wall = WallID.Stone,
                         };
                         tiles[x, y].active(true);
+                    }
+                    else
+                    {
+                        tiles[x, y] = new Tile()
+                        {
+                            wall = WallID.Stone,
+                        };
                     }
                 }
             }
 
+            for (int i = 0; i < Context.BlockCount; i++)
+            {
+                int x = rand.Next(100, sandbox.TileCountX - 100);
+                if ((int)cavernTop[x] + Context.MinDistanceFromCavernTopAndBottom < (int)cavernBottom[x] - Context.MinDistanceFromCavernTopAndBottom)
+                {
+                    int y = rand.Next((int)cavernTop[x] + Context.MinDistanceFromCavernTopAndBottom, (int)cavernBottom[x] - Context.MinDistanceFromCavernTopAndBottom);
+                    int repeat = rand.Next(Context.MinRepeatForStroke, Context.MaxRepeatForStroke + 1);
+                    GenerateBlock(sandbox, x, y, rand, repeat);
+                }
+            }
+
             globalContext["CavernTop"] = cavernTop;
+            globalContext["CavernBottom"] = cavernBottom;
 
             return true;
+        }
+
+        public void GenerateBlock(WorldSandbox sandbox, int x, int y, Random random, int repeat = 0)
+        {
+            if (repeat < 0)
+            {
+                return;
+            }
+
+            double blockDiameter = random.Next(Context.BlockStrokeMinDiameter, Context.BlockStrokeMaxDiameter + 1);
+            int blockDirection = random.Next(2) == 0 ? 1 : -1;
+
+            Vector2 currentPosition;
+            currentPosition.X = x;
+            currentPosition.Y = y;
+            int k = random.Next(Context.MinRepeatPerStroke, Context.MaxRepeatPerStroke);
+            Vector2 velocity;
+            velocity.Y = random.Next(10, 20) * 0.01f;
+            velocity.Y = random.Next(2) == 0 ? velocity.Y : -velocity.Y;
+            velocity.X = (float)blockDirection;
+            while (k > 0)
+            {
+                k--;
+                int minX = (int)((double)currentPosition.X - (blockDiameter * 0.5));
+                int maxX = (int)((double)currentPosition.X + (blockDiameter * 0.5));
+                int minY = (int)((double)currentPosition.Y - (blockDiameter * 0.5));
+                int maxY = (int)((double)currentPosition.Y + (blockDiameter * 0.5));
+                if (minX < 0)
+                {
+                    minX = 0;
+                }
+
+                if (maxX > sandbox.TileCountX)
+                {
+                    maxX = sandbox.TileCountX;
+                }
+
+                if (minY < 0)
+                {
+                    minY = 0;
+                }
+
+                if (maxY > sandbox.TileCountY)
+                {
+                    maxY = sandbox.TileCountY;
+                    return;
+                }
+
+                double realRadius = blockDiameter * random.Next(80, 120) * 0.004;
+                for (int l = minX; l < maxX; l++)
+                {
+                    for (int m = minY; m < maxY; m++)
+                    {
+                        float a = Math.Abs((float)l - currentPosition.X);
+                        float b = Math.Abs((float)m - currentPosition.Y);
+                        if (Math.Sqrt((double)(a * a + b * b)) < realRadius)
+                        {
+                            sandbox.Tiles[l, m].type = TileID.Stone;
+                            sandbox.Tiles[l, m].active(true);
+                        }
+                    }
+                }
+
+                currentPosition += velocity;
+                velocity.X += random.Next(-10, 11) * 0.05f;
+                velocity.Y += random.Next(-10, 11) * 0.05f;
+                if (velocity.X > (float)blockDirection + 0.5f)
+                {
+                    velocity.X = (float)blockDirection + 0.5f;
+                }
+
+                if (velocity.X < (float)blockDirection - 0.5f)
+                {
+                    velocity.X = (float)blockDirection - 0.5f;
+                }
+
+                if (velocity.Y > 0.5f)
+                {
+                    velocity.Y = 0.5f;
+                }
+
+                if (velocity.Y < -0.5f)
+                {
+                    velocity.Y = -0.5f;
+                }
+            }
+
+            GenerateBlock(sandbox, x, y, random, repeat - 1);
         }
 
         /// <summary>
@@ -126,6 +236,22 @@
             /// 地表からの最大距離。
             /// </summary>
             public int CavernMaxDistanceFromSurface { get; set; } = 100;
+
+            public int BlockStrokeMinDiameter { get; set; } = 7;
+
+            public int BlockStrokeMaxDiameter { get; set; } = 15;
+
+            public int MinRepeatPerStroke { get; set; } = 15;
+
+            public int MaxRepeatPerStroke { get; set; } = 25;
+
+            public int MinRepeatForStroke { get; set; } = 3;
+
+            public int MaxRepeatForStroke { get; set; } = 4;
+
+            public int MinDistanceFromCavernTopAndBottom { get; set; } = 15;
+
+            public int BlockCount { get; set; } = 60;
         }
     }
 }

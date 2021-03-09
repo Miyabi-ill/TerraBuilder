@@ -7,6 +7,7 @@
     using System.Windows.Controls;
     using System.Windows.Media.Imaging;
     using Microsoft.Win32;
+    using Microsoft.WindowsAPICodePack.Dialogs;
     using TUBGWorldGenerator.ChestSimulator;
     using TUBGWorldGenerator.Views;
     using TUBGWorldGenerator.WorldGeneration;
@@ -21,8 +22,6 @@
         /// </summary>
         public MainWindow()
         {
-            Configs.LoadAll("Configs");
-
             Sandbox = new WorldSandbox();
             Runner = new WorldGenerationRunner();
             InitializeComponent();
@@ -169,6 +168,19 @@
         {
             var window = new ChestSimulatorWindow(Sandbox);
             window.Show();
+        }
+
+        private void LoadChestConfigButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new CommonOpenFileDialog()
+            {
+                IsFolderPicker = true,
+                RestoreDirectory = true,
+            };
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                Configs.LoadAll(dialog.FileName);
+            }
         }
     }
 }

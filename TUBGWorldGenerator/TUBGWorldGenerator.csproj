@@ -53,6 +53,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAPICodePack-Core.1.1.0.0\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAPICodePack-Shell.1.1.0.0\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.ShellExtensions, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAPICodePack-Shell.1.1.0.0\lib\Microsoft.WindowsAPICodePack.ShellExtensions.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -101,6 +110,7 @@
     </Compile>
     <Compile Include="Configs.cs" />
     <Compile Include="Utils\GenerateChest.cs" />
+    <Compile Include="Utils\Liquids.cs" />
     <Compile Include="Utils\PerlinNoise.cs" />
     <Compile Include="Utils\WeightedRandom.cs" />
     <Compile Include="Utils\WorldToImage.cs" />
@@ -109,13 +119,16 @@
     </Compile>
     <Compile Include="WorldGeneration\ActionContext.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Caverns.cs" />
+    <Compile Include="WorldGeneration\Actions\Biomes\CavernWater.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Desert.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\SpawnArea.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Surface.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Tunnel.cs" />
     <Compile Include="WorldGeneration\Actions\Buildings\RandomCavernChests.cs" />
+    <Compile Include="WorldGeneration\Actions\Buildings\RandomRope.cs" />
     <Compile Include="WorldGeneration\Actions\Buildings\RandomSizeBlocks.cs" />
     <Compile Include="WorldGeneration\Actions\Buildings\RandomSizeBlockWithArea.cs" />
+    <Compile Include="WorldGeneration\Actions\Buildings\Wells.cs" />
     <Compile Include="WorldGeneration\Chests\ChestContext.cs" />
     <Compile Include="WorldGeneration\Chests\ChestProbably.cs" />
     <Compile Include="WorldGeneration\Chests\ItemContext.cs" />
