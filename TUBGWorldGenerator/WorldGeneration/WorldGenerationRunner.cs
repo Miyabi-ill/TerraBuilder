@@ -17,9 +17,11 @@
             AvailableActions.Add(nameof(Actions.Biomes.Surface), () => new Actions.Biomes.Surface());
             AvailableActions.Add(nameof(Actions.Biomes.Tunnel), () => new Actions.Biomes.Tunnel());
             AvailableActions.Add(nameof(Actions.Biomes.SpawnArea), () => new Actions.Biomes.SpawnArea());
+            AvailableActions.Add(nameof(Actions.Biomes.CavernWater), () => new Actions.Biomes.CavernWater());
             AvailableActions.Add(nameof(Actions.Buildings.RandomSizeBlocks), () => new Actions.Buildings.RandomSizeBlocks());
             AvailableActions.Add(nameof(Actions.Buildings.RandomSizeBlockWithArea), () => new Actions.Buildings.RandomSizeBlockWithArea());
             AvailableActions.Add(nameof(Actions.Buildings.RandomCavernChests), () => new Actions.Buildings.RandomCavernChests());
+            AvailableActions.Add(nameof(Actions.Buildings.RandomRope), () => new Actions.Buildings.RandomRope());
             AvailableActions.Add(nameof(Actions.Buildings.Wells), () => new Actions.Buildings.Wells());
         }
 
@@ -38,6 +40,8 @@
             WorldGenerationActions.Add(new Actions.Buildings.RandomSizeBlocks());
             WorldGenerationActions.Add(new Actions.Buildings.RandomSizeBlockWithArea());
             WorldGenerationActions.Add(new Actions.Buildings.RandomCavernChests());
+            WorldGenerationActions.Add(new Actions.Biomes.CavernWater());
+            WorldGenerationActions.Add(new Actions.Buildings.RandomRope());
             WorldGenerationActions.Add(new Actions.Biomes.SpawnArea());
 
             // TODO: Load from json

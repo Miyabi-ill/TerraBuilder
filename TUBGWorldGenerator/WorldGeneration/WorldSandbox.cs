@@ -109,7 +109,7 @@
                 {
                     for (int y = 0; y < TileCountY; y++)
                     {
-                        Main.tile[x, y] = null;
+                        Main.tile[x, y] = new Tile();
                     }
                 }
 
