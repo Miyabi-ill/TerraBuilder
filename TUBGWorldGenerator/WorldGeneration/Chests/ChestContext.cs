@@ -35,6 +35,6 @@
         /// <summary>
         /// チェストに入れるアイテムのスロット。
         /// </summary>
-        public List<ItemSlotProbablyAndStack> ItemSlots { get; private set; } = new List<ItemSlotProbablyAndStack>();
+        public List<ItemSlotOrItemProbablyAndStack> ItemSlots { get; private set; } = new List<ItemSlotOrItemProbablyAndStack>();
     }
 }

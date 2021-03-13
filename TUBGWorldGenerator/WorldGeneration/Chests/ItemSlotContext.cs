@@ -11,6 +11,6 @@
         [JsonIgnore]
         public string Name { get; set; }
 
-        public List<ItemProbablyAndStack> Items { get; private set; } = new List<ItemProbablyAndStack>();
+        public List<ItemSlotOrItemProbablyAndStack> Items { get; private set; } = new List<ItemSlotOrItemProbablyAndStack>();
     }
 }
