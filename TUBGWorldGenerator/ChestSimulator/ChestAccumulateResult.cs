@@ -48,11 +48,11 @@
                     {
                         if (chestItemProbablys.ContainsKey(item.Name))
                         {
-                            chestItemProbablys[item.Name]++;
+                            chestItemProbablys[item.Name] += item.stack;
                         }
                         else
                         {
-                            chestItemProbablys.Add(item.Name, 1);
+                            chestItemProbablys.Add(item.Name, item.stack);
                         }
                     }
                 }
@@ -135,11 +135,11 @@
                     {
                         if (chestItemProbablys.ContainsKey(item.Name))
                         {
-                            chestItemProbablys[item.Name]++;
+                            chestItemProbablys[item.Name] += item.stack;
                         }
                         else
                         {
-                            chestItemProbablys.Add(item.Name, 1);
+                            chestItemProbablys.Add(item.Name, item.stack);
                         }
                     }
                 }

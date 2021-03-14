@@ -109,6 +109,7 @@
       <DependentUpon>ChestSimulatorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Configs.cs" />
+    <Compile Include="Utils\Colors.cs" />
     <Compile Include="Utils\GenerateChest.cs" />
     <Compile Include="Utils\Liquids.cs" />
     <Compile Include="Utils\PerlinNoise.cs" />
@@ -116,6 +117,9 @@
     <Compile Include="Utils\WorldToImage.cs" />
     <Compile Include="Views\AddActionWindow.xaml.cs">
       <DependentUpon>AddActionWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PieChart.xaml.cs">
+      <DependentUpon>PieChart.xaml</DependentUpon>
     </Compile>
     <Compile Include="WorldGeneration\ActionContext.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Caverns.cs" />
@@ -159,6 +163,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AddActionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PieChart.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
