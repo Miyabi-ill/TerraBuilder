@@ -17,6 +17,173 @@
         // アイテム名, (全体の出現数, アイテムが出現したチェスト数, チェストの中に含まれる平均個数, チェストに含まれる確率)
         public Dictionary<string, Tuple<int, int, double, double>> ItemsProbablys { get; set; } = new Dictionary<string, Tuple<int, int, double, double>>();
 
+        public static (Dictionary<string, (int count, double probably)> chestProbably,
+            Dictionary<string, Dictionary<string, (int count, double probably)>> itemSlotProbably,
+            Dictionary<string, Dictionary<string, (int stack, int count, double probably)>> itemProbablyPerItemSlot,
+            Dictionary<string, ChestAccumulateResult> chestAccResults)
+            CreateResultFromChestGroupWithStep(string chestGroupName, int simulateChestCount = 10000)
+        {
+            Random random = new Random();
+            Dictionary<string, (int count, double probably)> chestOverrollProbably = new Dictionary<string, (int count, double probably)>();
+            Dictionary<string, Dictionary<string, (int count, double probably)>> itemSlotProbably = new Dictionary<string, Dictionary<string, (int count, double probably)>>();
+            Dictionary<string, Dictionary<string, (int stack, int count, double probably)>> itemProbablyPerItemSlot = new Dictionary<string, Dictionary<string, (int stack, int count, double probably)>>();
+            Dictionary<string, ChestAccumulateResult> chestAccResults = new Dictionary<string, ChestAccumulateResult>();
+            for (int i = 0; i < simulateChestCount; i++)
+            {
+                var chestContext = GenerateChest.GetChestContextByRandom(random, chestGroupName);
+                Dictionary<string, (int count, double probably)> itemSlotDict;
+                ChestAccumulateResult chestAccumulateResult;
+
+                // チェストに加算、アイテムスロット辞書を取得/作成
+                if (chestOverrollProbably.ContainsKey(chestContext.Name))
+                {
+                    int currentCount = chestOverrollProbably[chestContext.Name].count;
+                    chestOverrollProbably[chestContext.Name] = (currentCount + 1, (double)(currentCount + 1) / simulateChestCount);
+
+                    itemSlotDict = itemSlotProbably[chestContext.Name];
+
+                    chestAccumulateResult = chestAccResults[chestContext.Name];
+                }
+                else
+                {
+                    chestOverrollProbably.Add(chestContext.Name, (1, 1.0 / simulateChestCount));
+
+                    itemSlotDict = new Dictionary<string, (int count, double probably)>();
+                    itemSlotProbably.Add(chestContext.Name, itemSlotDict);
+
+                    chestAccumulateResult = new ChestAccumulateResult() { ChestName = chestContext.Name };
+                    chestAccResults.Add(chestContext.Name, chestAccumulateResult);
+                }
+
+                chestAccumulateResult.Count++;
+
+                // アイテムスロット確率は後で計算
+                // チェスト内アイテムの辞書
+                var itemInChest = new Dictionary<string, int>();
+                foreach (WorldGeneration.Chests.ItemSlotContext itemSlotContext in GenerateChest.GenerateItemSlotsByRandom(random, chestContext))
+                {
+                    // アイテムスロット毎アイテム数用辞書の準備と、アイテムスロットを数える
+                    Dictionary<string, (int stack, int count, double probably)> itemDict;
+                    if (itemSlotDict.ContainsKey(itemSlotContext.Name))
+                    {
+                        int currentCount = itemSlotDict[itemSlotContext.Name].count;
+                        itemSlotDict[itemSlotContext.Name] = (currentCount + 1, 0);
+                        itemDict = itemProbablyPerItemSlot[itemSlotContext.Name];
+                    }
+                    else
+                    {
+                        itemSlotDict.Add(itemSlotContext.Name, (1, 0));
+
+                        if (itemProbablyPerItemSlot.ContainsKey(itemSlotContext.Name))
+                        {
+                            itemDict = itemProbablyPerItemSlot[itemSlotContext.Name];
+                        }
+                        else
+                        {
+                            itemDict = new Dictionary<string, (int stack, int count, double probably)>();
+                            itemProbablyPerItemSlot.Add(itemSlotContext.Name, itemDict);
+                        }
+                    }
+
+                    // アイテムスロット毎アイテムを数える
+                    foreach (var item in GenerateChest.GenerateFromItemSlot(random, itemSlotContext))
+                    {
+                        if (item == null || string.IsNullOrEmpty(item.Name))
+                        {
+                            continue;
+                        }
+
+                        if (itemDict.ContainsKey(item.Name))
+                        {
+                            int currentCount = itemDict[item.Name].count;
+                            int currentStack = itemDict[item.Name].stack;
+                            itemDict[item.Name] = (currentStack + item.stack, currentCount + 1, 0);
+                        }
+                        else
+                        {
+                            itemDict.Add(item.Name, (item.stack, 1, 0));
+                        }
+
+                        if (itemInChest.ContainsKey(item.Name))
+                        {
+                            itemInChest[item.Name] += item.stack;
+                        }
+                        else
+                        {
+                            itemInChest.Add(item.Name, item.stack);
+                        }
+                    }
+                }
+
+                // ChestAccumulateResult用合算
+                foreach (var itemProbably in itemInChest)
+                {
+                    if (chestAccumulateResult.ItemsProbablys.ContainsKey(itemProbably.Key))
+                    {
+                        chestAccumulateResult.ItemsProbablys[itemProbably.Key] = new Tuple<int, int, double, double>(
+                            chestAccumulateResult.ItemsProbablys[itemProbably.Key].Item1 + itemProbably.Value,
+                            chestAccumulateResult.ItemsProbablys[itemProbably.Key].Item2 + 1,
+                            0,
+                            0);
+                    }
+                    else
+                    {
+                        chestAccumulateResult.ItemsProbablys.Add(
+                            itemProbably.Key,
+                            new Tuple<int, int, double, double>(
+                                itemProbably.Value,
+                                1,
+                                0,
+                                0));
+                    }
+                }
+            }
+
+            // 確率計算
+            // アイテムスロット
+            foreach (string key in itemSlotProbably.Keys.ToArray())
+            {
+                // keyはチェスト名。
+                int itemSlotSum = itemSlotProbably[key].Sum(x => x.Value.count);
+
+                // アイテムスロットごとに確率を設定
+                foreach (var itemSlotKey in itemSlotProbably[key].Keys.ToArray())
+                {
+                    int count = itemSlotProbably[key][itemSlotKey].count;
+                    itemSlotProbably[key][itemSlotKey] = (count, (double)count / itemSlotSum);
+                }
+            }
+
+            // アイテム
+            foreach (string key in itemProbablyPerItemSlot.Keys.ToArray())
+            {
+                // keyはアイテムスロット名
+                int itemsSum = itemProbablyPerItemSlot[key].Values.Sum(x => x.count);
+                foreach (string itemKey in itemProbablyPerItemSlot[key].Keys.ToArray())
+                {
+                    var item = itemProbablyPerItemSlot[key][itemKey];
+                    itemProbablyPerItemSlot[key][itemKey] = (item.stack, item.count, (double)item.count / itemsSum);
+                }
+            }
+
+            // ChestAccumulateResult
+            int resultSum = chestAccResults.Values.Sum(x => x.Count);
+            foreach (ChestAccumulateResult accResult in chestAccResults.Values)
+            {
+                accResult.Probably = (double)accResult.Count / resultSum;
+                foreach (string key in accResult.ItemsProbablys.Keys.ToList())
+                {
+                    int count = accResult.ItemsProbablys[key].Item1;
+                    int itemChestCount = accResult.ItemsProbablys[key].Item2;
+                    double avgCountInChest = count / (double)itemChestCount;
+                    double chestContainsProb = itemChestCount / (double)accResult.Count;
+                    accResult.ItemsProbablys[key] = new Tuple<int, int, double, double>(count, itemChestCount, avgCountInChest, chestContainsProb);
+                }
+            }
+
+            return (chestOverrollProbably, itemSlotProbably, itemProbablyPerItemSlot, chestAccResults);
+        }
+
         public static Dictionary<string, ChestAccumulateResult> CreateResultFromChestGroup(string chestGroupName, int simulateChestCount = 10000)
         {
             Random random = new Random();
@@ -48,11 +215,11 @@
                     {
                         if (chestItemProbablys.ContainsKey(item.Name))
                         {
-                            chestItemProbablys[item.Name]++;
+                            chestItemProbablys[item.Name] += item.stack;
                         }
                         else
                         {
-                            chestItemProbablys.Add(item.Name, 1);
+                            chestItemProbablys.Add(item.Name, item.stack);
                         }
                     }
                 }
@@ -135,11 +302,11 @@
                     {
                         if (chestItemProbablys.ContainsKey(item.Name))
                         {
-                            chestItemProbablys[item.Name]++;
+                            chestItemProbablys[item.Name] += item.stack;
                         }
                         else
                         {
-                            chestItemProbablys.Add(item.Name, 1);
+                            chestItemProbablys.Add(item.Name, item.stack);
                         }
                     }
                 }

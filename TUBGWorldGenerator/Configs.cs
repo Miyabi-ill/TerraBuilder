@@ -68,7 +68,7 @@
                         Name = "ExampleItemSlot",
                     };
 
-                    ItemProbablyAndStack itemProbablyAndStack = new ItemProbablyAndStack
+                    ItemSlotOrItemProbablyAndStack itemProbablyAndStack = new ItemSlotOrItemProbablyAndStack
                     {
                         Name = "Magic Mirror",
                     };
@@ -97,7 +97,7 @@
                     {
                         Name = "ExampleChest",
                     };
-                    chestContext.ItemSlots.Add(new ItemSlotProbablyAndStack() { Name = "ExampleItemSlot" });
+                    chestContext.ItemSlots.Add(new ItemSlotOrItemProbablyAndStack() { Name = "ExampleItemSlot" });
                     Chests.Add(chestContext.Name, chestContext);
                     sw.WriteLine(JsonConvert.SerializeObject(Chests, Formatting.Indented));
                 }

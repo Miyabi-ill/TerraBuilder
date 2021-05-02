@@ -1,6 +1,7 @@
 ﻿namespace TUBGWorldGenerator.Utils
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using Terraria;
     using TUBGWorldGenerator.WorldGeneration;
@@ -37,32 +38,38 @@
         public static Chest GenerateChestByRandom(Random random, ChestContext chestContext)
         {
             Chest chest = new Chest();
-            int itemIndex = 0;
-            foreach (var itemSlot in chestContext.ItemSlots)
+            List<Item> items = new List<Item>();
+            foreach (var itemSlotContext in GenerateItemSlotsByRandom(random, chestContext))
             {
-                if (random.NextDouble() < itemSlot.Probably)
-                {
-                    int stackCount = random.Next(itemSlot.Min, itemSlot.Max + 1);
-                    for (int i = 0; i < stackCount; i++)
-                    {
-                        int selectedItemIndex = WeightedRandom.SelectIndex(random, itemSlot.Context.Items.Select(x => x.Probably));
-                        if (selectedItemIndex == -1)
-                        {
-                            continue;
-                        }
+                items.AddRange(GenerateFromItemSlot(random, itemSlotContext));
+            }
 
-                        Item item = new Item();
-                        var itemContext = itemSlot.Context.Items[selectedItemIndex];
-                        item.SetDefaults(itemContext.Context.ItemID);
-                        item.stack = random.Next(itemContext.Min, itemContext.Max);
-                        item.prefix = (byte)itemContext.Context.PrefixID;
-                        chest.item[itemIndex] = item;
-                        itemIndex++;
-                    }
+            for (int i = 0; i < chest.item.Length; i++)
+            {
+                if (i >= items.Count)
+                {
+                    break;
                 }
+
+                chest.item[i] = items[i];
             }
 
             return chest;
+        }
+
+        public static IEnumerable<ItemSlotContext> GenerateItemSlotsByRandom(Random random, ChestContext chestContext)
+        {
+            foreach (ItemSlotOrItemProbablyAndStack itemSlot in chestContext.ItemSlots)
+            {
+                if (random.NextDouble() < itemSlot.Probably)
+                {
+                    int count = random.Next(itemSlot.Min, itemSlot.Max + 1);
+                    for (int i = 0; i < count; i++)
+                    {
+                        yield return itemSlot.ItemSlotContext;
+                    }
+                }
+            }
         }
 
         public static ChestContext GetChestContextByRandom(Random random, string chestGroupName)
@@ -80,6 +87,41 @@
             }
 
             return probablies[selectedItemIndex].ChestContext;
+        }
+
+        public static IEnumerable<Item> GenerateFromItemSlot(Random random, ItemSlotContext itemSlot)
+        {
+            int selectedItemIndex = WeightedRandom.SelectIndex(random, itemSlot.Items.Select(x => x.Probably));
+            if (selectedItemIndex == -1)
+            {
+                return new List<Item>();
+            }
+
+            List<Item> items = new List<Item>();
+            ItemSlotOrItemProbablyAndStack probablyAndStack = itemSlot.Items[selectedItemIndex];
+            if (probablyAndStack.ItemContext != null)
+            {
+                Item item = new Item();
+                ItemContext itemContext = probablyAndStack.ItemContext;
+                item.SetDefaults(itemContext.ItemID);
+                item.stack = random.Next(probablyAndStack.Min, probablyAndStack.Max);
+                item.prefix = (byte)itemContext.PrefixID;
+                items.Add(item);
+                return items;
+            }
+
+            if (probablyAndStack.ItemSlotContext != null)
+            {
+                int slotCount = random.Next(probablyAndStack.Min, probablyAndStack.Max);
+                for (int i = 0; i < slotCount; i++)
+                {
+                    items.AddRange(GenerateFromItemSlot(random, probablyAndStack.ItemSlotContext));
+                }
+
+                return items;
+            }
+
+            return items;
         }
     }
 }
