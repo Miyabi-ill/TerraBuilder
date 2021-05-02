@@ -39,12 +39,9 @@
         {
             Chest chest = new Chest();
             List<Item> items = new List<Item>();
-            foreach (ItemSlotOrItemProbablyAndStack itemSlot in chestContext.ItemSlots)
+            foreach (var itemSlotContext in GenerateItemSlotsByRandom(random, chestContext))
             {
-                if (random.NextDouble() < itemSlot.Probably)
-                {
-                    items.AddRange(GenerateFromItemSlot(random, itemSlot.ItemSlotContext));
-                }
+                items.AddRange(GenerateFromItemSlot(random, itemSlotContext));
             }
 
             for (int i = 0; i < chest.item.Length; i++)
@@ -58,6 +55,21 @@
             }
 
             return chest;
+        }
+
+        public static IEnumerable<ItemSlotContext> GenerateItemSlotsByRandom(Random random, ChestContext chestContext)
+        {
+            foreach (ItemSlotOrItemProbablyAndStack itemSlot in chestContext.ItemSlots)
+            {
+                if (random.NextDouble() < itemSlot.Probably)
+                {
+                    int count = random.Next(itemSlot.Min, itemSlot.Max + 1);
+                    for (int i = 0; i < count; i++)
+                    {
+                        yield return itemSlot.ItemSlotContext;
+                    }
+                }
+            }
         }
 
         public static ChestContext GetChestContextByRandom(Random random, string chestGroupName)
