@@ -86,11 +86,13 @@
                         bool success = action.Run(sandbox);
                         if (!success)
                         {
+                            MainWindow.Window.ShowErrorMessage($"アクション`{action.Name}`で生成に失敗しました。");
                             return false;
                         }
                     }
                     catch
                     {
+                        MainWindow.Window.ShowErrorMessage($"アクション`{action.Name}`で生成にエラーが発生しました。");
                         return false;
                     }
                 }

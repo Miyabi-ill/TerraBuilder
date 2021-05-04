@@ -144,7 +144,7 @@
 				</ListView>
 			</DockPanel>
 			<DockPanel Grid.Row="1" LastChildFill="True">
-				<TextBlock Margin="5" x:Name="MessageTextBlock" DockPanel.Dock="Bottom" Text="{Binding Message}"/>
+				<TextBlock Margin="5" x:Name="MessageTextBlock" DockPanel.Dock="Bottom"/>
 				<Image x:Name="MapImage"/>
 			</DockPanel>
 		</Grid>
