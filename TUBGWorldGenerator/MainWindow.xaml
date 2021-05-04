@@ -46,14 +46,21 @@
 					<Button Margin="5" Grid.Row="1" Click="LoadChestConfigButton_Click">チェストコンフィグを読み込み</Button>
 				</Grid>
 				<Expander Margin="5" DockPanel.Dock="Top" Header="Global Config" IsExpanded="True">
-					<xctk:PropertyGrid
-						x:Name="GlobalContextProperty"
-						ShowTitle="False"
-						ShowDescriptionByTooltip="False"
-						ShowSearchBox="False"
-						ShowSortOptions="False"
-						ShowSummary="False"
-						DockPanel.Dock="Top"/>
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition/>
+							<RowDefinition/>
+						</Grid.RowDefinitions>
+						<Button Margin="5" Click="RandomSeedButton_Click">シードをランダムに設定</Button>
+						<xctk:PropertyGrid
+							x:Name="GlobalContextProperty"
+							ShowTitle="False"
+							ShowDescriptionByTooltip="False"
+							ShowSearchBox="False"
+							ShowSortOptions="False"
+							ShowSummary="False"
+							Grid.Row="1"/>
+					</Grid>
 				</Expander>
 
 				<Expander Margin="5" x:Name="LocalContextExpander" DockPanel.Dock="Top" Header="Local Config">

@@ -1,5 +1,6 @@
 ﻿namespace TUBGWorldGenerator
 {
+    using System;
     using System.Collections.Generic;
     using System.Reflection;
     using System.Threading.Tasks;
@@ -181,6 +182,11 @@
             {
                 Configs.LoadAll(dialog.FileName);
             }
+        }
+
+        private void RandomSeedButton_Click(object sender, RoutedEventArgs e)
+        {
+            WorldGenerationRunner.CurrentRunner.GlobalContext.Seed = new Random().Next();
         }
     }
 }
