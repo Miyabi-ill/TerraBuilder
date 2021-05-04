@@ -1,6 +1,7 @@
 ﻿namespace TUBGWorldGenerator.WorldGeneration.Actions.Biomes
 {
     using System;
+    using System.ComponentModel;
     using System.Linq;
     using Microsoft.Xna.Framework;
     using Terraria;
@@ -16,7 +17,7 @@
         public string Name => nameof(Caverns);
 
         /// <inheritdoc/>
-        public string Description => "Generate Caverns.";
+        public string Description => "地下に洞窟を生成する。";
 
         /// <inheritdoc/>
         public CavernContext Context { get; } = new CavernContext();
@@ -220,37 +221,97 @@
             /// <summary>
             /// 洞窟の最小の高さ。
             /// </summary>
+            [Category("洞窟生成")]
+            [DisplayName("最小高さ")]
+            [Description("洞窟の最小の高さ")]
             public int CavernMinHeight { get; set; } = 5;
 
             /// <summary>
             /// 洞窟の最大の高さ。
             /// </summary>
+            [Category("洞窟生成")]
+            [DisplayName("最大高さ")]
+            [Description("洞窟の最大の高さ")]
             public int CavernMaxHeight { get; set; } = 200;
 
             /// <summary>
             /// 地表からの最小距離。
             /// </summary>
+            [Category("洞窟生成")]
+            [DisplayName("最小地表距離")]
+            [Description("地表から洞窟の天井までの最小距離")]
             public int CavernMinDistanceFromSurface { get; set; } = 0;
 
             /// <summary>
             /// 地表からの最大距離。
             /// </summary>
+            [Category("洞窟生成")]
+            [DisplayName("最大地表距離")]
+            [Description("地表から洞窟の天井までの最大距離")]
             public int CavernMaxDistanceFromSurface { get; set; } = 100;
 
+            /// <summary>
+            /// 空中に設置されるブロック塊のブラシ最小サイズ
+            /// </summary>
+            [Category("洞窟内空中ブロック")]
+            [DisplayName("ブロック最小直径")]
+            [Description("空中に設置されるブロック塊のブラシ最小サイズ")]
             public int BlockStrokeMinDiameter { get; set; } = 7;
 
+            /// <summary>
+            /// 空中に設置されるブロック塊のブラシ最大サイズ
+            /// </summary>
+            [Category("洞窟内空中ブロック")]
+            [DisplayName("ブロック最大直径")]
+            [Description("空中に設置されるブロック塊のブラシ最大サイズ")]
             public int BlockStrokeMaxDiameter { get; set; } = 15;
 
+            /// <summary>
+            /// 空中に設置されるブロック塊のブラシの1ストロークあたりの最小移動距離
+            /// </summary>
+            [Category("洞窟内空中ブロック")]
+            [DisplayName("ブロック塊の最小移動距離")]
+            [Description("空中に設置されるブロック塊のブラシの1ストロークあたりの最小移動距離")]
             public int MinRepeatPerStroke { get; set; } = 15;
 
+            /// <summary>
+            /// 空中に設置されるブロック塊のブラシの1ストロークあたりの最大移動距離
+            /// </summary>
+            [Category("洞窟内空中ブロック")]
+            [DisplayName("ブロック塊の最大移動距離")]
+            [Description("空中に設置されるブロック塊のブラシの1ストロークあたりの最大移動距離")]
             public int MaxRepeatPerStroke { get; set; } = 25;
 
+            /// <summary>
+            /// 空中に設置されるブロック塊のブラシのストローク最小繰り返し回数
+            /// </summary>
+            [Category("洞窟内空中ブロック")]
+            [DisplayName("ブロック塊の移動最小繰り返し回数")]
+            [Description("空中に設置されるブロック塊のブラシのストローク最小繰り返し回数")]
             public int MinRepeatForStroke { get; set; } = 3;
 
+            /// <summary>
+            /// 空中に設置されるブロック塊のブラシのストローク最大繰り返し回数
+            /// </summary>
+            [Category("洞窟内空中ブロック")]
+            [DisplayName("ブロック塊の移動最大繰り返し回数")]
+            [Description("空中に設置されるブロック塊のブラシのストローク最大繰り返し回数")]
             public int MaxRepeatForStroke { get; set; } = 4;
 
+            /// <summary>
+            /// 洞窟の上下のタイルから、ブロック塊のブラシ開始地点までの最小距離。
+            /// </summary>
+            [Category("洞窟内空中ブロック")]
+            [DisplayName("洞窟の上下からの最小距離")]
+            [Description("洞窟の上下のタイルから、ブロック塊のブラシ開始地点までの最小距離")]
             public int MinDistanceFromCavernTopAndBottom { get; set; } = 15;
 
+            /// <summary>
+            /// 空中に設置されるブロック塊の設置個数
+            /// </summary>
+            [Category("洞窟内空中ブロック")]
+            [DisplayName("ブロック塊設置個数")]
+            [Description("空中に設置されるブロック塊の設置個数")]
             public int BlockCount { get; set; } = 60;
         }
     }

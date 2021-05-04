@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace TUBGWorldGenerator.WorldGeneration.Actions.Buildings
     {
         public string Name => nameof(RandomRope);
 
-        public string Description => "ロープを地下にランダムに配置する";
+        public string Description => "地下にロープをランダムに配置する";
 
         public RandomRopeContext Context { get; set; } = new RandomRopeContext();
 
@@ -46,10 +47,19 @@ namespace TUBGWorldGenerator.WorldGeneration.Actions.Buildings
 
         public class RandomRopeContext : ActionContext
         {
+            [Category("ロープ生成")]
+            [DisplayName("ロープ設置数")]
+            [Description("ロープを設置する数")]
             public int RopeCount { get; set; } = 300;
 
+            [Category("ロープ生成")]
+            [DisplayName("ロープ最小長さ")]
+            [Description("ロープの最小長さ")]
             public int RopeMinLength { get; set; } = 15;
 
+            [Category("ロープ生成")]
+            [DisplayName("ロープ最大長さ")]
+            [Description("ロープの最大長さ")]
             public int RopeMaxLength { get; set; } = 50;
         }
     }

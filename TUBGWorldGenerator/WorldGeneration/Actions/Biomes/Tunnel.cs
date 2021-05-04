@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using Microsoft.Xna.Framework;
 
     /// <summary>
@@ -178,11 +179,17 @@
             /// <summary>
             /// トンネルの数
             /// </summary>
+            [Category("トンネル生成")]
+            [DisplayName("トンネル数")]
+            [Description("生成するトンネルの個数")]
             public int TunnelCount { get; set; } = 10;
 
             /// <summary>
             /// 近くのトンネルとの最小距離
             /// </summary>
+            [Category("トンネル生成")]
+            [DisplayName("近くのトンネルからの最小距離")]
+            [Description("近くのトンネルからどれだけ離れているかを設定する。この距離以内には追加のトンネルの入口は生成されない。")]
             public int MinDistanceFromNearbyTunnel { get; set; } = 100;
         }
     }

@@ -1,6 +1,7 @@
 ﻿namespace TUBGWorldGenerator.WorldGeneration.Actions.Buildings
 {
     using System;
+    using System.ComponentModel;
     using Terraria;
     using Terraria.ID;
     using TUBGWorldGenerator.Utils;
@@ -63,10 +64,19 @@
 
         public class RandomCavernChestContext : ActionContext
         {
+            [Category("地下チェスト生成")]
+            [DisplayName("1チェストあたり最大リトライ数")]
+            [Description("チェストを1つ設置するまでのリトライ回数。チェストが設置できないとき=下が斜めブロックなどのときにリトライされる。")]
             public int MaxRetryForOneChest { get; set; } = 100;
 
+            [Category("地下チェスト生成")]
+            [DisplayName("チェスト設置数")]
+            [Description("チェストを設置する数。もしリトライに失敗した場合、この数より少なく生成される。")]
             public int ChestCount { get; set; } = 50;
 
+            [Category("地下チェスト生成")]
+            [DisplayName("設置するチェストグループ名")]
+            [Description("地下に設置するチェストのチェストグループ名")]
             public string ChestGroupName { get; set; }
         }
     }

@@ -1,6 +1,7 @@
 ﻿namespace TUBGWorldGenerator.WorldGeneration.Actions.Buildings
 {
     using System.Collections.Generic;
+    using System.ComponentModel;
     using Terraria;
     using Terraria.DataStructures;
     using Terraria.ID;
@@ -130,14 +131,34 @@
                 ChestProbably = 0.03;
             }
 
+            [Category("部屋エリア設置")]
+            [DisplayName("エリア内の部屋の個数")]
+            [Description("エリア内に設置する部屋の個数")]
+            public new int BlockCount { get; set; } = 200;
+
+            [Category("部屋エリア設置")]
+            [DisplayName("エリア数")]
+            [Description("部屋を集中して設置するエリアの個数")]
             public int AreaCount { get; set; } = 5;
 
+            [Category("部屋エリア設置")]
+            [DisplayName("近くのエリアからの最小距離")]
+            [Description("近くのエリアから最小でも離れている距離。この距離以内にはエリアは生成されない。")]
             public int MinDistanceFromNearbyArea { get; set; } = 200;
 
+            [Category("部屋エリア設置")]
+            [DisplayName("エリア最小幅")]
+            [Description("部屋を集中して設置するエリアの最小幅")]
             public int AreaMinWidth { get; set; } = 30;
 
+            [Category("部屋エリア設置")]
+            [DisplayName("エリア最大幅")]
+            [Description("部屋を集中して設置するエリアの最小幅")]
             public int AreaMaxWidth { get; set; } = 150;
 
+            [Category("部屋エリア設置")]
+            [DisplayName("エリア選択リトライ数")]
+            [Description("エリア選択をやり直す回数。選択に失敗した場合生成されない。失敗する原因=近くのエリアからの最小距離が大きすぎるなど")]
             public int MaxAreaSelectRetry { get; set; } = 10;
         }
     }

@@ -1,5 +1,6 @@
 ﻿namespace TUBGWorldGenerator.WorldGeneration.Actions.Buildings
 {
+    using System.ComponentModel;
     using Terraria;
     using Terraria.ID;
     using TUBGWorldGenerator.Utils;
@@ -266,26 +267,59 @@
 
         public class RandomSizeBlockContext : ActionContext
         {
+            [Category("部屋")]
+            [DisplayName("部屋の最小幅(壁含む)")]
+            [Description("部屋の最小の幅。壁を含んでいるので、通り抜け可能な最小の幅は4ブロック。")]
             public int BlockMinX { get; set; } = 5;
 
+            [Category("部屋")]
+            [DisplayName("部屋の最大幅(壁含む)")]
+            [Description("部屋の最大の幅。壁を含んでいるので、通り抜け可能な最小の幅は4ブロック。")]
             public int BlockMaxX { get; set; } = 15;
 
+            [Category("部屋")]
+            [DisplayName("部屋の最小高さ(壁含む)")]
+            [Description("部屋の最小の高さ。壁を含んでいるので、通り抜け可能な最小の高さは5ブロック。")]
             public int BlockMinY { get; set; } = 5;
 
+            [Category("部屋")]
+            [DisplayName("部屋の最大高さ(壁含む)")]
+            [Description("部屋の最大の高さ。壁を含んでいるので、通り抜け可能な最小の高さは5ブロック。")]
             public int BlockMaxY { get; set; } = 10;
 
+            [Category("部屋設置")]
+            [DisplayName("部屋の個数")]
+            [Description("設置する部屋の個数")]
             public int BlockCount { get; set; } = 200;
 
+            [Category("部屋設置")]
+            [DisplayName("部屋設置最大リトライ数")]
+            [Description("設置する部屋の設置に失敗したときの最大リトライ数。設置に失敗するケース=既に建造物がある場合など")]
             public int MaxPlaceRetry { get; set; } = 100;
 
+            [Category("部屋設置")]
+            [DisplayName("部屋設置最大高さ")]
+            [Description("部屋の設置を最大で地上からどこまでの高さに制限するか。初期地点から建物が見えることを防ぐ。")]
             public int MaxHeightFromSurface { get; set; } = 100;
 
+            [Category("部屋設置")]
+            [DisplayName("チェスト生成確率")]
+            [Description("部屋の中にチェストを設置する確率。十分なスペースがなければ設置されない。")]
             public double ChestProbably { get; set; } = 0.3;
 
+            [Category("部屋設置")]
+            [DisplayName("チェストグループ名")]
+            [Description("部屋の中にチェストを設置する場合に使われるチェストグループ名。")]
             public string ChestGroupName { get; set; }
 
+            [Category("部屋設置")]
+            [DisplayName("部屋設置場所")]
+            [Description("部屋を設置する場所(バイオーム)。地下、地上など。")]
             public PlaceBiome PlaceBiome { get; set; } = PlaceBiome.Surface;
 
+            [Category("部屋設置")]
+            [DisplayName("松明設置確率")]
+            [Description("部屋の中に松明を設置する確率。")]
             public double TorchProbably { get; set; } = 0.08;
         }
     }
