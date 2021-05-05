@@ -4,6 +4,7 @@
     using System.IO;
     using Newtonsoft.Json;
     using Terraria.ID;
+    using TUBGWorldGenerator.WorldGeneration;
     using TUBGWorldGenerator.WorldGeneration.Chests;
 
     public static class Configs
@@ -16,7 +17,87 @@
 
         public static Dictionary<string, ItemContext> Items { get; private set; } = new Dictionary<string, ItemContext>();
 
-        public static void LoadAll(string dirName)
+        // TODO: クラス全体をリファクタ
+        // このクラスはコンフィグをまとめて読み込む用(パスを保存して読み込む用)のクラスにする
+        internal static string LastChestConfigsDir
+        {
+            get => lastChestConfigsDir;
+            set
+            {
+                lastChestConfigsDir = value;
+                SaveConfigsPath();
+            }
+        }
+
+        internal static string LastActionConfigPath
+        {
+            get => lastChestConfigPath;
+            set
+            {
+                lastChestConfigPath = value;
+                SaveConfigsPath();
+            }
+        }
+
+        private static string lastChestConfigsDir;
+
+        private static string lastChestConfigPath;
+
+        private static bool isLoading = false;
+
+        private const string SavedConfigPath = "Config.json";
+
+        public static void RecoverConfigsFromSaved()
+        {
+            isLoading = true;
+            using (var sr = new StreamReader(SavedConfigPath))
+            {
+                var dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(sr.ReadToEnd());
+
+                if (dict.TryGetValue(nameof(LastChestConfigsDir), out string lastChestConfigsDir))
+                {
+                    LastChestConfigsDir = lastChestConfigsDir;
+                }
+
+                if (dict.TryGetValue(nameof(LastActionConfigPath), out string lastChestConfigsPath))
+                {
+                    LastActionConfigPath = lastChestConfigsPath;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(LastChestConfigsDir))
+            {
+                LoadAllChestConfigs(LastChestConfigsDir);
+            }
+
+            if (!string.IsNullOrEmpty(LastActionConfigPath))
+            {
+                WorldGenerationRunner.CurrentRunner.Load(LastActionConfigPath);
+            }
+
+            isLoading = false;
+        }
+
+        private static void SaveConfigsPath()
+        {
+            if (isLoading)
+            {
+                return;
+            }
+
+            Dictionary<string, string> configValues = new Dictionary<string, string>()
+            {
+                [nameof(LastChestConfigsDir)] = LastChestConfigsDir,
+                [nameof(LastActionConfigPath)] = LastActionConfigPath,
+            };
+
+            using (var sw = new StreamWriter(SavedConfigPath))
+            {
+                sw.Write(JsonConvert.SerializeObject(configValues, Formatting.Indented));
+            }
+        }
+
+        public static void LoadAllChestConfigs(string dirName)
         {
             if (!Directory.Exists(dirName))
             {

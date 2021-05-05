@@ -119,16 +119,29 @@
 
         public void Load(string path)
         {
-            using (var sr = new StreamReader(path))
+            if (File.Exists(path))
             {
-                var tuple = JsonConvert.DeserializeObject<ValueTuple<GlobalContext, ObservableCollection<IWorldGenerationAction<ActionContext>>>>(
-                    sr.ReadToEnd(),
-                    new JsonSerializerSettings()
+                using (var sr = new StreamReader(path))
+                {
+                    var tuple = JsonConvert.DeserializeObject<ValueTuple<GlobalContext, ObservableCollection<IWorldGenerationAction<ActionContext>>>>(
+                        sr.ReadToEnd(),
+                        new JsonSerializerSettings()
+                        {
+                            TypeNameHandling = TypeNameHandling.Auto,
+                        });
+                    GlobalContext = tuple.Item1;
+                    WorldGenerationActions.Clear();
+                    foreach (var item in tuple.Item2)
                     {
-                        TypeNameHandling = TypeNameHandling.Auto,
-                    });
-                GlobalContext = tuple.Item1;
-                WorldGenerationActions = tuple.Item2;
+                        WorldGenerationActions.Add(item);
+                    }
+                }
+
+                MainWindow.Window.ShowMessage($"アクションを{path}から読み込みました。");
+            }
+            else
+            {
+                MainWindow.Window.ShowMessage($"生成コンフィグファイル`{path}`が存在しません。");
             }
         }
     }

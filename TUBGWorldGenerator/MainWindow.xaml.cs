@@ -36,6 +36,8 @@
             UpdateMapView();
 
             Window = this;
+
+            Configs.RecoverConfigsFromSaved();
         }
 
         internal static MainWindow Window { get; private set; }
@@ -44,16 +46,27 @@
 
         private WorldGenerationRunner Runner { get; }
 
+        /// <summary>
+        /// ユーザーにメッセージを表示する。
+        /// </summary>
+        /// <param name="text">表示するメッセージ</param>
         public void ShowMessage(string text)
         {
-            Dispatcher.BeginInvoke((Action)(() => {
+            Dispatcher.BeginInvoke((Action)(() =>
+            {
                 MessageTextBlock.Text = text;
+                MessageTextBlock.Foreground = Brushes.Black;
             }));
         }
 
+        /// <summary>
+        /// ユーザーにエラーメッセージを表示する。
+        /// </summary>
+        /// <param name="text">表示するエラーメッセージ</param>
         public void ShowErrorMessage(string text)
         {
-            Dispatcher.BeginInvoke((Action)(() => {
+            Dispatcher.BeginInvoke((Action)(() =>
+            {
                 MessageTextBlock.Text = text;
                 MessageTextBlock.Foreground = Brushes.Red;
             }));
@@ -164,11 +177,11 @@
             if (dialog.ShowDialog() == true)
             {
                 Runner.Load(dialog.FileName);
+                Configs.LastActionConfigPath = dialog.FileName;
                 ActionList.ItemsSource = Runner.WorldGenerationActions;
                 GlobalContextProperty.SelectedObject = Runner.GlobalContext;
                 LocalContextProperty.SelectedObject = null;
                 LocalContextExpander.Header = "Local Config";
-                ShowMessage(string.Format("アクションを{0}から読み込みました。", dialog.FileName));
             }
         }
 
@@ -184,6 +197,7 @@
             if (dialog.ShowDialog() == true)
             {
                 Runner.Save(dialog.FileName);
+                Configs.LastActionConfigPath = dialog.FileName;
             }
         }
 
@@ -200,9 +214,11 @@
                 IsFolderPicker = true,
                 RestoreDirectory = true,
             };
+
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                Configs.LoadAll(dialog.FileName);
+                Configs.LoadAllChestConfigs(dialog.FileName);
+                Configs.LastChestConfigsDir = dialog.FileName;
             }
         }
 
