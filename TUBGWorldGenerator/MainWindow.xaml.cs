@@ -1,10 +1,12 @@
 ﻿namespace TUBGWorldGenerator
 {
+    using System;
     using System.Collections.Generic;
     using System.Reflection;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Windows.Media;
     using System.Windows.Media.Imaging;
     using Microsoft.Win32;
     using Microsoft.WindowsAPICodePack.Dialogs;
@@ -32,13 +34,43 @@
             ActionList.ItemsSource = Runner.WorldGenerationActions;
 
             UpdateMapView();
+
+            Window = this;
+
+            Configs.RecoverConfigsFromSaved();
         }
 
-        public string Message { get; set; }
+        internal static MainWindow Window { get; private set; }
 
         private WorldSandbox Sandbox { get; }
 
         private WorldGenerationRunner Runner { get; }
+
+        /// <summary>
+        /// ユーザーにメッセージを表示する。
+        /// </summary>
+        /// <param name="text">表示するメッセージ</param>
+        public void ShowMessage(string text)
+        {
+            Dispatcher.BeginInvoke((Action)(() =>
+            {
+                MessageTextBlock.Text = text;
+                MessageTextBlock.Foreground = Brushes.Black;
+            }));
+        }
+
+        /// <summary>
+        /// ユーザーにエラーメッセージを表示する。
+        /// </summary>
+        /// <param name="text">表示するエラーメッセージ</param>
+        public void ShowErrorMessage(string text)
+        {
+            Dispatcher.BeginInvoke((Action)(() =>
+            {
+                MessageTextBlock.Text = text;
+                MessageTextBlock.Foreground = Brushes.Red;
+            }));
+        }
 
         /// <summary>
         /// マップを更新する。
@@ -52,7 +84,11 @@
         {
             RunningOverlay.Visibility = Visibility.Visible;
             bool success = await Task.Run(() => Runner.Run(Sandbox)).ConfigureAwait(true);
-            Message = success ? "生成が正常に終了しました。" : "生成に失敗しました。";
+            if (success)
+            {
+                ShowMessage("生成が正常に終了しました。");
+            }
+
             UpdateMapView();
             RunningOverlay.Visibility = Visibility.Collapsed;
         }
@@ -91,7 +127,7 @@
             lock (Sandbox)
             {
                 string path = Sandbox.Save(null);
-                Message = string.Format("{0}に保存しました。", path);
+                ShowMessage(string.Format("{0}に保存しました。", path));
                 UpdateMapView();
             }
         }
@@ -141,11 +177,11 @@
             if (dialog.ShowDialog() == true)
             {
                 Runner.Load(dialog.FileName);
+                Configs.LastActionConfigPath = dialog.FileName;
                 ActionList.ItemsSource = Runner.WorldGenerationActions;
                 GlobalContextProperty.SelectedObject = Runner.GlobalContext;
                 LocalContextProperty.SelectedObject = null;
                 LocalContextExpander.Header = "Local Config";
-                Message = string.Format("アクションを{0}から読み込みました。", dialog.FileName);
             }
         }
 
@@ -161,6 +197,7 @@
             if (dialog.ShowDialog() == true)
             {
                 Runner.Save(dialog.FileName);
+                Configs.LastActionConfigPath = dialog.FileName;
             }
         }
 
@@ -177,10 +214,17 @@
                 IsFolderPicker = true,
                 RestoreDirectory = true,
             };
+
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                Configs.LoadAll(dialog.FileName);
+                Configs.LoadAllChestConfigs(dialog.FileName);
+                Configs.LastChestConfigsDir = dialog.FileName;
             }
+        }
+
+        private void RandomSeedButton_Click(object sender, RoutedEventArgs e)
+        {
+            WorldGenerationRunner.CurrentRunner.GlobalContext.Seed = new Random().Next();
         }
     }
 }

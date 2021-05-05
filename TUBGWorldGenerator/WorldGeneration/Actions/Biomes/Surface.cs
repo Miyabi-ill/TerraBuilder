@@ -224,6 +224,9 @@
             /// 地表生成を行う最大の高さ。
             /// <see cref="SurfaceLevel"/>からこの値を減算した高さが実際に地表生成を行う最大の高さになる
             /// </summary>
+            [Category("地表生成")]
+            [DisplayName("地表最大高さ")]
+            [Description("地表生成を行う最大の高さ。地表レベルからのブロック数。")]
             public int SurfaceMaxHeight { get; set; } = 50;
         }
     }
