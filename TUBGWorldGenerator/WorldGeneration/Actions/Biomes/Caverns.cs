@@ -84,8 +84,8 @@
                     {
                         tiles[x, y] = new Tile()
                         {
-                            type = TileID.Stone,
-                            wall = WallID.Stone,
+                            type = TileID.GrayBrick,
+                            wall = WallID.GrayBrick,
                         };
                         tiles[x, y].active(true);
                     }
@@ -93,8 +93,8 @@
                     {
                         tiles[x, y] = new Tile()
                         {
-                            type = TileID.Stone,
-                            wall = WallID.Stone,
+                            type = TileID.GrayBrick,
+                            wall = WallID.GrayBrick,
                         };
                         tiles[x, y].active(true);
                     }
@@ -102,7 +102,7 @@
                     {
                         tiles[x, y] = new Tile()
                         {
-                            wall = WallID.Stone,
+                            wall = WallID.GrayBrick,
                         };
                     }
                 }
@@ -180,7 +180,7 @@
                         float b = Math.Abs((float)m - currentPosition.Y);
                         if (Math.Sqrt((double)(a * a + b * b)) < realRadius)
                         {
-                            sandbox.Tiles[l, m].type = TileID.Stone;
+                            sandbox.Tiles[l, m].type = TileID.GrayBrick;
                             sandbox.Tiles[l, m].active(true);
                         }
                     }
