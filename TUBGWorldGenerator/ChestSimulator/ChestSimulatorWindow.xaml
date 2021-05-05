@@ -26,7 +26,7 @@
 				<TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="1">チェストシミュレート生成数</TextBlock>
 				<TextBox Margin="5" Grid.Row="1" Grid.Column="1" x:Name="ChestSimulateCountBox">10000</TextBox>
 				<TextBlock Margin="5" Grid.Row="2">表示モード</TextBlock>
-				<ComboBox Margin="5" Grid.Row="2" Grid.Column="1" x:Name="ShowDataMode" SelectionChanged="ShowDataMode_SelectionChanged">
+				<ComboBox Margin="5" Grid.Row="2" Grid.Column="1" x:Name="ShowDataMode" SelectionChanged="ShowDataMode_SelectionChanged" SelectedIndex="0">
 					<ComboBoxItem>表</ComboBoxItem>
 					<ComboBoxItem>円グラフ</ComboBoxItem>
 				</ComboBox>
@@ -36,7 +36,7 @@
 				<Button Margin="5" Grid.Row="4" Grid.Column="1" Click="SimulateButton_Click">シミュレート</Button>
 			</Grid>
 			<Grid>
-				<Grid x:Name="ListViewModeGrid" Visibility="Collapsed">
+				<Grid x:Name="ListViewModeGrid" Visibility="Visible">
 					<ListView x:Name="ChestAccResults" ScrollViewer.CanContentScroll="False">
 						<ListView.ItemsPanel>
 							<ItemsPanelTemplate>

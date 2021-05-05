@@ -196,6 +196,11 @@
                 return;
             }
 
+            if (ListViewModeGrid == null || CircleGraphViewModeGrid == null)
+            {
+                return;
+            }
+
             switch (selectedText)
             {
                 case "表":
