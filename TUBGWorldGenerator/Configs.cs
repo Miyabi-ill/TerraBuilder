@@ -50,18 +50,21 @@
         public static void RecoverConfigsFromSaved()
         {
             isLoading = true;
-            using (var sr = new StreamReader(SavedConfigPath))
+            if (File.Exists(SavedConfigPath))
             {
-                var dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(sr.ReadToEnd());
-
-                if (dict.TryGetValue(nameof(LastChestConfigsDir), out string lastChestConfigsDir))
+                using (var sr = new StreamReader(SavedConfigPath))
                 {
-                    LastChestConfigsDir = lastChestConfigsDir;
-                }
+                    var dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(sr.ReadToEnd());
 
-                if (dict.TryGetValue(nameof(LastActionConfigPath), out string lastChestConfigsPath))
-                {
-                    LastActionConfigPath = lastChestConfigsPath;
+                    if (dict.TryGetValue(nameof(LastChestConfigsDir), out string lastChestConfigsDir))
+                    {
+                        LastChestConfigsDir = lastChestConfigsDir;
+                    }
+
+                    if (dict.TryGetValue(nameof(LastActionConfigPath), out string lastChestConfigsPath))
+                    {
+                        LastActionConfigPath = lastChestConfigsPath;
+                    }
                 }
             }
 
