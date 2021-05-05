@@ -28,7 +28,7 @@
             set
             {
                 surfaceLevel = value;
-                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(SurfaceLevel)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SurfaceLevel)));
             }
         }
 
@@ -44,7 +44,7 @@
             set
             {
                 respawnLevel = value;
-                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(RespawnLevel)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RespawnLevel)));
             }
         }
 
@@ -61,7 +61,7 @@
             {
                 seed = value;
                 Random = new Random(seed);
-                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(Seed)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Seed)));
             }
         }
 
@@ -75,7 +75,7 @@
             set
             {
                 rand = value;
-                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(nameof(Random)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Random)));
             }
         }
     }

@@ -23,6 +23,7 @@
             AvailableActions.Add(nameof(Actions.Buildings.RandomCavernChests), () => new Actions.Buildings.RandomCavernChests());
             AvailableActions.Add(nameof(Actions.Buildings.RandomRope), () => new Actions.Buildings.RandomRope());
             AvailableActions.Add(nameof(Actions.Buildings.Wells), () => new Actions.Buildings.Wells());
+            AvailableActions.Add(nameof(Actions.Buildings.LiquidsInAir), () => new Actions.Buildings.LiquidsInAir());
         }
 
         /// <summary>
@@ -42,6 +43,7 @@
             WorldGenerationActions.Add(new Actions.Buildings.RandomCavernChests());
             WorldGenerationActions.Add(new Actions.Biomes.CavernWater());
             WorldGenerationActions.Add(new Actions.Buildings.RandomRope());
+            WorldGenerationActions.Add(new Actions.Buildings.LiquidsInAir());
             WorldGenerationActions.Add(new Actions.Biomes.SpawnArea());
 
             // TODO: Load from json

@@ -113,6 +113,7 @@
     <Compile Include="Utils\GenerateChest.cs" />
     <Compile Include="Utils\Liquids.cs" />
     <Compile Include="Utils\PerlinNoise.cs" />
+    <Compile Include="Utils\RandGen.cs" />
     <Compile Include="Utils\WeightedRandom.cs" />
     <Compile Include="Utils\WorldToImage.cs" />
     <Compile Include="Views\AddActionWindow.xaml.cs">
@@ -128,6 +129,7 @@
     <Compile Include="WorldGeneration\Actions\Biomes\SpawnArea.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Surface.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Tunnel.cs" />
+    <Compile Include="WorldGeneration\Actions\Buildings\LiquidsInAir.cs" />
     <Compile Include="WorldGeneration\Actions\Buildings\RandomCavernChests.cs" />
     <Compile Include="WorldGeneration\Actions\Buildings\RandomRope.cs" />
     <Compile Include="WorldGeneration\Actions\Buildings\RandomSizeBlocks.cs" />
