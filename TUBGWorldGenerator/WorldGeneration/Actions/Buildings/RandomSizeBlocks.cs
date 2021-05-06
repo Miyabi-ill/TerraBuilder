@@ -72,6 +72,7 @@
                         int x = random.Next(100, sandbox.TileCountX - 100);
                         int y = random.Next((int)cavernTop[x], (int)cavernBottom[x]);
                         bool placeToTop = random.Next(2) == 0;
+                        int? maxY = placeToTop ? (int?)((int)cavernTop[x] - 2) : null;
                         bool success = PlaceBlockToCavern(
                             sandbox,
                             Context,
@@ -79,7 +80,8 @@
                             sizeY: random.Next(Context.BlockMinY, Context.BlockMaxY),
                             x,
                             y,
-                            placeToTop);
+                            placeToTop,
+                            maxY);
                         if (success)
                         {
                             break;
@@ -124,8 +126,13 @@
             return false;
         }
 
-        public static bool PlaceBlockToCavern(WorldSandbox sandbox, RandomSizeBlockContext context, int sizeX, int sizeY, int x, int y, bool placeToTop = false)
+        public static bool PlaceBlockToCavern(WorldSandbox sandbox, RandomSizeBlockContext context, int sizeX, int sizeY, int x, int y, bool placeToTop = false, int? maxTileY = null)
         {
+            if (!maxTileY.HasValue)
+            {
+                maxTileY = placeToTop ? 0 : sandbox.TileCountY;
+            }
+
             for (int cx = x; cx < x + sizeX; cx++)
             {
                 for (int cy = y; cy < y + sizeY; cy++)
@@ -139,7 +146,7 @@
 
             if (placeToTop)
             {
-                for (int cy = y; cy > 0; cy--)
+                for (int cy = y; cy > maxTileY; cy--)
                 {
                     bool foundBuildingBlock = false;
                     for (int cx = x; cx < x + sizeX; cx++)
@@ -161,7 +168,7 @@
             }
             else
             {
-                for (int cy = y; cy < sandbox.TileCountY; cy++)
+                for (int cy = y; cy < maxTileY; cy++)
                 {
                     bool foundBuildingBlock = false;
                     for (int cx = x; cx < x + sizeX; cx++)

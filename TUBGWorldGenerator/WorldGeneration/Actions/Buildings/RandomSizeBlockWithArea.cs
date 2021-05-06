@@ -99,6 +99,8 @@
                             {
                                 int x = random.Next(areaLeft, areaLeft + width);
                                 int y = random.Next((int)cavernTop[x], (int)cavernBottom[x]);
+                                bool placeToTop = random.Next(2) == 0;
+                                int? maxY = placeToTop ? (int?)((int)cavernTop[x] - 2) : null;
                                 bool result = PlaceBlockToCavern(
                                     sandbox,
                                     Context,
@@ -106,7 +108,8 @@
                                     sizeY: random.Next(Context.BlockMinY, Context.BlockMaxY),
                                     x,
                                     y,
-                                    random.Next(2) == 0);
+                                    placeToTop,
+                                    maxY);
                                 if (result)
                                 {
                                     break;
