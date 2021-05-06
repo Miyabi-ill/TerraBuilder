@@ -16,6 +16,24 @@
                 return false;
             }
 
+            // タイル保護をチェック
+            for (int i = x; i < x + 2; i++)
+            {
+                for (int j = y; j < y + 2; j++)
+                {
+                    if (sandbox.TileProtectionMap[i, j].HasFlag(TileProtectionMap.TileProtectionType.TopSolid)
+                        || sandbox.TileProtectionMap[i, j].HasFlag(TileProtectionMap.TileProtectionType.BottomSolid)
+                        || sandbox.TileProtectionMap[i, j].HasFlag(TileProtectionMap.TileProtectionType.RightSolid)
+                        || sandbox.TileProtectionMap[i, j].HasFlag(TileProtectionMap.TileProtectionType.LeftSolid)
+                        || sandbox.TileProtectionMap[i, j].HasFlag(TileProtectionMap.TileProtectionType.TileType)
+                        || sandbox.TileProtectionMap[i, j].HasFlag(TileProtectionMap.TileProtectionType.TileShape)
+                        || sandbox.TileProtectionMap[i, j].HasFlag(TileProtectionMap.TileProtectionType.TileFrame))
+                    {
+                        return false;
+                    }
+                }
+            }
+
             int chestIndex = WorldGen.PlaceChest(x, y + 1, (ushort)chestContext.TileType, style: chestContext.TileStyle);
             if (chestIndex != -1)
             {

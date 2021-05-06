@@ -46,6 +46,9 @@
                 nodestroy.actuator(true);
 
                 sandbox.Tiles[x, globalContext.RespawnLevel + 1] = nodestroy;
+
+                sandbox.TileProtectionMap[x, globalContext.RespawnLevel] = TileProtectionMap.TileProtectionType.All;
+                sandbox.TileProtectionMap[x, globalContext.RespawnLevel + 1] = TileProtectionMap.TileProtectionType.All;
             }
 
             sandbox.Tiles[5, globalContext.RespawnLevel - 1] = new Tile() { wall = WallID.Wood };

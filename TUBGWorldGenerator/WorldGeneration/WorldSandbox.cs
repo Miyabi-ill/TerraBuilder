@@ -46,6 +46,11 @@
         public ITileCollection Tiles { get; private set; }
 
         /// <summary>
+        /// タイル保護マップ
+        /// </summary>
+        public TileProtectionMap TileProtectionMap { get; private set; }
+
+        /// <summary>
         /// ワールドにあるチェスト
         /// </summary>
         public Chest[] Chests { get; private set; }
@@ -125,6 +130,8 @@
                     WorldGenerationRunner.CurrentRunner.GlobalContext.Seed = WorldGenerationRunner.CurrentRunner.GlobalContext.Seed;
                     WorldGenerationRunner.CurrentRunner.GlobalContext.ClearAdditionalContext();
                 }
+
+                TileProtectionMap = new TileProtectionMap(this);
 
                 return true;
             }

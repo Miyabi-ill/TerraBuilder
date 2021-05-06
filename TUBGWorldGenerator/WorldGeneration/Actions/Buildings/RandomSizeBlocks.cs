@@ -130,7 +130,7 @@
             {
                 for (int cy = y; cy < y + sizeY; cy++)
                 {
-                    if (sandbox.Tiles[cx, cy]?.active() == true || (sandbox.Tiles[cx, cy]?.wall != 0 && sandbox.Tiles[cx, cy]?.wall != WallID.Stone))
+                    if (sandbox.Tiles[cx, cy]?.active() == true || (sandbox.Tiles[cx, cy]?.wall != 0 && sandbox.Tiles[cx, cy]?.wall != WallID.GrayBrick))
                     {
                         return false;
                     }
@@ -183,60 +183,67 @@
             }
         }
 
-        public static bool PlaceBlock(WorldSandbox sandbox,RandomSizeBlockContext context, int sizeX, int sizeY, int x, int y)
-        { 
+        public static bool PlaceBlock(WorldSandbox sandbox, RandomSizeBlockContext context, int sizeX, int sizeY, int x, int y)
+        {
             var random = WorldGenerationRunner.CurrentRunner.GlobalContext.Random;
+
+            Tile[,] tiles = new Tile[sizeX, sizeY];
+            TileProtectionMap.TileProtectionType[,] tileProtectionTypes = new TileProtectionMap.TileProtectionType[sizeX, sizeY];
+
             ActiveWallDirection randomWallDir = (ActiveWallDirection)random.Next(0, 4);
-            for (int px = x; px < x + sizeX; px++)
+            for (int px = 0; px < sizeX; px++)
             {
-                for (int py = y; py < y + sizeY; py++)
+                for (int py = 0; py < sizeY; py++)
                 {
-                    if (px == x)
+                    if (px == 0)
                     {
                         ushort tileType = randomWallDir == ActiveWallDirection.Left ? TileID.WoodBlock : TileID.Platforms;
-                        sandbox.Tiles[px, py] = new Tile()
+                        tiles[px, py] = new Tile()
                         {
                             type = tileType,
                         };
-                        sandbox.Tiles[px, py].active(true);
-                        WorldGen.SquareTileFrame(px, py);
+                        tiles[px, py].active(true);
+                        tileProtectionTypes[px, py] = TileProtectionMap.TileProtectionType.TopSolid;
                     }
-                    else if (px == x + sizeX - 1)
+                    else if (px == sizeX - 1)
                     {
                         ushort tileType = randomWallDir == ActiveWallDirection.Right ? TileID.WoodBlock : TileID.Platforms;
-                        sandbox.Tiles[px, py] = new Tile()
+                        tiles[px, py] = new Tile()
                         {
                             type = tileType,
                         };
-                        sandbox.Tiles[px, py].active(true);
-                        WorldGen.SquareTileFrame(px, py);
+                        tiles[px, py].active(true);
+                        tileProtectionTypes[px, py] = TileProtectionMap.TileProtectionType.TopSolid;
                     }
-                    else if (py == y)
+                    else if (py == 0)
                     {
                         ushort tileType = randomWallDir == ActiveWallDirection.Top ? TileID.WoodBlock : TileID.Platforms;
-                        sandbox.Tiles[px, py] = new Tile()
+                        tiles[px, py] = new Tile()
                         {
                             type = tileType,
                         };
-                        sandbox.Tiles[px, py].active(true);
-                        WorldGen.SquareTileFrame(px, py);
+                        tiles[px, py].active(true);
+                        tileProtectionTypes[px, py] = TileProtectionMap.TileProtectionType.TopSolid;
                     }
-                    else if (py == y + sizeY - 1)
+                    else if (py == sizeY - 1)
                     {
                         ushort tileType = randomWallDir == ActiveWallDirection.Bottom ? TileID.WoodBlock : TileID.Platforms;
-                        sandbox.Tiles[px, py] = new Tile()
+                        tiles[px, py] = new Tile()
                         {
                             type = tileType,
                         };
-                        sandbox.Tiles[px, py].active(true);
-                        WorldGen.SquareTileFrame(px, py);
+                        tiles[px, py].active(true);
+                        tileProtectionTypes[px, py] = TileProtectionMap.TileProtectionType.TopSolid;
                     }
                     else
                     {
-                        sandbox.Tiles[px, py] = new Tile() { wall = WallID.Wood };
+                        tiles[px, py] = new Tile() { wall = WallID.Wood };
+                        tileProtectionTypes[px, py] = TileProtectionMap.TileProtectionType.None;
                     }
                 }
             }
+
+            sandbox.TileProtectionMap.PlaceTiles(sandbox, tileProtectionTypes, tiles, x, y);
 
             if (!string.IsNullOrEmpty(context.ChestGroupName) && random.NextDouble() < context.ChestProbably)
             {
@@ -244,7 +251,11 @@
                 if (chestContext != null)
                 {
                     int chestX = random.Next(x + 1, x + sizeX - 2);
-                    GenerateChest.PlaceChest(sandbox, chestX, y + sizeY - 3, random, chestContext);
+                    bool success = GenerateChest.PlaceChest(sandbox, chestX, y + sizeY - 3, random, chestContext);
+                    if (success)
+                    {
+                        sandbox.TileProtectionMap.SetProtection(TileProtectionMap.TileProtectionType.All, chestX, y + sizeY - 3, chestX + 1, y + sizeY - 2);
+                    }
                 }
             }
 
