@@ -1,0 +1,42 @@
+﻿<Window x:Class="TUBGWorldGenerator.BuildingGenerator.UI.BuildingGeneratorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TUBGWorldGenerator.BuildingGenerator.UI"
+        mc:Ignorable="d"
+        Title="建築ジェネレータ" Height="450" Width="800"
+		DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+    <Grid>
+		<DockPanel LastChildFill="True">
+			<DockPanel DockPanel.Dock="Right" Width="400" LastChildFill="True">
+				<Grid DockPanel.Dock="Top">
+					<Grid.RowDefinitions>
+						<RowDefinition/>
+						<RowDefinition/>
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+					<Button Margin="5" Click="ReadButton_Click" Content="ファイルを読み込み"/>
+					<Button Grid.Column="1" Margin="5" Click="WriteButton_Click" Content="ファイルを書き込み"/>
+					<Button Grid.Row="1" Margin="5" Click="OverwriteWithTemplateButton_Click" Content="テンプレートで上書き"/>
+				</Grid>
+				<Grid DockPanel.Dock="Bottom">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+				</Grid>
+				<TextBox AcceptsReturn="True" AcceptsTab="True" Margin="5" TextChanged="InputTextBox_TextChanged" Text="{Binding JsonText}"></TextBox>
+			</DockPanel>
+			<Grid Margin="5">
+				<Image DockPanel.Dock="Left" x:Name="PreviewImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+				<Grid Background="#33ffff00" Name="GenerateFailedOverlay" Visibility="Hidden">
+					<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">テキストからの生成に失敗しました</TextBlock>
+				</Grid>
+			</Grid>
+		</DockPanel>
+    </Grid>
+</Window>

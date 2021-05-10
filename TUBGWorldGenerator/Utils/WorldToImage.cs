@@ -6,6 +6,7 @@
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Windows.Media.Imaging;
+    using Terraria;
     using Terraria.Map;
     using TUBGWorldGenerator.WorldGeneration;
 
@@ -15,7 +16,7 @@
     public static class WorldToImage
     {
         /// <summary>
-        /// ワールドを画像にする。
+        /// タイルを画像にする。
         /// </summary>
         /// <param name="sandbox">ワールドサンドボックス</param>
         /// <returns>画像</returns>
@@ -47,6 +48,124 @@
 
             Bitmap bitmap = CreateBitmap(sandbox.TileCountX, sandbox.TileCountY, array);
             return Convert(bitmap);
+        }
+
+        /// <summary>
+        /// タイルを画像にする。
+        /// </summary>
+        /// <param name="tiles">タイル</param>
+        /// <returns>画像</returns>
+        public static BitmapImage CreateMapImage(Tile[,] tiles)
+        {
+            int w = tiles.GetLength(0);
+            int h = tiles.GetLength(1);
+
+            int arrayIndex = 0;
+            var array = new byte[w * h * 3];
+
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    var mapTile = CreateMapTileFromTile(tiles[x, y], x, y);
+                    var color = MapHelper.GetMapTileXnaColor(ref mapTile);
+
+                    array[arrayIndex * 3] = color.B;
+                    array[(arrayIndex * 3) + 1] = color.G;
+                    array[(arrayIndex * 3) + 2] = color.R;
+                    arrayIndex++;
+                }
+            }
+
+            Bitmap bitmap = CreateBitmap(w, h, array);
+            return Convert(bitmap);
+        }
+
+        private static MapTile CreateMapTileFromTile(Tile tile, int x, int y)
+        {
+            if (tile == null)
+            {
+                return default(MapTile);
+            }
+
+            int color = 0;
+            int mapTileType = 0;
+            int mapTileOption = 0;
+            if (tile.active())
+            {
+                int type = tile.type;
+                mapTileType = MapHelper.tileLookup[type];
+                if (type == 5)
+                {
+                    color = (int)tile.color();
+                }
+                else
+                {
+                    if (type == 51 && (x + y) % 2 == 0)
+                    {
+                        mapTileType = 0;
+                    }
+
+                    if (mapTileType != 0)
+                    {
+                        if (type == 160)
+                        {
+                            color = 0;
+                        }
+                        else
+                        {
+                            color = (int)tile.color();
+                        }
+
+                        MapHelper.GetTileBaseOption(y, tile, ref mapTileOption);
+                    }
+                }
+            }
+
+            if (mapTileType == 0)
+            {
+                if (tile.liquid > 32)
+                {
+                    int num5 = (int)tile.liquidType();
+                    mapTileType = (int)MapHelper.liquidPosition + num5;
+                }
+                else if (tile.wall > 0 && tile.wall < 316)
+                {
+                    int wall = (int)tile.wall;
+                    mapTileType = (int)MapHelper.wallLookup[wall];
+                    color = (int)tile.wallColor();
+                    if (wall <= 27)
+                    {
+                        if (wall != 21)
+                        {
+                            if (wall != 27)
+                            {
+                                mapTileOption = 0;
+                            }
+                            else
+                            {
+                                mapTileOption = x % 2;
+                            }
+                        }
+                    }
+                    else if (wall - 88 > 5 && wall != 168 && wall != 241)
+                    {
+                        mapTileOption = 0;
+                    }
+                    else
+                    {
+                        color = 0;
+                    }
+                }
+            }
+
+            if (mapTileType == 0)
+            {
+                mapTileType = (int)MapHelper.skyPosition + 255;
+                color = 0;
+            }
+
+            return MapTile.Create((ushort)(mapTileType + mapTileOption), 255, (byte)color);
         }
 
         private static BitmapImage Convert(Bitmap src)

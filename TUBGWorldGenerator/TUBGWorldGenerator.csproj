@@ -104,6 +104,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BuildingGenerator\Box.cs" />
+    <Compile Include="BuildingGenerator\BuildingGenerator.cs" />
+    <Compile Include="BuildingGenerator\BuildBase.cs" />
+    <Compile Include="BuildingGenerator\Line.cs" />
+    <Compile Include="BuildingGenerator\RandomValue.cs" />
+    <Compile Include="BuildingGenerator\Rectangle.cs" />
+    <Compile Include="BuildingGenerator\Size.cs" />
+    <Compile Include="BuildingGenerator\TerrariaNameDict.cs" />
+    <Compile Include="BuildingGenerator\TileObject.cs" />
+    <Compile Include="BuildingGenerator\UI\BuildingGeneratorWindow.xaml.cs">
+      <DependentUpon>BuildingGeneratorWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ChestSimulator\ChestAccumulateResult.cs" />
     <Compile Include="ChestSimulator\ChestSimulatorWindow.xaml.cs">
       <DependentUpon>ChestSimulatorWindow.xaml</DependentUpon>
@@ -145,6 +157,10 @@
     <Compile Include="WorldGeneration\TileProtectionMap.cs" />
     <Compile Include="WorldGeneration\WorldGenerationRunner.cs" />
     <Compile Include="WorldGeneration\WorldSandbox.cs" />
+    <Page Include="BuildingGenerator\UI\BuildingGeneratorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ChestSimulator\ChestSimulatorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

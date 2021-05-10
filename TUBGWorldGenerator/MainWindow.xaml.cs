@@ -207,6 +207,12 @@
             window.Show();
         }
 
+        private void BuildingGeneratorMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new BuildingGenerator.UI.BuildingGeneratorWindow();
+            window.Show();
+        }
+
         private void LoadChestConfigButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new CommonOpenFileDialog()
