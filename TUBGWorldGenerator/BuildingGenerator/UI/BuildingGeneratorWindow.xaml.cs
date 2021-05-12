@@ -79,7 +79,7 @@
             if (BuildingGenerator.Result != null)
             {
                 GenerateFailedOverlay.Visibility = Visibility.Hidden;
-                PreviewImage.Source = WorldToImage.CreateMapImage(BuildingGenerator.Result);
+                PreviewImage.Source = TileToImage.CreateBitmap(BuildingGenerator.Result);
             }
             else
             {
@@ -155,32 +155,32 @@
 
             Rectangle leftWall = new Rectangle()
             {
-                X = 0,
-                Y = 4,
+                X = 1,
+                Y = 5,
                 FillTile = nameof(Terraria.ID.TileID.WoodBlock),
                 Size = new TUBGWorldGenerator.BuildingGenerator.Size() { Height = 2, Width = 1 },
             };
 
             Rectangle topWall = new Rectangle()
             {
-                X = 0,
-                Y = 5,
+                X = 1,
+                Y = 6,
                 FillTile = nameof(Terraria.ID.TileID.WoodBlock),
                 Size = new TUBGWorldGenerator.BuildingGenerator.Size() { Height = 1, Width = 8 },
             };
 
             Rectangle rightWall = new Rectangle()
             {
-                X = 7,
-                Y = 4,
+                X = 8,
+                Y = 5,
                 FillTile = nameof(Terraria.ID.TileID.WoodBlock),
                 Size = new TUBGWorldGenerator.BuildingGenerator.Size() { Height = 2, Width = 1 },
             };
 
             Rectangle bottomWall = new Rectangle()
             {
-                X = 0,
-                Y = 0,
+                X = 1,
+                Y = 1,
                 FillTile = nameof(Terraria.ID.TileID.WoodBlock),
                 Size = new TUBGWorldGenerator.BuildingGenerator.Size() { Height = 1, Width = 8 },
             };
@@ -192,13 +192,46 @@
 
             Rectangle inner = new Rectangle()
             {
-                X = 1,
-                Y = 1,
+                X = 2,
+                Y = 2,
                 FillWall = nameof(Terraria.ID.WallID.Wood),
                 Size = new TUBGWorldGenerator.BuildingGenerator.Size() { Height = 4, Width = 6 },
             };
 
             root.Childs.Add(inner);
+
+            TileObject leftDoor = new TileObject()
+            {
+                ItemName = "WoodenDoor",
+                X = 1,
+                Y = 2,
+            };
+
+            TileObject rightDoor = new TileObject()
+            {
+                ItemName = "WoodenDoor",
+                X = 8,
+                Y = 2,
+            };
+
+            TileObject table = new TileObject()
+            {
+                ItemName = "WoodenTable",
+                X = 3,
+                Y = 2,
+            };
+
+            TileObject chair = new TileObject()
+            {
+                ItemName = "WoodenChair",
+                X = 6,
+                Y = 2,
+            };
+
+            root.Childs.Add(leftDoor);
+            root.Childs.Add(rightDoor);
+            root.Childs.Add(table);
+            root.Childs.Add(chair);
 
             jsonText = JsonConvert.SerializeObject(root, new JsonSerializerSettings()
             {

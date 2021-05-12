@@ -81,7 +81,7 @@
             return Convert(bitmap);
         }
 
-        private static MapTile CreateMapTileFromTile(Tile tile, int x, int y)
+        public static MapTile CreateMapTileFromTile(Tile tile, int x, int y)
         {
             if (tile == null)
             {
@@ -168,7 +168,7 @@
             return MapTile.Create((ushort)(mapTileType + mapTileOption), 255, (byte)color);
         }
 
-        private static BitmapImage Convert(Bitmap src)
+        public static BitmapImage Convert(Bitmap src)
         {
             MemoryStream ms = new MemoryStream();
             src.Save(ms, ImageFormat.Bmp);
@@ -180,7 +180,7 @@
             return image;
         }
 
-        private static Bitmap CreateBitmap(int width, int height, byte[] datas)
+        public static Bitmap CreateBitmap(int width, int height, byte[] datas)
         {
             var b = new Bitmap(width, height, PixelFormat.Format24bppRgb);
 

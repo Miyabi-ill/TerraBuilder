@@ -90,12 +90,12 @@
             {
                 Tile[,] builds = child.Build();
                 int h = builds.GetLength(1);
-                int startY = Size.Height - (h + child.Y);
+                int startY = Size.Height - (h + child.Y - 1);
                 for (int i = 0; i < builds.GetLength(0); i++)
                 {
                     for (int j = 0; j < h; j++)
                     {
-                        tiles[i + child.X, startY + j] = builds[i, j];
+                        tiles[i + child.X - 1, startY + j] = builds[i, j];
                     }
                 }
             }

@@ -1,6 +1,7 @@
 ﻿namespace TUBGWorldGenerator.BuildingGenerator
 {
     using System.Collections.Generic;
+    using Terraria;
     using Terraria.ID;
 
     /// <summary>
@@ -25,6 +26,20 @@
                     WallNameToID.Add(field.Name, (ushort)field.GetValue(null));
                 }
             }
+
+            foreach (var field in typeof(ItemID).GetFields())
+            {
+                if (field.FieldType == typeof(short))
+                {
+                    int id = (short)field.GetValue(null);
+                    Item item = new Item();
+                    item.SetDefaults(id);
+                    if (item.type == id)
+                    {
+                        ItemNameToItem.Add(field.Name, item);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -36,5 +51,7 @@
         /// 壁内部名からIDを取得する
         /// </summary>
         public static Dictionary<string, ushort> WallNameToID { get; } = new Dictionary<string, ushort>();
+
+        public static Dictionary<string, Item> ItemNameToItem { get; } = new Dictionary<string, Item>();
     }
 }
