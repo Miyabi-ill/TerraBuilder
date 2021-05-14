@@ -30,6 +30,11 @@
                 _tiles = new MapTile[sandbox.TileCountX, sandbox.TileCountY],
             };
 
+            if (Main.Map == null)
+            {
+                Main.Map = worldMap;
+            } 
+
             for (int y = 0; y < sandbox.TileCountY; y++)
             {
                 for (int x = 0; x < sandbox.TileCountX; x++)

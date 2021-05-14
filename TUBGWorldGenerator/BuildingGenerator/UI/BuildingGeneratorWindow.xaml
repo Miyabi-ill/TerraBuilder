@@ -34,7 +34,7 @@
 			<Grid Margin="5">
 				<Image DockPanel.Dock="Left" x:Name="PreviewImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
 				<Grid Background="#33ffff00" Name="GenerateFailedOverlay" Visibility="Hidden">
-					<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">テキストからの生成に失敗しました</TextBlock>
+					<TextBlock Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">テキストからの生成に失敗しました</TextBlock>
 				</Grid>
 			</Grid>
 		</DockPanel>

@@ -95,12 +95,51 @@
                 {
                     for (int j = 0; j < h; j++)
                     {
-                        tiles[i + child.X - 1, startY + j] = builds[i, j];
+                        if (i + child.X - 1 < 0
+                            || i + child.X - 1 >= tiles.GetLength(0)
+                            || startY + j < 0
+                            || startY + j >= tiles.GetLength(1))
+                        {
+                            continue;
+                        }
+
+                        if (tiles[i + child.X - 1, startY + j] == null)
+                        {
+                            tiles[i + child.X - 1, startY + j] = new Tile();
+                        }
+
+                        MergeTileNotOverwrite(tiles[i + child.X - 1, startY + j], builds[i, j]);
                     }
                 }
             }
 
             return tiles;
+        }
+
+        private static Tile MergeTileNotOverwrite(Tile to, Tile from)
+        {
+            if (!to.active() && from.active())
+            {
+                to.type = from.type;
+                to.active(true);
+                to.frameX = from.frameX;
+                to.frameY = from.frameY;
+                to.halfBrick(from.halfBrick());
+                to.slope(from.slope());
+            }
+
+            if (to.liquid == 0 && from.liquid > 0)
+            {
+                to.liquid = from.liquid;
+                to.liquidType(from.liquidType());
+            }
+
+            if (to.wall == 0 && from.wall > 0)
+            {
+                to.wall = from.wall;
+            }
+
+            return to;
         }
     }
 }
