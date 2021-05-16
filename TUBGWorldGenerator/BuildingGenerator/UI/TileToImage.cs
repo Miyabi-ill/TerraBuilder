@@ -10,6 +10,9 @@
     using Terraria.ID;
     using Terraria.Map;
     using TUBGWorldGenerator.Utils;
+    using System.Linq;
+    using System.Drawing.Imaging;
+    using System.Runtime.InteropServices;
 
     public static class TileToImage
     {
@@ -282,6 +285,7 @@
                             {
                                 var point = GetWallFrame(tiles, i, j);
                                 image = image.Clone(new Rectangle(point.X, point.Y, 32, 32), image.PixelFormat);
+                                image = SimplePaintBitmap(image, tiles[i, j].wallColor());
                                 g.DrawImageUnscaled(image, i * 16, j * 16);
                             }
                         }
@@ -297,17 +301,19 @@
                             Bitmap image = textureLoader.GetTile(tiles[i, j].type);
                             if (image != null)
                             {
-                                Point frame = TerrariaIsSoFuck(tiles, i, j);
+                                Point frame = TileFrame(tiles, i, j);
                                 //int frameX = tiles[i, j].frameX == -1 ? frame.X : tiles[i, j].frameX;
                                 //int frameY = tiles[i, j].frameY == -1 ? frame.Y : tiles[i, j].frameY;
                                 //image = image.Clone(new Rectangle(frameX, frameY, 16, 16), image.PixelFormat);
                                 try
                                 {
                                     image = image.Clone(new Rectangle(frame.X, frame.Y, 16, 16), image.PixelFormat);
+                                    image = SimplePaintBitmap(image, tiles[i, j].color());
                                 }
                                 catch (OutOfMemoryException)
                                 {
                                     image = image.Clone(new Rectangle(0, 0, 16, 16), image.PixelFormat);
+                                    image = SimplePaintBitmap(image, tiles[i, j].color());
                                 }
 
                                 g.DrawImage(image, (i * 16) + 8, (j * 16) + 8);
@@ -400,6 +406,334 @@
             }
 
             return wallFrameLookup[wallFlag][0];
+        }
+
+        public static Bitmap SimplePaintBitmap(Bitmap image, int paintId, bool isWall = false)
+        {
+            if (paintId == 0 || paintId == 31)
+            {
+                return image;
+            }
+
+            var size = new Rectangle(0, 0, image.Width, image.Height);
+            var bitmapData = image.LockBits(size, ImageLockMode.ReadOnly, image.PixelFormat);
+
+            var buffer = new byte[bitmapData.Stride * bitmapData.Height];
+            Marshal.Copy(bitmapData.Scan0, buffer, 0, buffer.Length);
+            image.UnlockBits(bitmapData);
+
+            Func<IEnumerable<byte>, byte[]> paintFunc;
+            switch (paintId)
+            {
+                case 1:
+                    paintFunc = PaintRed;
+                    break;
+                case 2:
+                    paintFunc = PaintOrange;
+                    break;
+                case 3:
+                    paintFunc = PaintYellow;
+                    break;
+                case 4:
+                    paintFunc = PaintLime;
+                    break;
+                case 5:
+                    paintFunc = PaintGreen;
+                    break;
+                case 6:
+                    paintFunc = PaintTeal;
+                    break;
+                case 7:
+                    paintFunc = PaintCyan;
+                    break;
+                case 8:
+                    paintFunc = PaintSkyBlue;
+                    break;
+                case 9:
+                    paintFunc = PaintBlue;
+                    break;
+                case 10:
+                    paintFunc = PaintPurple;
+                    break;
+                case 11:
+                    paintFunc = PaintViolet;
+                    break;
+                case 12:
+                    paintFunc = PaintPink;
+                    break;
+                case 13:
+                    paintFunc = PaintDeepRed;
+                    break;
+                case 14:
+                    paintFunc = PaintDeepOrange;
+                    break;
+                case 15:
+                    paintFunc = PaintDeepYellow;
+                    break;
+                case 16:
+                    paintFunc = PaintDeepLime;
+                    break;
+                case 17:
+                    paintFunc = PaintDeepGreen;
+                    break;
+                case 18:
+                    paintFunc = PaintDeepTeal;
+                    break;
+                case 19:
+                    paintFunc = PaintDeepCyan;
+                    break;
+                case 20:
+                    paintFunc = PaintDeepSkyBlue;
+                    break;
+                case 21:
+                    paintFunc = PaintDeepBlue;
+                    break;
+                case 22:
+                    paintFunc = PaintPurple;
+                    break;
+                case 23:
+                    paintFunc = PaintViolet;
+                    break;
+                case 24:
+                    paintFunc = PaintPink;
+                    break;
+                case 25:
+                    paintFunc = PaintBlack;
+                    break;
+                case 26:
+                    paintFunc = PaintWhite;
+                    break;
+                case 27:
+                    paintFunc = PaintGray;
+                    break;
+                case 28:
+                    paintFunc = PaintBrown;
+                    break;
+                case 29:
+                    paintFunc = PaintShadow;
+                    break;
+                case 30:
+                    paintFunc = PaintNegative;
+                    break;
+                default:
+                    paintFunc = (x) => x.ToArray();
+                    break;
+            }
+
+            for (var i = 0; i < buffer.Length; i += 4)
+            {
+                byte[] color = paintFunc(buffer.Skip(i).Take(3));
+                buffer[i] = color[2];
+                buffer[i + 1] = color[1];
+                buffer[i + 2] = color[0];
+            }
+
+            var result = new Bitmap(image.Width, image.Height);
+            var resultData = result.LockBits(size, ImageLockMode.WriteOnly, image.PixelFormat);
+
+            Marshal.Copy(buffer, 0, resultData.Scan0, buffer.Length);
+            result.UnlockBits(resultData);
+
+            return result;
+
+            byte[] PaintRed(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                return new byte[] { sorted[2], sorted[0], sorted[0] };
+            }
+
+            byte[] PaintOrange(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                return new byte[] { sorted[2], (byte)((sorted[0] + sorted[2]) / 2), sorted[0] };
+            }
+
+            byte[] PaintYellow(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                return new byte[] { sorted[2], sorted[2], sorted[0] };
+            }
+
+            byte[] PaintLime(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                return new byte[] { (byte)((sorted[0] + sorted[2]) / 2), sorted[2], sorted[0] };
+            }
+
+            byte[] PaintGreen(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                return new byte[] { sorted[0], sorted[2], sorted[0] };
+            }
+
+            byte[] PaintTeal(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                return new byte[] { sorted[0], sorted[2], (byte)((sorted[0] + sorted[2]) / 2) };
+            }
+
+            byte[] PaintCyan(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                return new byte[] { sorted[0], sorted[2], sorted[2] };
+            }
+
+            byte[] PaintSkyBlue(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                return new byte[] { sorted[0], (byte)((sorted[0] + sorted[2]) / 2), sorted[2] };
+            }
+
+            byte[] PaintBlue(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                return new byte[] { sorted[0], sorted[0], sorted[2] };
+            }
+
+            byte[] PaintPurple(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                return new byte[] { (byte)((sorted[0] + sorted[2]) / 2), sorted[0], sorted[2] };
+            }
+
+            byte[] PaintViolet(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                return new byte[] { sorted[2], sorted[0], sorted[2] };
+            }
+
+            byte[] PaintPink(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                return new byte[] { sorted[2], sorted[0], (byte)((sorted[0] + sorted[2]) / 2) };
+            }
+
+            byte[] PaintDeepRed(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                sorted[0] = (byte)(sorted[0] * 0.4);
+                return new byte[] { sorted[2], sorted[0], sorted[0] };
+            }
+
+            byte[] PaintDeepOrange(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                sorted[0] = (byte)(sorted[0] * 0.4);
+                return new byte[] { sorted[2], (byte)((sorted[0] + sorted[2]) / 2), sorted[0] };
+            }
+
+            byte[] PaintDeepYellow(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                sorted[0] = (byte)(sorted[0] * 0.4);
+                return new byte[] { sorted[2], sorted[2], sorted[0] };
+            }
+
+            byte[] PaintDeepLime(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                sorted[0] = (byte)(sorted[0] * 0.4);
+                return new byte[] { (byte)((sorted[0] + sorted[2]) / 2), sorted[2], sorted[0] };
+            }
+
+            byte[] PaintDeepGreen(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                sorted[0] = (byte)(sorted[0] * 0.4);
+                return new byte[] { sorted[0], sorted[2], sorted[0] };
+            }
+
+            byte[] PaintDeepTeal(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                sorted[0] = (byte)(sorted[0] * 0.4);
+                return new byte[] { sorted[0], sorted[2], (byte)((sorted[0] + sorted[2]) / 2) };
+            }
+
+            byte[] PaintDeepCyan(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                sorted[0] = (byte)(sorted[0] * 0.4);
+                return new byte[] { sorted[0], sorted[2], sorted[2] };
+            }
+
+            byte[] PaintDeepSkyBlue(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                sorted[0] = (byte)(sorted[0] * 0.4);
+                return new byte[] { sorted[0], (byte)((sorted[0] + sorted[2]) / 2), sorted[2] };
+            }
+
+            byte[] PaintDeepBlue(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                sorted[0] = (byte)(sorted[0] * 0.4);
+                return new byte[] { sorted[0], sorted[0], sorted[2] };
+            }
+
+            byte[] PaintDeepPurple(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                sorted[0] = (byte)(sorted[0] * 0.4);
+                return new byte[] { (byte)((sorted[0] + sorted[2]) / 2), sorted[0], sorted[2] };
+            }
+
+            byte[] PaintDeepViolet(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                sorted[0] = (byte)(sorted[0] * 0.4);
+                return new byte[] { sorted[2], sorted[0], sorted[2] };
+            }
+
+            byte[] PaintDeepPink(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                sorted[0] = (byte)(sorted[0] * 0.4);
+                return new byte[] { sorted[2], sorted[0], (byte)((sorted[0] + sorted[2]) / 2) };
+            }
+
+            byte[] PaintBlack(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                byte value = (byte)((sorted[0] + sorted[2]) * 0.15);
+                return new byte[] { value, value, value };
+            }
+
+            byte[] PaintWhite(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                byte value = (byte)(sorted[2] + ((sorted[0] + sorted[1]) * 0.25));
+                value = value > 255 ? (byte)255 : value;
+                return new byte[] { value, value, value };
+            }
+
+            byte[] PaintGray(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                byte value = (byte)((sorted[0] + sorted[2]) / 2);
+                return new byte[] { value, value, value };
+            }
+
+            byte[] PaintBrown(IEnumerable<byte> color)
+            {
+                byte max = color.Max();
+                byte center = (byte)(max * 0.7);
+                byte min = (byte)(center * 0.7);
+                return new byte[] { max, center, min };
+            }
+
+            byte[] PaintShadow(IEnumerable<byte> color)
+            {
+                var sorted = color.OrderBy(x => x).ToArray();
+                byte value = (byte)((sorted[0] + sorted[2]) * 0.05);
+                return new byte[] { value, value, value };
+            }
+
+            byte[] PaintNegative(IEnumerable<byte> color)
+            {
+                byte[] array = color.ToArray();
+                return new byte[] { (byte)(255 - array[2]), (byte)(255 - array[1]), (byte)(255 - array[0]) };
+            }
         }
 
         private static BlockStyle FindBlockStyle(Tile blockTile)
@@ -634,7 +968,7 @@
             return selfFrame8WayLookup[frameFlag][0];
         }
 
-        private static Point TerrariaIsSoFuck(Tile[,] tiles, int x, int y)
+        private static Point TileFrame(Tile[,] tiles, int x, int y)
         {
             bool mergeUp;
             bool mergeDown;
@@ -688,7 +1022,7 @@
                 tile2 = tiles[x - 1, y];
                 if (tile2 != null && tile2.active())
                 {
-                    left = (Main.tileStone[tile2.type] ? 1 : tile2.type);
+                    left = Main.tileStone[tile2.type] ? 1 : tile2.type;
                     if (tile2.slope() == 1 || tile2.slope() == 3)
                     {
                         left = -1;
@@ -702,7 +1036,7 @@
                 tile3 = tiles[x + 1, y];
                 if (tile3 != null && tile3.active())
                 {
-                    right = (Main.tileStone[tile3.type] ? 1 : tile3.type);
+                    right = Main.tileStone[tile3.type] ? 1 : tile3.type;
                     if (tile3.slope() == 2 || tile3.slope() == 4)
                     {
                         right = -1;
@@ -716,7 +1050,7 @@
                 tile8 = tiles[x, y - 1];
                 if (tile8 != null && tile8.active())
                 {
-                    up = (Main.tileStone[tile8.type] ? 1 : tile8.type);
+                    up = Main.tileStone[tile8.type] ? 1 : tile8.type;
                     if (tile8.slope() == 3 || tile8.slope() == 4)
                     {
                         up = -1;
@@ -730,7 +1064,7 @@
                 tile9 = tiles[x, y + 1];
                 if (tile9 != null && tile9.active())
                 {
-                    down = (Main.tileStone[tile9.type] ? 1 : tile9.type);
+                    down = Main.tileStone[tile9.type] ? 1 : tile9.type;
                     if (tile9.slope() == 1 || tile9.slope() == 2)
                     {
                         down = -1;
@@ -744,7 +1078,7 @@
                 tile6 = tiles[x - 1, y - 1];
                 if (tile6 != null && tile6.active())
                 {
-                    upLeft = (Main.tileStone[tile6.type] ? 1 : tile6.type);
+                    upLeft = Main.tileStone[tile6.type] ? 1 : tile6.type;
                 }
             }
 
@@ -754,7 +1088,7 @@
                 tile7 = tiles[x + 1, y - 1];
                 if (tile7 != null && tile7.active())
                 {
-                    upRight = (Main.tileStone[tile7.type] ? 1 : tile7.type);
+                    upRight = Main.tileStone[tile7.type] ? 1 : tile7.type;
                 }
             }
 
@@ -764,7 +1098,7 @@
                 tile4 = tiles[x - 1, y + 1];
                 if (tile4 != null && tile4.active())
                 {
-                    downLeft = (Main.tileStone[tile4.type] ? 1 : tile4.type);
+                    downLeft = Main.tileStone[tile4.type] ? 1 : tile4.type;
                 }
             }
 
@@ -774,7 +1108,7 @@
                 tile5 = tiles[x + 1, y + 1];
                 if (tile5 != null && tile5.active())
                 {
-                    downRight = (Main.tileStone[tile5.type] ? 1 : tile5.type);
+                    downRight = Main.tileStone[tile5.type] ? 1 : tile5.type;
                 }
             }
 
@@ -783,16 +1117,19 @@
                 up = -1;
                 left = -1;
             }
+
             if (tile.slope() == 1)
             {
                 up = -1;
                 right = -1;
             }
+
             if (tile.slope() == 4)
             {
                 down = -1;
                 left = -1;
             }
+
             if (tile.slope() == 3)
             {
                 down = -1;
@@ -829,8 +1166,10 @@
                     {
                         WorldGen.TileMergeAttempt(tileType, Main.tilePile, ref up, ref down, ref left, ref right, ref upLeft, ref upRight, ref downLeft, ref downRight);
                     }
+
                     break;
             }
+
             if ((tileType == 1 || Main.tileMoss[tileType] || tileType == 117 || tileType == 25 || tileType == 203) && down == 165 && tile9 != null)
             {
                 if (tile9.frameY == 72)
@@ -842,6 +1181,7 @@
                     down = tileType;
                 }
             }
+
             if ((tileType == 1 || Main.tileMoss[tileType] || tileType == 117 || tileType == 25 || tileType == 203) && up == 165 && tile8 != null)
             {
                 if (tile8.frameY == 90)
@@ -853,6 +1193,7 @@
                     up = tileType;
                 }
             }
+
             if (tileType == 225)
             {
                 if (down == 165)
@@ -864,26 +1205,32 @@
                     up = tileType;
                 }
             }
+
             if ((tileType == 200 || tileType == 161 || tileType == 147 || tileType == 163 || tileType == 164) && down == 165)
             {
                 down = tileType;
             }
+
             if ((tile.slope() == 1 || tile.slope() == 2) && down > -1 && !TileID.Sets.Platforms[down])
             {
                 down = tileType;
             }
+
             if (up > -1 && (tile8.slope() == 1 || tile8.slope() == 2) && !TileID.Sets.Platforms[up])
             {
                 up = tileType;
             }
+
             if ((tile.slope() == 3 || tile.slope() == 4) && up > -1 && !TileID.Sets.Platforms[up])
             {
                 up = tileType;
             }
+
             if (down > -1 && (tile9.slope() == 3 || tile9.slope() == 4) && !TileID.Sets.Platforms[down])
             {
                 down = tileType;
             }
+
             if (tileType == 124)
             {
                 if (up > -1 && Main.tileSolid[up] && !TileID.Sets.Platforms[up])
@@ -931,10 +1278,12 @@
                 {
                     left = -1;
                 }
+
                 if (right != tileType)
                 {
                     right = -1;
                 }
+
                 up = -1;
             }
 
@@ -952,40 +1301,49 @@
             {
                 WorldGen.TileMergeAttempt(tileType, Main.tileBlendAll, ref up, ref down, ref left, ref right, ref upLeft, ref upRight, ref downLeft, ref downRight);
             }
+
             if (Main.tileBlendAll[tileType])
             {
                 WorldGen.TileMergeAttempt(tileType, TileID.Sets.BlockMergesWithMergeAllBlock, ref up, ref down, ref left, ref right, ref upLeft, ref upRight, ref downLeft, ref downRight);
             }
+
             if (TileID.Sets.ForcedDirtMerging[tileType])
             {
                 if (up == 0)
                 {
                     up = tileType;
                 }
+
                 if (down == 0)
                 {
                     down = tileType;
                 }
+
                 if (left == 0)
                 {
                     left = tileType;
                 }
+
                 if (right == 0)
                 {
                     right = tileType;
                 }
+
                 if (upLeft == 0)
                 {
                     upLeft = tileType;
                 }
+
                 if (upRight == 0)
                 {
                     upRight = tileType;
                 }
+
                 if (downLeft == 0)
                 {
                     downLeft = tileType;
                 }
+
                 if (downRight == 0)
                 {
                     downRight = tileType;
@@ -1154,17 +1512,20 @@
                     {
                         down = tileType;
                     }
+
                     if (up != tileType)
                     {
                         if (left > -1 && Main.tileSolid[left])
                         {
                             left = tileType;
                         }
+
                         if (right > -1 && Main.tileSolid[right])
                         {
                             right = tileType;
                         }
                     }
+
                     break;
                 case 53:
                     WorldGen.TileMergeAttemptFrametest(x, y, tileType, 397, ref up, ref down, ref left, ref right, ref upLeft, ref upRight, ref downLeft, ref downRight);
@@ -1337,6 +1698,7 @@
                         break;
                 }
             }
+
             if (tileType == 0)
             {
                 WorldGen.TileMergeAttempt(tileType, Main.tileMoss, ref up, ref down, ref left, ref right, ref upLeft, ref upRight, ref downLeft, ref downRight);
@@ -1354,6 +1716,7 @@
             {
                 WorldGen.TileMergeAttempt(tileType, TileID.Sets.tileMossBrick, ref up, ref down, ref left, ref right, ref upLeft, ref upRight, ref downLeft, ref downRight);
             }
+
             if (TileID.Sets.Conversion.Grass[tileType])
             {
                 WorldGen.TileMergeAttempt(tileType, TileID.Sets.Ore, ref up, ref down, ref left, ref right, ref upLeft, ref upRight, ref downLeft, ref downRight);
@@ -1362,6 +1725,7 @@
             {
                 WorldGen.TileMergeAttempt(tileType, TileID.Sets.Conversion.Grass, ref up, ref down, ref left, ref right, ref upLeft, ref upRight, ref downLeft, ref downRight);
             }
+
             if (tileType == 59)
             {
                 WorldGen.TileMergeAttempt(tileType, TileID.Sets.OreMergesWithMud, ref up, ref down, ref left, ref right, ref upLeft, ref upRight, ref downLeft, ref downRight);
@@ -1402,6 +1766,7 @@
                             break;
                     }
                 }
+
                 if (up != tileType && up != num32 && (down == tileType || down == num32))
                 {
                     if (left == num32 && right == tileType)

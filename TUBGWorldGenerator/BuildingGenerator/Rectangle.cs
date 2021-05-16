@@ -12,6 +12,9 @@
         private int fillTileType = -1;
         private ushort fillWallType;
 
+        private string paintName;
+        private byte paintType;
+
         /// <inheritdoc/>
         [JsonProperty]
         public override int X { get; set; }
@@ -40,7 +43,7 @@
         /// <summary>
         /// 範囲内をタイルで埋めるときのタイルID。
         /// </summary>
-        [JsonProperty]
+        [JsonIgnore]
         public int FillTileType
         {
             get => fillTileType;
@@ -67,7 +70,7 @@
         /// <summary>
         /// 範囲内を壁で埋めるときの壁ID。
         /// </summary>
-        [JsonProperty]
+        [JsonIgnore]
         public ushort FillWallType
         {
             get => fillWallType;
@@ -75,6 +78,30 @@
             {
                 fillWallType = value;
             }
+        }
+
+        /// <summary>
+        /// ペンキの名前
+        /// </summary>
+        [JsonProperty]
+        public string Paint
+        {
+            get => paintName;
+            set
+            {
+                paintName = value;
+                paintType = TerrariaNameDict.PaintNameToID[paintName];
+            }
+        }
+
+        /// <summary>
+        /// ペンキID
+        /// </summary>
+        [JsonIgnore]
+        public byte PaintType
+        {
+            get => paintType;
+            set => paintType = value;
         }
 
         /// <inheritdoc/>
@@ -91,12 +118,14 @@
                     if (FillWallType != 0)
                     {
                         tiles[i, j].wall = FillWallType;
+                        tiles[i, j].wallColor(PaintType);
                     }
 
                     if (FillTileType != -1)
                     {
                         tiles[i, j].type = (ushort)FillTileType;
                         tiles[i, j].active(true);
+                        tiles[i, j].color(PaintType);
                     }
                 }
             }

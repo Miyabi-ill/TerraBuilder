@@ -1,6 +1,7 @@
 ﻿namespace TUBGWorldGenerator.BuildingGenerator
 {
     using System;
+    using Newtonsoft.Json;
     using Terraria;
     using Terraria.ObjectData;
 
@@ -11,6 +12,9 @@
         private int style;
         private int alternate;
 
+        private string paintName;
+        private byte paintType;
+
         /// <inheritdoc/>
         public override int X { get; set; }
 
@@ -20,6 +24,7 @@
         /// <summary>
         /// アイテム名。設定すると<see cref="TileID"/>と<see cref="Style"/>が自動的に設定される。
         /// </summary>
+        [JsonProperty]
         public string ItemName
         {
             get => itemName;
@@ -38,6 +43,7 @@
         /// <summary>
         /// 設置するタイルID。基本的に<see cref="ItemName"/>を使い、それで設定できないものに使う。
         /// </summary>
+        [JsonProperty]
         public int TileID
         {
             get => tileId;
@@ -50,6 +56,7 @@
         /// <summary>
         /// 設置するスタイル。基本的に<see cref="ItemName"/>を使い、それで設定できないものに使う。
         /// </summary>
+        [JsonProperty]
         public int Style
         {
             get => style;
@@ -62,6 +69,7 @@
         /// <summary>
         /// 同じタイル、スタイルの中で違うテクスチャを選択する。ex.本、カボチャランタン、プレゼントなど
         /// </summary>
+        [JsonProperty]
         public int Alternate
         {
             get => alternate;
@@ -69,6 +77,30 @@
             {
                 alternate = value;
             }
+        }
+
+        /// <summary>
+        /// ペンキの名前
+        /// </summary>
+        [JsonProperty]
+        public string Paint
+        {
+            get => paintName;
+            set
+            {
+                paintName = value;
+                paintType = TerrariaNameDict.PaintNameToID[paintName];
+            }
+        }
+
+        /// <summary>
+        /// ペンキID
+        /// </summary>
+        [JsonIgnore]
+        public byte PaintType
+        {
+            get => paintType;
+            set => paintType = value;
         }
 
         /// <inheritdoc/>
@@ -118,6 +150,7 @@
                     tile.frameX = (short)frameX;
                     tile.frameY = (short)frameY;
                     tile.type = num;
+                    tiles[i, j].color(PaintType);
                     frameY += tileObjectData.CoordinateHeights[j] + tileObjectData.CoordinatePadding;
                 }
             }

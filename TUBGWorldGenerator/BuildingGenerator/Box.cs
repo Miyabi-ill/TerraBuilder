@@ -126,6 +126,11 @@
                 to.frameY = from.frameY;
                 to.halfBrick(from.halfBrick());
                 to.slope(from.slope());
+
+                if (to.color() == 0)
+                {
+                    to.color(from.color());
+                }
             }
 
             if (to.liquid == 0 && from.liquid > 0)
@@ -137,6 +142,11 @@
             if (to.wall == 0 && from.wall > 0)
             {
                 to.wall = from.wall;
+
+                if (to.wallColor() == 0)
+                {
+                    to.wallColor(from.wallColor());
+                }
             }
 
             return to;

@@ -40,6 +40,15 @@
                     }
                 }
             }
+
+            foreach (var field in typeof(PaintID).GetFields())
+            {
+                if (field.FieldType == typeof(byte))
+                {
+                    byte id = (byte)field.GetValue(null);
+                    PaintNameToID.Add(field.Name, id);
+                }
+            }
         }
 
         /// <summary>
@@ -52,6 +61,14 @@
         /// </summary>
         public static Dictionary<string, ushort> WallNameToID { get; } = new Dictionary<string, ushort>();
 
+        /// <summary>
+        /// アイテム名からアイテムを取得する
+        /// </summary>
         public static Dictionary<string, Item> ItemNameToItem { get; } = new Dictionary<string, Item>();
+
+        /// <summary>
+        /// ペンキ名からペンキIDを取得する
+        /// </summary>
+        public static Dictionary<string, byte> PaintNameToID { get; } = new Dictionary<string, byte>();
     }
 }
