@@ -115,7 +115,7 @@
             Tile[,] tiles = new Tile[tileObjectData.Width, tileObjectData.Height];
 
             ushort num = (ushort)TileID;
-            int styleMultiplyX = (Style * tileObjectData.StyleMultiplier) + Style;
+            int styleMultiplyX = tileObjectData.CalculatePlacementStyle(Style, Alternate, 0);
             int styleMultiplyY = 0;
 
             // スタイルが複数あり、テクスチャの最大幅を超えてしまう場合、改行したテクスチャの位置を取得する
