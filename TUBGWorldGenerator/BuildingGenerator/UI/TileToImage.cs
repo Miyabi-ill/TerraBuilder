@@ -375,7 +375,7 @@
                 }
             }
 
-            if (x + 1 < tiles.GetLength(1))
+            if (y + 1 < tiles.GetLength(1))
             {
                 Tile tile2 = tiles[x, y + 1];
                 if (tile2 != null && (tile2.wall > 0 || (tile2.active() && tile2.type == 54)))

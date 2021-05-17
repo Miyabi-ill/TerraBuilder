@@ -9,6 +9,13 @@
     /// </summary>
     public class BuildingGenerator
     {
+        public BuildingGenerator()
+        {
+            CurrentGenerator = this;
+        }
+
+        public static BuildingGenerator CurrentGenerator { get; private set; }
+
         /// <summary>
         /// 建築ツリーのルート要素
         /// </summary>
@@ -18,6 +25,21 @@
         /// <see cref="Root"/>から生成された建築物。
         /// </summary>
         public Tile[,] Result { get; private set; }
+
+        /// <summary>
+        /// 建築物の設定ファイルが入ったディレクトリのパス
+        /// </summary>
+        public string BuildingsRootPath
+        {
+            get => BuildingsDict.BuildingsDirectory;
+            set
+            {
+                BuildingsDict.BuildingsDirectory = value;
+                BuildingsDict.Update();
+            }
+        }
+
+        public BuildingsDict BuildingsDict { get; } = new BuildingsDict();
 
         /// <summary>
         /// 建築を現在のツリーから生成し、<see cref="Result"/>に格納する。

@@ -39,9 +39,21 @@
             }
         }
 
+        internal static string LastBuildingsPath
+        {
+            get => lastBuildingsPath;
+            set
+            {
+                lastBuildingsPath = value;
+                SaveConfigsPath();
+            }
+        }
+
         private static string lastChestConfigsDir;
 
         private static string lastChestConfigPath;
+
+        private static string lastBuildingsPath;
 
         private static bool isLoading = false;
 
@@ -64,6 +76,11 @@
                     if (dict.TryGetValue(nameof(LastActionConfigPath), out string lastChestConfigsPath))
                     {
                         LastActionConfigPath = lastChestConfigsPath;
+                    }
+
+                    if (dict.TryGetValue(nameof(LastBuildingsPath), out string lastBuildingsDir))
+                    {
+                        LastBuildingsPath = lastBuildingsDir;
                     }
                 }
             }
@@ -92,6 +109,7 @@
             {
                 [nameof(LastChestConfigsDir)] = LastChestConfigsDir,
                 [nameof(LastActionConfigPath)] = LastActionConfigPath,
+                [nameof(LastBuildingsPath)] = LastBuildingsPath,
             };
 
             using (var sw = new StreamWriter(SavedConfigPath))

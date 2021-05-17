@@ -9,13 +9,14 @@
     using TUBGWorldGenerator.Utils;
     using System.Windows.Controls;
     using Newtonsoft.Json;
+    using Microsoft.WindowsAPICodePack.Dialogs;
 
     /// <summary>
     /// Interaction logic for BuildingGeneratorWindow.xaml
     /// </summary>
     public partial class BuildingGeneratorWindow : Window, INotifyPropertyChanged
     {
-        private string syncFileName;
+        private string fileName;
         private string jsonText;
         private BuildingGenerator buildingGenerator;
         private FileSystemWatcher fileSystemWatcher;
@@ -27,16 +28,19 @@
         {
             InitializeComponent();
 
-            BuildingGenerator = new BuildingGenerator();
+            BuildingGenerator = new BuildingGenerator()
+            {
+                BuildingsRootPath = Configs.LastBuildingsPath,
+            };
         }
 
-        public string SyncFileName
+        public string FileName
         {
-            get => syncFileName;
+            get => fileName;
             set
             {
-                syncFileName = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SyncFileName)));
+                fileName = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileName)));
             }
         }
 
@@ -61,16 +65,6 @@
             }
         }
 
-        private FileSystemWatcher FileSystemWatcher
-        {
-            get => fileSystemWatcher;
-            set
-            {
-                fileSystemWatcher = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileSystemWatcher)));
-            }
-        }
-
         private void ParseJson()
         {
             BuildingGenerator.ImportJson(JsonText);
@@ -87,17 +81,6 @@
             }
         }
 
-        private void FileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            if (e.Name == Path.GetFileName(SyncFileName))
-            {
-                using (var sr = new StreamReader(e.FullPath))
-                {
-                    JsonText = sr.ReadToEnd();
-                }
-            }
-        }
-
         private void ReadButton_Click(object sender, RoutedEventArgs e)
         {
             var fileSelectDialog = new OpenFileDialog()
@@ -108,14 +91,9 @@
 
             if (fileSelectDialog.ShowDialog() == true)
             {
-                if (SyncFileName != fileSelectDialog.FileName)
+                if (FileName != fileSelectDialog.FileName)
                 {
-                    SyncFileName = fileSelectDialog.FileName;
-                    FileSystemWatcher = new FileSystemWatcher(SyncFileName)
-                    {
-                        NotifyFilter = NotifyFilters.LastWrite,
-                    };
-                    FileSystemWatcher.Changed += FileSystemWatcher_Changed;
+                    FileName = fileSelectDialog.FileName;
                 }
             }
         }
@@ -131,8 +109,8 @@
 
             if (saveFileDialog.ShowDialog() == true)
             {
-                SyncFileName = saveFileDialog.FileName;
-                using (var sw = new StreamWriter(SyncFileName))
+                FileName = saveFileDialog.FileName;
+                using (var sw = new StreamWriter(FileName))
                 {
                     sw.Write(jsonText);
                 }
@@ -240,6 +218,21 @@
                 Formatting = Formatting.Indented,
             });
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(JsonText)));
+        }
+
+        private void SelectDirectoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new CommonOpenFileDialog()
+            {
+                IsFolderPicker = true,
+                DefaultDirectory = BuildingGenerator.BuildingsRootPath,
+            };
+
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                BuildingGenerator.BuildingsRootPath = dialog.FileName;
+                Configs.LastBuildingsPath = dialog.FileName;
+            }
         }
     }
 }

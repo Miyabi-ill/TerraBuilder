@@ -21,7 +21,8 @@
 					</Grid.ColumnDefinitions>
 					<Button Margin="5" Click="ReadButton_Click" Content="ファイルを読み込み"/>
 					<Button Grid.Column="1" Margin="5" Click="WriteButton_Click" Content="ファイルを書き込み"/>
-					<Button Grid.Row="1" Margin="5" Click="OverwriteWithTemplateButton_Click" Content="テンプレートで上書き"/>
+					<Button Grid.Row="1" Margin="5" Click="SelectDirectoryButton_Click" Content="建築ディレクトリを指定"/>
+					<Button Grid.Row="1" Grid.Column="1" Margin="5" Click="OverwriteWithTemplateButton_Click" Content="テンプレートで上書き"/>
 				</Grid>
 				<Grid DockPanel.Dock="Bottom">
 					<Grid.ColumnDefinitions>

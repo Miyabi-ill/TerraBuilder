@@ -107,9 +107,13 @@
     <Compile Include="BuildingGenerator\Box.cs" />
     <Compile Include="BuildingGenerator\BuildingGenerator.cs" />
     <Compile Include="BuildingGenerator\BuildBase.cs" />
+    <Compile Include="BuildingGenerator\BuildingsDict.cs" />
+    <Compile Include="BuildingGenerator\BuildParent.cs" />
+    <Compile Include="BuildingGenerator\Import.cs" />
     <Compile Include="BuildingGenerator\Line.cs" />
     <Compile Include="BuildingGenerator\RandomValue.cs" />
     <Compile Include="BuildingGenerator\Rectangle.cs" />
+    <Compile Include="BuildingGenerator\Repeat.cs" />
     <Compile Include="BuildingGenerator\Size.cs" />
     <Compile Include="BuildingGenerator\TerrariaNameDict.cs" />
     <Compile Include="BuildingGenerator\TileObject.cs" />
