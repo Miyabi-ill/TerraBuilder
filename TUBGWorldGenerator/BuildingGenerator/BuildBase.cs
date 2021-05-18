@@ -2,6 +2,7 @@
 {
     using System.ComponentModel;
     using System.Xml.Serialization;
+    using Newtonsoft.Json;
     using Terraria;
 
     /// <summary>
@@ -12,10 +13,12 @@
         /// <inheritdoc/>
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private int x;
-        private int y;
+        private int x = 1;
+        private int y = 1;
         private string name;
 
+        [JsonProperty]
+        [DefaultValue(1)]
         /// <summary>
         /// 建築の基準点X。左下を0とする。
         /// </summary>
@@ -29,6 +32,8 @@
             }
         }
 
+        [JsonProperty]
+        [DefaultValue(1)]
         /// <summary>
         /// 建築の基準点Y。左下を0とする。
         /// </summary>
@@ -42,6 +47,7 @@
             }
         }
 
+        [JsonProperty]
         /// <summary>
         /// 建築名。<see cref="Import"/>に使われる。
         /// </summary>
