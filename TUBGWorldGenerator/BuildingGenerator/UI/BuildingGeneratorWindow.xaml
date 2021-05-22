@@ -4,40 +4,73 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TUBGWorldGenerator.BuildingGenerator.UI"
+		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="建築ジェネレータ" Height="450" Width="800"
 		DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
-    <Grid>
-		<DockPanel LastChildFill="True">
-			<DockPanel DockPanel.Dock="Right" Width="400" LastChildFill="True">
-				<Grid DockPanel.Dock="Top">
-					<Grid.RowDefinitions>
-						<RowDefinition/>
-						<RowDefinition/>
-					</Grid.RowDefinitions>
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition/>
-						<ColumnDefinition/>
-					</Grid.ColumnDefinitions>
-					<Button Margin="5" Click="ReadButton_Click" Content="ファイルを読み込み"/>
-					<Button Grid.Column="1" Margin="5" Click="WriteButton_Click" Content="ファイルを書き込み"/>
-					<Button Grid.Row="1" Margin="5" Click="SelectDirectoryButton_Click" Content="建築ディレクトリを指定"/>
-					<Button Grid.Row="1" Grid.Column="1" Margin="5" Click="OverwriteWithTemplateButton_Click" Content="テンプレートで上書き"/>
-				</Grid>
-				<Grid DockPanel.Dock="Bottom">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition/>
-						<ColumnDefinition/>
-					</Grid.ColumnDefinitions>
-				</Grid>
-				<TextBox AcceptsReturn="True" AcceptsTab="True" Margin="5" TextChanged="InputTextBox_TextChanged" Text="{Binding JsonText}"></TextBox>
-			</DockPanel>
-			<Grid Margin="5">
-				<Image DockPanel.Dock="Left" x:Name="PreviewImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
-				<Grid Background="#33ffff00" Name="GenerateFailedOverlay" Visibility="Hidden">
-					<TextBlock Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">テキストからの生成に失敗しました</TextBlock>
-				</Grid>
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition/>
+			<ColumnDefinition Width="Auto"/>
+			<ColumnDefinition/>
+		</Grid.ColumnDefinitions>
+		<Grid Grid.Column="0" Margin="5">
+			<Image DockPanel.Dock="Left" x:Name="PreviewImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+			<Grid Background="#33ffff00" Name="GenerateFailedOverlay" Visibility="Hidden">
+				<TextBlock Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">テキストからの生成に失敗しました</TextBlock>
 			</Grid>
-		</DockPanel>
-    </Grid>
+		</Grid>
+		<GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" Width="2"></GridSplitter>
+		<Grid Grid.Column="2">
+			<Grid.RowDefinitions>
+				<RowDefinition/>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition/>
+			</Grid.RowDefinitions>
+			<DockPanel Grid.Column="2" LastChildFill="True">
+				<DockPanel DockPanel.Dock="Right" LastChildFill="True">
+					<Grid DockPanel.Dock="Top">
+						<Grid.RowDefinitions>
+							<RowDefinition/>
+							<RowDefinition/>
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition/>
+							<ColumnDefinition/>
+						</Grid.ColumnDefinitions>
+						<Button Margin="5" Click="ReadButton_Click" Content="ファイルを読み込み"/>
+						<Button Grid.Column="1" Margin="5" Click="WriteButton_Click" Content="ファイルを書き込み"/>
+						<Button Grid.Row="1" Margin="5" Click="SelectDirectoryButton_Click" Content="建築ディレクトリを指定"/>
+						<Button Grid.Row="1" Grid.Column="1" Margin="5" Click="OverwriteWithTemplateButton_Click" Content="テンプレートで上書き"/>
+					</Grid>
+					<Grid DockPanel.Dock="Bottom">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition/>
+							<ColumnDefinition/>
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<TextBox AcceptsReturn="True" AcceptsTab="True" Margin="5" Width="200" TextChanged="InputTextBox_TextChanged" Text="{Binding JsonText}"></TextBox>
+					<TreeView ItemsSource="{Binding Builds}">
+						<TreeView.ItemTemplate>
+							<HierarchicalDataTemplate>
+								<StackPanel Orientation="Horizontal">
+									<TextBlock Text="{Binding DisplayName}"></TextBlock>
+								</StackPanel>
+							</HierarchicalDataTemplate>
+						</TreeView.ItemTemplate>
+					</TreeView>
+				</DockPanel>
+			</DockPanel>
+			<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Gray" Height="2"></GridSplitter>
+			<xctk:PropertyGrid
+				x:Name="BuildSettingProperty"
+				Grid.Row="2"
+				ShowTitle="True"
+				ShowDescriptionByTooltip="False"
+				ShowSearchBox="False"
+				ShowSortOptions="False"
+				ShowSummary="False"
+				DockPanel.Dock="Top"/>
+		</Grid>
+	</Grid>
 </Window>

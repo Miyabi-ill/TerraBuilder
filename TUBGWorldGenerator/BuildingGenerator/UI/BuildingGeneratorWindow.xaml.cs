@@ -10,6 +10,7 @@
     using System.Windows.Controls;
     using Newtonsoft.Json;
     using Microsoft.WindowsAPICodePack.Dialogs;
+    using System.Collections.ObjectModel;
 
     /// <summary>
     /// Interaction logic for BuildingGeneratorWindow.xaml
@@ -19,7 +20,7 @@
         private string fileName;
         private string jsonText;
         private BuildingGenerator buildingGenerator;
-        private FileSystemWatcher fileSystemWatcher;
+        private ObservableCollection<BuildNode> buildNodes = new ObservableCollection<BuildNode>();
 
         /// <inheritdoc/>
         public event PropertyChangedEventHandler PropertyChanged;
@@ -65,10 +66,29 @@
             }
         }
 
+        public ObservableCollection<BuildNode> Builds
+        {
+            get => buildNodes;
+            set
+            {
+                buildNodes = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Builds)));
+            }
+        }
+
         private void ParseJson()
         {
             BuildingGenerator.ImportJson(JsonText);
             BuildingGenerator.Build();
+            Builds.Clear();
+            if (BuildingGenerator.Root != null)
+            {
+                BuildNode node = new BuildNode(BuildingGenerator.Root);
+                foreach (var build in node.Child)
+                {
+                    Builds.Add(build);
+                }
+            }
 
             if (BuildingGenerator.Result != null)
             {

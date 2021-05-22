@@ -120,6 +120,7 @@
     <Compile Include="BuildingGenerator\UI\BuildingGeneratorWindow.xaml.cs">
       <DependentUpon>BuildingGeneratorWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BuildingGenerator\UI\BuildNode.cs" />
     <Compile Include="BuildingGenerator\UI\TextureLoader.cs" />
     <Compile Include="BuildingGenerator\UI\TileToImage.cs" />
     <Compile Include="ChestSimulator\ChestAccumulateResult.cs" />
