@@ -233,7 +233,7 @@
 
             jsonText = JsonConvert.SerializeObject(root, new JsonSerializerSettings()
             {
-                TypeNameHandling = TypeNameHandling.All,
+                TypeNameHandling = TypeNameHandling.Auto,
                 NullValueHandling = NullValueHandling.Ignore,
                 Formatting = Formatting.Indented,
             });

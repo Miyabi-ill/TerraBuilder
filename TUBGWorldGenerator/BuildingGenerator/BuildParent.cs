@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,8 +15,49 @@ namespace TUBGWorldGenerator.BuildingGenerator
     /// </summary>
     public class BuildParent : BuildBase
     {
+        private int x = 1;
+        private int y = 1;
+        private string name;
         private Size size;
         private ObservableCollection<BuildBase> childs = new ObservableCollection<BuildBase>();
+
+        /// <inheritdoc/>
+        [JsonProperty]
+        [DefaultValue(1)]
+        public override int X
+        {
+            get => x;
+            set
+            {
+                x = value;
+                RaisePropertyChanged(nameof(X));
+            }
+        }
+
+        /// <inheritdoc/>
+        [JsonProperty]
+        [DefaultValue(1)]
+        public override int Y
+        {
+            get => y;
+            set
+            {
+                y = value;
+                RaisePropertyChanged(nameof(Y));
+            }
+        }
+
+        /// <inheritdoc/>
+        [JsonProperty]
+        public override string Name
+        {
+            get => name;
+            set
+            {
+                name = value;
+                RaisePropertyChanged(nameof(Name));
+            }
+        }
 
         /// <summary>
         /// 建築のサイズ。

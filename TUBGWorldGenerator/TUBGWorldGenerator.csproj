@@ -109,6 +109,7 @@
     <Compile Include="BuildingGenerator\BuildBase.cs" />
     <Compile Include="BuildingGenerator\BuildingsDict.cs" />
     <Compile Include="BuildingGenerator\BuildParent.cs" />
+    <Compile Include="BuildingGenerator\BuildRoot.cs" />
     <Compile Include="BuildingGenerator\Import.cs" />
     <Compile Include="BuildingGenerator\Line.cs" />
     <Compile Include="BuildingGenerator\RandomValue.cs" />

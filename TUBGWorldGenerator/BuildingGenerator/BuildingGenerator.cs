@@ -19,7 +19,7 @@
         /// <summary>
         /// 建築ツリーのルート要素
         /// </summary>
-        public BuildBase Root { get; set; }
+        public BuildRoot Root { get; set; }
 
         /// <summary>
         /// <see cref="Root"/>から生成された建築物。
@@ -64,7 +64,7 @@
         {
             try
             {
-                Root = JsonConvert.DeserializeObject<BuildBase>(text, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto });
+                Root = JsonConvert.DeserializeObject<BuildRoot>(text, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto });
             }
             catch (Exception e)
             {

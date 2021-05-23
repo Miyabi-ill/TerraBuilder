@@ -45,7 +45,7 @@
                 {
                     try
                     {
-                        var build = JsonConvert.DeserializeObject<BuildBase>(sr.ReadToEnd(), new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto });
+                        var build = JsonConvert.DeserializeObject<BuildRoot>(sr.ReadToEnd(), new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto });
                         if (!string.IsNullOrEmpty(build.Name))
                         {
                             this[build.Name] = build;
