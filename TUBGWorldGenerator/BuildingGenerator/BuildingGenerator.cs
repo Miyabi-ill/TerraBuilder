@@ -57,7 +57,8 @@
         }
 
         /// <summary>
-        /// Jsonからツリーを生成する
+        /// Jsonからツリーを生成する。
+        /// タイルを取得するためには、<see cref="Build"/>を呼び出す。
         /// </summary>
         /// <param name="text">Jsonテキスト</param>
         public void ImportJson(string text)

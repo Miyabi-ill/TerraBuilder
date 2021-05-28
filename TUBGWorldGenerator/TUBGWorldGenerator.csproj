@@ -104,6 +104,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BuildingGenerator\BuildingCache.cs" />
     <Compile Include="BuildingGenerator\Box.cs" />
     <Compile Include="BuildingGenerator\BuildingGenerator.cs" />
     <Compile Include="BuildingGenerator\BuildBase.cs" />
@@ -115,9 +116,13 @@
     <Compile Include="BuildingGenerator\RandomValue.cs" />
     <Compile Include="BuildingGenerator\Rectangle.cs" />
     <Compile Include="BuildingGenerator\Repeat.cs" />
+    <Compile Include="BuildingGenerator\SearchResult.cs" />
     <Compile Include="BuildingGenerator\Size.cs" />
     <Compile Include="BuildingGenerator\TerrariaNameDict.cs" />
     <Compile Include="BuildingGenerator\TileObject.cs" />
+    <Compile Include="BuildingGenerator\UI\BuildingFinderControl.xaml.cs">
+      <DependentUpon>BuildingFinderControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="BuildingGenerator\UI\BuildingGeneratorWindow.xaml.cs">
       <DependentUpon>BuildingGeneratorWindow.xaml</DependentUpon>
     </Compile>
@@ -165,6 +170,10 @@
     <Compile Include="WorldGeneration\TileProtectionMap.cs" />
     <Compile Include="WorldGeneration\WorldGenerationRunner.cs" />
     <Compile Include="WorldGeneration\WorldSandbox.cs" />
+    <Page Include="BuildingGenerator\UI\BuildingFinderControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="BuildingGenerator\UI\BuildingGeneratorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

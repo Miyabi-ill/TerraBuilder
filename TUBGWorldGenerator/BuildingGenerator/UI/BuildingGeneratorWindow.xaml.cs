@@ -33,6 +33,8 @@
             {
                 BuildingsRootPath = Configs.LastBuildingsPath,
             };
+
+            BuildingFinder.BuildingCache = new BuildingCache(new BuildingGenerator() { BuildingsRootPath = Configs.LastBuildingsPath });
         }
 
         public string FileName
@@ -124,7 +126,7 @@
             {
                 Filter = "Jsonファイル(*.json)|*.json|すべてのファイル(*.*)|*.*",
                 RestoreDirectory = true,
-                FileName = "Building.xml",
+                FileName = "Building.json",
             };
 
             if (saveFileDialog.ShowDialog() == true)
