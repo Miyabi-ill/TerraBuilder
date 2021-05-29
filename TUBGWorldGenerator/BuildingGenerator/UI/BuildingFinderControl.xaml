@@ -16,7 +16,7 @@
 				<ListView.ItemTemplate>
 					<DataTemplate>
 						<DockPanel LastChildFill="True">
-							<Image Source="{Binding Image}" Height="150"/>
+							<Image Source="{Binding Image}" Height="150" ToolTip="{Binding Name}"/>
 						</DockPanel>
 					</DataTemplate>
 				</ListView.ItemTemplate>
