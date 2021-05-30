@@ -1,16 +1,13 @@
 ﻿namespace TUBGWorldGenerator.BuildingGenerator.UI
 {
-    using System.ComponentModel;
-    using System.Linq;
-    using System.IO;
-    using System.Text;
-    using System.Windows;
-    using Microsoft.Win32;
-    using TUBGWorldGenerator.Utils;
-    using System.Windows.Controls;
-    using Newtonsoft.Json;
-    using Microsoft.WindowsAPICodePack.Dialogs;
     using System.Collections.ObjectModel;
+    using System.ComponentModel;
+    using System.IO;
+    using System.Windows;
+    using System.Windows.Controls;
+    using Microsoft.Win32;
+    using Microsoft.WindowsAPICodePack.Dialogs;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Interaction logic for BuildingGeneratorWindow.xaml

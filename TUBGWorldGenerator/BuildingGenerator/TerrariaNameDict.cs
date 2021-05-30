@@ -15,7 +15,7 @@
             {
                 if (field.FieldType == typeof(ushort))
                 {
-                    TileNameToID.Add(field.Name, (ushort)field.GetValue(null));
+                    TileNameToID.Add(field.Name.ToLower(), (ushort)field.GetValue(null));
                 }
             }
 

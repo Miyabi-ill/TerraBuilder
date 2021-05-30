@@ -5,8 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Win32;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria.ID;
 
 namespace TUBGWorldGenerator.BuildingGenerator.UI
 {
@@ -16,9 +18,120 @@ namespace TUBGWorldGenerator.BuildingGenerator.UI
         //private Bitmap defaultTexture;
         private Bitmap actuator;
 
+        private TextureLoader()
+        {
+            string path = null;
+            if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\GOG.com\Games\1207665503\"))
+                {
+                    if (key != null)
+                    {
+                        path = Path.Combine((string)key.GetValue("PATH"), "Content");
+                    }
+                }
+            }
+
+            // find steam
+            if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+            {
+                // try with dionadar's fix
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 105600"))
+                {
+                    if (key != null)
+                    {
+                        path = Path.Combine((string)key.GetValue("InstallLocation"), "Content");
+                    }
+                }
+            }
+
+            // if that fails, try steam path
+            if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+            {
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\\Valve\\Steam"))
+                {
+                    if (key != null)
+                    {
+                        path = key.GetValue("SteamPath") as string;
+                    }
+                }
+
+                // no steam key, let's try steam in program files
+                if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+                {
+                    path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+                    path = Path.Combine(path, "Steam");
+                }
+
+                path = Path.Combine(path, "steamapps", "common", "terraria", "Content");
+            }
+
+            // if that fails, try steam path - the long way
+            if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\\Valve\\Steam"))
+                {
+                    if (key != null)
+                    {
+                        path = key.GetValue("InstallPath") as string;
+                    }
+                    else
+                    {
+                        using (RegistryKey key2 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\\WOW6432Node\\Valve\\Steam"))
+                        {
+                            if (key2 != null)
+                            {
+                                path = key2.GetValue("InstallPath") as string;
+                            }
+                        }
+                    }
+
+                    // no steam key, let's try steam in program files
+                    if (!string.IsNullOrWhiteSpace(path) && Directory.Exists(path))
+                    {
+                        var vdfFile = Path.Combine(path, "steamapps", "libraryfolders.vdf");
+
+                        using (var file = File.Open(vdfFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        using (TextReader tr = new StreamReader(file))
+                        {
+                            var libraryPaths = new List<string>();
+                            string line = null;
+                            bool foundPath = false;
+                            while ((line = tr.ReadLine()) != null && !foundPath)
+                            {
+                                if (!string.IsNullOrWhiteSpace(line))
+                                {
+                                    var split = line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                                    foreach (var item in split)
+                                    {
+                                        var trimmed = item.Trim('\"').Replace("\\\\", "\\");
+                                        if (Directory.Exists(trimmed))
+                                        {
+
+                                            var testpath = Path.Combine(trimmed, "steamapps", "common", "terraria", "Content");
+                                            if (Directory.Exists(testpath))
+                                            {
+                                                path = testpath;
+                                                foundPath = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            ExtractedContentsDir = path;
+        }
+
+        public static TextureLoader Instance { get; } = new TextureLoader();
+
         public string ExtractedContentsDir { get; set; }
 
-        public static Microsoft.Xna.Framework.Rectangle ZeroSixteenRectangle { get; } = new Microsoft.Xna.Framework.Rectangle(0, 0, 16, 16);
+        private static Microsoft.Xna.Framework.Rectangle ZeroSixteenRectangle { get; } = new Microsoft.Xna.Framework.Rectangle(0, 0, 16, 16);
 
         private Dictionary<int, Bitmap> Moon { get; } = new Dictionary<int, Bitmap>();
 
@@ -102,7 +215,23 @@ namespace TUBGWorldGenerator.BuildingGenerator.UI
 
         public Bitmap GetArmorLegs(int num) => GetTextureById(ArmorLegs, num, "Images\\Armor_Legs_{0}");
 
-        public Bitmap GetItem(int num) => GetTextureById(Item, num, "Images\\Item_{0}");
+        public Bitmap GetItem(int num)
+        {
+            int id = ItemID.Sets.TextureCopyLoad[num];
+            if (id == -1)
+            {
+                return GetTextureById(Item, num, "Images\\Item_{0}");
+            }
+
+            int lastId = num;
+            while (id != -1)
+            {
+                lastId = id;
+                id = ItemID.Sets.TextureCopyLoad[id];
+            }
+
+            return GetTextureById(Item, lastId, "Images\\Item_{0}");
+        }
 
         public Bitmap GetMoon(int num) => GetTextureById(Moon, num, "Images\\Moon_{0}");
 

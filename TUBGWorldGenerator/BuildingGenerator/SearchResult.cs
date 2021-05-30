@@ -15,16 +15,43 @@ namespace TUBGWorldGenerator.BuildingGenerator
         private string originalName;
         private IEnumerable<string> tags;
 
+        private Func<BitmapImage> getImageFunction;
+
         /// <inheritdoc/>
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public SearchResult()
+        {
+            PropertyChanged += GetImageFunction_PropertyChanged;
+        }
+
+        private async void GetImageFunction_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ImageGetFunction)
+                && ImageGetFunction != null)
+            {
+                Image = await Task.Run(() => ImageGetFunction()).ConfigureAwait(false);
+            }
+        }
 
         public BitmapImage Image
         {
             get => image;
+
             set
             {
                 image = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Image)));
+            }
+        }
+
+        public Func<BitmapImage> ImageGetFunction
+        {
+            get => getImageFunction;
+            set
+            {
+                getImageFunction = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ImageGetFunction)));
             }
         }
 

@@ -18,33 +18,31 @@
     {
         private struct BlockStyle
         {
-            public bool top;
+            public bool Top;
 
-            public bool bottom;
+            public bool Bottom;
 
-            public bool left;
+            public bool Left;
 
-            public bool right;
+            public bool Right;
 
             public BlockStyle(bool up, bool down, bool left, bool right)
             {
-                top = up;
-                bottom = down;
-                this.left = left;
-                this.right = right;
+                Top = up;
+                Bottom = down;
+                Left = left;
+                Right = right;
             }
 
             public void Clear()
             {
-                top = bottom = left = right = false;
+                Top = Bottom = Left = Right = false;
             }
         }
 
         private static readonly Point wallFrameSize;
 
         private static readonly Point frameSize8Way = new Point(18, 18);
-
-        private static TextureLoader textureLoader;
 
         private static Point[][] wallFrameLookup;
 
@@ -146,115 +144,6 @@
 
         public static BitmapImage CreateBitmap(Tile[,] tiles)
         {
-            if (textureLoader == null)
-            {
-                string path = null;
-                if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
-                {
-                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\GOG.com\Games\1207665503\"))
-                    {
-                        if (key != null)
-                        {
-                            path = Path.Combine((string)key.GetValue("PATH"), "Content");
-                        }
-                    }
-                }
-
-                // find steam
-                if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
-                {
-                    // try with dionadar's fix
-                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 105600"))
-                    {
-                        if (key != null)
-                        {
-                            path = Path.Combine((string)key.GetValue("InstallLocation"), "Content");
-                        }
-                    }
-                }
-
-                // if that fails, try steam path
-                if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
-                {
-                    using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\\Valve\\Steam"))
-                    {
-                        if (key != null)
-                        {
-                            path = key.GetValue("SteamPath") as string;
-                        }
-                    }
-
-                    // no steam key, let's try steam in program files
-                    if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
-                    {
-                        path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-                        path = Path.Combine(path, "Steam");
-                    }
-
-                    path = Path.Combine(path, "steamapps", "common", "terraria", "Content");
-                }
-
-                // if that fails, try steam path - the long way
-                if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
-                {
-                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\\Valve\\Steam"))
-                    {
-                        if (key != null)
-                        {
-                            path = key.GetValue("InstallPath") as string;
-                        }
-                        else
-                        {
-                            using (RegistryKey key2 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\\WOW6432Node\\Valve\\Steam"))
-                            {
-                                if (key2 != null)
-                                {
-                                    path = key2.GetValue("InstallPath") as string;
-                                }
-                            }
-                        }
-
-                        // no steam key, let's try steam in program files
-                        if (!string.IsNullOrWhiteSpace(path) && Directory.Exists(path))
-                        {
-                            var vdfFile = Path.Combine(path, "steamapps", "libraryfolders.vdf");
-
-                            using (var file = File.Open(vdfFile, FileMode.Open, FileAccess.Read, FileShare.Read))
-                            using (TextReader tr = new StreamReader(file))
-                            {
-                                var libraryPaths = new List<string>();
-                                string line = null;
-                                bool foundPath = false;
-                                while ((line = tr.ReadLine()) != null && !foundPath)
-                                {
-                                    if (!string.IsNullOrWhiteSpace(line))
-                                    {
-                                        var split = line.Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                                        foreach (var item in split)
-                                        {
-                                            var trimmed = item.Trim('\"').Replace("\\\\", "\\");
-                                            if (Directory.Exists(trimmed))
-                                            {
-
-                                                var testpath = Path.Combine(trimmed, "steamapps", "common", "terraria", "Content");
-                                                if (Directory.Exists(testpath))
-                                                {
-                                                    path = testpath;
-                                                    foundPath = true;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                textureLoader = new TextureLoader() { ExtractedContentsDir = path };
-            }
-
             // 上下左右に8pxづつ余裕を持たせる
             Bitmap result = new Bitmap((tiles.GetLength(0) * 16) + 16, (tiles.GetLength(1) * 16) + 16);
             using (Graphics g = Graphics.FromImage(result))
@@ -265,7 +154,7 @@
                     {
                         if (tiles[i, j].wall != 0)
                         {
-                            Bitmap image = textureLoader.GetWall(tiles[i, j].wall);
+                            Bitmap image = TextureLoader.Instance.GetWall(tiles[i, j].wall);
                             if (image == null)
                             {
                                 var array = new byte[16 * 16 * 3];
@@ -298,7 +187,7 @@
                     {
                         if (tiles[i, j].active())
                         {
-                            Bitmap image = textureLoader.GetTile(tiles[i, j].type);
+                            Bitmap image = TextureLoader.Instance.GetTile(tiles[i, j].type);
                             if (image != null)
                             {
                                 //Point frame = TileFrame(tiles, i, j);
@@ -336,7 +225,7 @@
             Point frame = TileFrame(tiles, tileX, tileY);
             Rectangle normalTileRect = new Rectangle(frame.X, frame.Y, 16, 16);
 
-            Bitmap baseImage = textureLoader.GetTile(tiles[tileX, tileY].type);
+            Bitmap baseImage = TextureLoader.Instance.GetTile(tiles[tileX, tileY].type);
 
             int offsetX = 0;
             int offsetY = 0;
@@ -1164,7 +1053,7 @@
 
             // 上マージ有無
             BlockStyle blockStyle2 = default(BlockStyle);
-            if (blockStyle.top)
+            if (blockStyle.Top)
             {
                 if (y - 1 >= 0)
                 {
@@ -1172,7 +1061,7 @@
                     if (tile.active() && WillItBlend(centerTile.type, tile.type))
                     {
                         blockStyle2 = FindBlockStyle(tile);
-                        if (blockStyle2.bottom)
+                        if (blockStyle2.Bottom)
                         {
                             frameFlag |= 1;
                         }
@@ -1185,7 +1074,7 @@
             }
 
             BlockStyle blockStyle3 = default(BlockStyle);
-            if (blockStyle.left)
+            if (blockStyle.Left)
             {
                 if (x - 1 >= 0)
                 {
@@ -1193,7 +1082,7 @@
                     if (tile.active() && WillItBlend(centerTile.type, tile.type))
                     {
                         blockStyle3 = FindBlockStyle(tile);
-                        if (blockStyle3.right)
+                        if (blockStyle3.Right)
                         {
                             frameFlag |= 2;
                         }
@@ -1206,7 +1095,7 @@
             }
 
             BlockStyle blockStyle4 = default(BlockStyle);
-            if (blockStyle.right)
+            if (blockStyle.Right)
             {
                 if (x + 1 < tiles.GetLength(0))
                 {
@@ -1214,7 +1103,7 @@
                     if (tile.active() && WillItBlend(centerTile.type, tile.type))
                     {
                         blockStyle4 = FindBlockStyle(tile);
-                        if (blockStyle4.left)
+                        if (blockStyle4.Left)
                         {
                             frameFlag |= 4;
                         }
@@ -1227,7 +1116,7 @@
             }
 
             BlockStyle blockStyle5 = default(BlockStyle);
-            if (blockStyle.bottom)
+            if (blockStyle.Bottom)
             {
                 if (y + 1 < tiles.GetLength(1))
                 {
@@ -1235,7 +1124,7 @@
                     if (tile.active() && WillItBlend(centerTile.type, tile.type))
                     {
                         blockStyle5 = FindBlockStyle(tile);
-                        if (blockStyle5.top)
+                        if (blockStyle5.Top)
                         {
                             frameFlag |= 8;
                         }
@@ -1247,7 +1136,7 @@
                 }
             }
 
-            if (blockStyle2.left && blockStyle3.top)
+            if (blockStyle2.Left && blockStyle3.Top)
             {
                 if (x - 1 >= 0 && y - 1 >= 0)
                 {
@@ -1255,7 +1144,7 @@
                     if (tile.active() && WillItBlend(centerTile.type, tile.type))
                     {
                         BlockStyle blockStyle6 = FindBlockStyle(tile);
-                        if (blockStyle6.right && blockStyle6.bottom)
+                        if (blockStyle6.Right && blockStyle6.Bottom)
                         {
                             frameFlag |= 0x10;
                         }
@@ -1263,7 +1152,7 @@
                 }
             }
 
-            if (blockStyle2.right && blockStyle4.top)
+            if (blockStyle2.Right && blockStyle4.Top)
             {
                 if (x + 1 < tiles.GetLength(0) && y - 1 >= 0)
                 {
@@ -1271,7 +1160,7 @@
                     if (tile.active() && WillItBlend(centerTile.type, tile.type))
                     {
                         BlockStyle blockStyle7 = FindBlockStyle(tile);
-                        if (blockStyle7.left && blockStyle7.bottom)
+                        if (blockStyle7.Left && blockStyle7.Bottom)
                         {
                             frameFlag |= 0x20;
                         }
@@ -1279,7 +1168,7 @@
                 }
             }
 
-            if (blockStyle5.left && blockStyle3.bottom)
+            if (blockStyle5.Left && blockStyle3.Bottom)
             {
                 if (x - 1 >= 0 && y + 1 < tiles.GetLength(1))
                 {
@@ -1287,7 +1176,7 @@
                     if (tile.active() && WillItBlend(centerTile.type, tile.type))
                     {
                         BlockStyle blockStyle8 = FindBlockStyle(tile);
-                        if (blockStyle8.right && blockStyle8.top)
+                        if (blockStyle8.Right && blockStyle8.Top)
                         {
                             frameFlag |= 0x40;
                         }
@@ -1295,7 +1184,7 @@
                 }
             }
 
-            if (blockStyle5.right && blockStyle4.bottom)
+            if (blockStyle5.Right && blockStyle4.Bottom)
             {
                 if (x + 1 < tiles.GetLength(0) && y + 1 < tiles.GetLength(1))
                 {
@@ -1303,7 +1192,7 @@
                     if (tile.active() && WillItBlend(centerTile.type, tile.type))
                     {
                         BlockStyle blockStyle9 = FindBlockStyle(tile);
-                        if (blockStyle9.left && blockStyle9.top)
+                        if (blockStyle9.Left && blockStyle9.Top)
                         {
                             frameFlag |= 0x80;
                         }

@@ -13,6 +13,7 @@
     using System.Windows;
     using System.Windows.Media.Imaging;
     using Newtonsoft.Json;
+    using Terraria.ID;
     using TUBGWorldGenerator.BuildingGenerator.UI;
 
     public class BuildingCache
@@ -44,6 +45,10 @@
 
         private Dictionary<string, BitmapImage> BuildingNameBitmapDictionary { get; } = new Dictionary<string, BitmapImage>();
 
+        private Dictionary<string, BitmapImage> ItemNameBitmapDictionary { get; } = new Dictionary<string, BitmapImage>();
+
+        private Dictionary<string, (string name, ObservableCollection<string> tags)> TileTags { get; set; } = new Dictionary<string, (string name, ObservableCollection<string> tags)>();
+
         /// <summary>
         /// キャッシュディレクトリの辞書。ファイル名(の拡張子を除いた名前)に対し、建物名とハッシュを保存する。Jsonに書き込み/読み込みする。
         /// </summary>
@@ -59,6 +64,11 @@
             if (!Directory.Exists(CacheDirectory))
             {
                 Directory.CreateDirectory(CacheDirectory);
+            }
+
+            if (TileTags.Count == 0)
+            {
+                LoadTileTags();
             }
 
             string cacheFilePath = Path.Combine(CacheDirectory, "cache.json");
@@ -111,13 +121,11 @@
                     text = sr.ReadToEnd();
                 }
 
-                // ファイル名がある かつ ハッシュ一致で画像取得
+                // ファイル名がある かつ ハッシュ一致
                 if (CacheFileNameDictionary.ContainsKey(buildingFileName)
                     && VerifyHash(text, CacheFileNameDictionary[buildingFileName].hash))
                 {
-                    Bitmap image = (Bitmap)Image.FromFile(Path.Combine(CacheDirectory, buildingFileName + ".png"));
-
-                    BuildingNameBitmapDictionary.Add(buildingFileName, Utils.WorldToImage.Convert(image));
+                    // 画像は必要なときに読み込む
                     continue;
                 }
 
@@ -156,7 +164,7 @@
                             }
                         }
                     }
-                    catch (Exception e)
+                    catch
                     {
                     }
                 }
@@ -203,18 +211,37 @@
             }
         }
 
-        public IEnumerable<SearchResult> Search(string keywords)
+        public async Task<List<SearchResult>> Search(string keywords)
         {
+            List<SearchResult> results = new List<SearchResult>();
+
             // 検索が空なら
             string search = keywords.Trim().ToLowerInvariant();
             if (string.IsNullOrEmpty(search))
             {
                 foreach (string name in CacheFileNameDictionary.Keys)
                 {
-                    yield return new SearchResult() { Name = CacheFileNameDictionary[name].name, OriginalName = name, Image = BuildingNameBitmapDictionary[name], Tags = CacheFileNameDictionary[name].tags };
+                    results.Add(new SearchResult()
+                    {
+                        Name = CacheFileNameDictionary[name].name,
+                        OriginalName = name,
+                        ImageGetFunction = () => GetBitmapFromBuildingName(name),
+                        Tags = CacheFileNameDictionary[name].tags,
+                    });
                 }
 
-                yield break;
+                foreach (var tileTag in TileTags)
+                {
+                    results.Add(new SearchResult()
+                    {
+                        Name = tileTag.Value.name,
+                        OriginalName = tileTag.Key,
+                        ImageGetFunction = () => GetItemBitmapFromTile(tileTag.Key),
+                        Tags = tileTag.Value.tags,
+                    });
+                }
+
+                return results;
             }
 
             // 検索が空以外なら、ファイル名、名前、タグから検索
@@ -222,19 +249,14 @@
             string[] searches = search.Split(' ', '　');
             if (searches.Length < 2)
             {
-                foreach (var result in InitialSearch(search))
-                {
-                    yield return result;
-                }
-
-                yield break;
+                return new List<SearchResult>(InitialSearch(keywords));
             }
 
-            IEnumerable<SearchResult> results = InitialSearch(searches[0]);
+            IEnumerable<SearchResult> searchResults = InitialSearch(searches[0]);
             for (int i = 1; i < searches.Length; i++)
             {
                 string keyword = searches[i];
-                results = results.Where(x =>
+                searchResults = searchResults.Where(x =>
                 {
                     if (x.Name.ToLowerInvariant().Contains(keyword)
                         || x.OriginalName.ToLowerInvariant().Contains(keyword))
@@ -254,10 +276,7 @@
                 });
             }
 
-            foreach (var result in results)
-            {
-                yield return result;
-            }
+            return new List<SearchResult>(searchResults);
 
             IEnumerable<SearchResult> InitialSearch(string keyword)
             {
@@ -266,7 +285,13 @@
                     if (cache.Key.ToLowerInvariant().Contains(keyword)
                         || cache.Value.name.ToLowerInvariant().Contains(keyword))
                     {
-                        yield return new SearchResult() { Name = CacheFileNameDictionary[cache.Key].name, OriginalName = cache.Key, Image = BuildingNameBitmapDictionary[cache.Key], Tags = CacheFileNameDictionary[cache.Key].tags };
+                        yield return new SearchResult()
+                        {
+                            Name = CacheFileNameDictionary[cache.Key].name,
+                            OriginalName = cache.Key,
+                            ImageGetFunction = () => GetBitmapFromBuildingName(cache.Key),
+                            Tags = CacheFileNameDictionary[cache.Key].tags,
+                        };
                     }
                     else
                     {
@@ -274,7 +299,45 @@
                         {
                             if (string.Equals(tag, keyword, StringComparison.OrdinalIgnoreCase))
                             {
-                                yield return new SearchResult() { Name = CacheFileNameDictionary[cache.Key].name, OriginalName = cache.Key, Image = BuildingNameBitmapDictionary[cache.Key], Tags = CacheFileNameDictionary[cache.Key].tags };
+                                yield return new SearchResult()
+                                {
+                                    Name = CacheFileNameDictionary[cache.Key].name,
+                                    OriginalName = cache.Key,
+                                    ImageGetFunction = () => GetBitmapFromBuildingName(cache.Key),
+                                    Tags = CacheFileNameDictionary[cache.Key].tags,
+                                };
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                foreach (var tileTag in TileTags)
+                {
+                    if (tileTag.Key.ToLowerInvariant().Contains(keyword)
+                        || tileTag.Value.name.ToLowerInvariant().Contains(keyword))
+                    {
+                        yield return new SearchResult()
+                        {
+                            Name = tileTag.Value.name,
+                            OriginalName = tileTag.Key,
+                            ImageGetFunction = () => GetItemBitmapFromTile(tileTag.Key),
+                            Tags = tileTag.Value.tags,
+                        };
+                    }
+                    else
+                    {
+                        foreach (string tag in tileTag.Value.tags)
+                        {
+                            if (string.Equals(tag, keyword, StringComparison.OrdinalIgnoreCase))
+                            {
+                                yield return new SearchResult()
+                                {
+                                    Name = tileTag.Value.name,
+                                    OriginalName = tileTag.Key,
+                                    ImageGetFunction = () => GetItemBitmapFromTile(tileTag.Key),
+                                    Tags = tileTag.Value.tags,
+                                };
                                 break;
                             }
                         }
@@ -302,6 +365,158 @@
             StringComparer comparer = StringComparer.OrdinalIgnoreCase;
 
             return comparer.Compare(hashedText, hash) == 0;
+        }
+
+        private void LoadTileTags()
+        {
+            string tileTagCacheFile = Path.Combine(CacheDirectory, "tileTags.json");
+            bool regenerateCacheFile = true;
+
+            // タイルに対するタグ名をファイルから読み込み
+            if (File.Exists(tileTagCacheFile))
+            {
+                using (var sr = new StreamReader(tileTagCacheFile))
+                {
+                    try
+                    {
+                        TileTags = JsonConvert.DeserializeObject<Dictionary<string, (string name, ObservableCollection<string> tags)>>(sr.ReadToEnd());
+                        regenerateCacheFile = false;
+                    }
+                    catch
+                    {
+                        TileTags = null;
+                    }
+                }
+            }
+
+            // ファイルからの読み込みに失敗
+            if (TileTags == null)
+            {
+                if (MessageBox.Show("タイルタグファイル(tileTag.json)の読み込みに失敗しました。初期状態に戻しますか？", "読み込みに失敗", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                {
+                    regenerateCacheFile = false;
+                }
+            }
+
+            // 再生成する
+            if (regenerateCacheFile)
+            {
+                TileTags = new Dictionary<string, (string name, ObservableCollection<string> tags)>();
+                Dictionary<int, object> tileIdsAlreadyAdd = new Dictionary<int, object>();
+                Dictionary<int, object> wallIdsAlreadyAdd = new Dictionary<int, object>();
+
+                // まずアイテム名からタイル、壁を取得。
+                foreach (var item in TerrariaNameDict.ItemNameToItem)
+                {
+                    if (item.Value.createTile != -1)
+                    {
+                        string key = "Tile:" + item.Key;
+                        if (!TileTags.ContainsKey(key))
+                        {
+                            TileTags.Add(key, (item.Value.Name, new ObservableCollection<string>() { "タイル", "たいる", "tile" }));
+                        }
+
+                        if (!tileIdsAlreadyAdd.ContainsKey(item.Value.createTile))
+                        {
+                            tileIdsAlreadyAdd.Add(item.Value.createTile, null);
+                        }
+                    }
+
+                    if (item.Value.createWall != -1)
+                    {
+                        string key = "Wall:" + item.Key;
+                        if (!TileTags.ContainsKey(key))
+                        {
+                            TileTags.Add(key, (item.Value.Name, new ObservableCollection<string>() { "wall", "壁", "かべ", "カベ" }));
+                        }
+
+                        if (!wallIdsAlreadyAdd.ContainsKey(item.Value.createWall))
+                        {
+                            wallIdsAlreadyAdd.Add(item.Value.createWall, null);
+                        }
+                    }
+                }
+
+                //for (int i = 0; i < TileID.Count; i++)
+                //{
+                //    if (tileIdsAlreadyAdd.ContainsKey(i))
+                //    {
+                //        continue;
+                //    }
+
+                //    string tileName = "Tile:" + TerrariaNameDict.TileNameToID.First(x => x.Value == i).Key;
+                //    TileTags.Add(tileName, (tileName, new ObservableCollection<string>() { "タイル", "たいる", "tile" }));
+                //}
+
+                //for (int i = 0; i < WallID.Count; i++)
+                //{
+                //    if (wallIdsAlreadyAdd.ContainsKey(i))
+                //    {
+                //        continue;
+                //    }
+
+                //    string wallName = "Wall:" + TerrariaNameDict.WallNameToID.First(x => x.Value == i).Key;
+                //    TileTags.Add(wallName, (wallName, new ObservableCollection<string>() { "wall", "壁", "かべ", "カベ" }));
+                //}
+
+                using (var sw = new StreamWriter(tileTagCacheFile))
+                {
+                    sw.WriteLine(JsonConvert.SerializeObject(TileTags, Formatting.Indented));
+                }
+            }
+        }
+
+        private BitmapImage GetBitmapFromBuildingName(string buildingName)
+        {
+            if (BuildingNameBitmapDictionary.ContainsKey(buildingName))
+            {
+                return BuildingNameBitmapDictionary[buildingName];
+            }
+
+            try
+            {
+                Bitmap image = (Bitmap)Image.FromFile(Path.Combine(CacheDirectory, buildingName + ".png"));
+                BitmapImage bitmapImage = Utils.WorldToImage.Convert(image);
+                BuildingNameBitmapDictionary.Add(buildingName, bitmapImage);
+                return bitmapImage;
+            }
+            catch { }
+            return null;
+        }
+
+        private BuildRoot GetBuildingFromBuildingName(string buildingName)
+        {
+            throw new NotImplementedException();
+        }
+
+        private BitmapImage GetItemBitmapFromTile(string itemName)
+        {
+            lock (ItemNameBitmapDictionary)
+            {
+                if (ItemNameBitmapDictionary.ContainsKey(itemName))
+                {
+                    return ItemNameBitmapDictionary[itemName];
+                }
+
+                string key = itemName;
+                if (key.StartsWith("Tile:"))
+                {
+                    key = key.Substring(5);
+                }
+                else if (key.StartsWith("Wall:"))
+                {
+                    key = key.Substring(5);
+                }
+
+                try
+                {
+                    BitmapImage image = Utils.WorldToImage.Convert(TextureLoader.Instance.GetItem(TerrariaNameDict.ItemNameToItem[key].type));
+                    ItemNameBitmapDictionary.Add(itemName, image);
+                    return image;
+                }
+                catch { }
+                return null;
+            }
         }
     }
 }

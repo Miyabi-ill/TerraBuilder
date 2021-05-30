@@ -22,7 +22,7 @@
 				<TextBlock Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">テキストからの生成に失敗しました</TextBlock>
 			</Grid>
 		</Grid>
-
+		<GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" Width="2"></GridSplitter>
 		<Grid Grid.Column="2">
 			<Grid.RowDefinitions>
 				<RowDefinition/>
@@ -74,7 +74,7 @@
 				ShowSummary="False"
 				DockPanel.Dock="Top"/>
 		</Grid>
-		<GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" Width="2"></GridSplitter>
+		<GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" Width="2"></GridSplitter>
 		<local:BuildingFinderControl Grid.Column="4" x:Name="BuildingFinder" Margin="5"/>
 	</Grid>
 </Window>

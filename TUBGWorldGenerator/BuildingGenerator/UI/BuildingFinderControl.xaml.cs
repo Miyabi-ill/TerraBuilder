@@ -27,12 +27,13 @@
             InitializeComponent();
         }
 
-        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private async void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox textBox)
             {
                 string searchText = textBox.Text.Trim();
-                SearchResult.ItemsSource = BuildingCache.Search(searchText);
+                var searchResults = await BuildingCache.Search(searchText);
+                SearchResult.Dispatcher.Invoke(() => SearchResult.ItemsSource = searchResults);
             }
         }
     }

@@ -24,6 +24,8 @@
         /// </summary>
         public MainWindow()
         {
+            Terraria.Localization.LanguageManager.Instance.SetLanguage("en-US");
+
             Sandbox = new WorldSandbox();
             Runner = new WorldGenerationRunner();
             InitializeComponent();

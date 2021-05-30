@@ -40,7 +40,7 @@
             set
             {
                 fillTile = value;
-                fillTileType = TerrariaNameDict.TileNameToID[fillTile];
+                fillTileType = TerrariaNameDict.TileNameToID[fillTile.ToLower()];
             }
         }
 
