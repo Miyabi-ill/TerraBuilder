@@ -17,10 +17,25 @@
 			<ColumnDefinition/>
 		</Grid.ColumnDefinitions>
 		<Grid Grid.Column="0" Margin="5">
-			<Image DockPanel.Dock="Left" x:Name="PreviewImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
-			<Grid Background="#33ffff00" Name="GenerateFailedOverlay" Visibility="Hidden">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition/>
+				<RowDefinition Height="Auto"/>
+			</Grid.RowDefinitions>
+			<DockPanel LastChildFill="False">
+				<Button Margin="5" Click="TileButton_Click">タイル</Button>
+				<Button Margin="5" Click="HammerButton_Click">ハンマー</Button>
+				<Button Margin="5" Click="EraserButton_Click">消しゴム</Button>
+				<Button Margin="5" Click="PaintButton_Click">ペンキ</Button>
+				<Button Margin="5" Click="InactiveButton_Click">背景化</Button>
+			</DockPanel>
+			<Image Grid.Row="1" Margin="5" x:Name="PreviewImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+			<Grid Grid.Row="1" x:Name="TileGrid" PreviewMouseMove="TileGrid_MouseMove" Width="{Binding ElementName=PreviewImage, Path=ActualWidth}" Height="{Binding ElementName=PreviewImage, Path=ActualHeight}" ShowGridLines="True" Panel.ZIndex="100"></Grid>
+			<Grid Grid.Row="1" Background="#33ffff00" Name="GenerateFailedOverlay" Visibility="Hidden">
 				<TextBlock Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">テキストからの生成に失敗しました</TextBlock>
 			</Grid>
+
+			<TextBlock Grid.Row="2" x:Name="InformationText"/>
 		</Grid>
 		<GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" Width="2"></GridSplitter>
 		<Grid Grid.Column="2">

@@ -1,10 +1,12 @@
 ﻿namespace TUBGWorldGenerator.BuildingGenerator.UI
 {
+    using System;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.IO;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Windows.Input;
     using Microsoft.Win32;
     using Microsoft.WindowsAPICodePack.Dialogs;
     using Newtonsoft.Json;
@@ -20,9 +22,6 @@
         private BuildingGenerator buildingGenerator;
         private ObservableCollection<BuildNode> buildNodes = new ObservableCollection<BuildNode>();
 
-        /// <inheritdoc/>
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public BuildingGeneratorWindow()
         {
             InitializeComponent();
@@ -33,6 +32,44 @@
             };
 
             BuildingFinder.BuildingCache = new BuildingCache(new BuildingGenerator() { BuildingsRootPath = Configs.LastBuildingsPath });
+        }
+
+        /// <inheritdoc/>
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [Flags]
+        private enum ToolState
+        {
+            PlaceTile = 0x1,
+            HalfBrick = 0x2,
+            RightBottomSlope = 0x4,
+            LeftBottomSlope = 0x8,
+            RightTopSlope = 0x10,
+            LeftTopSlope = 0x20,
+            Eraser = 0x40,
+            Paint = 0x80,
+            SwitchInactive = 0x100,
+        }
+
+        private void UpdateGrid()
+        {
+            TileGrid.ColumnDefinitions.Clear();
+            TileGrid.RowDefinitions.Clear();
+
+            int columnCount = (int)Math.Round(PreviewImage.Source.Width) / 16;
+            int rowCount = (int)Math.Round(PreviewImage.Source.Height) / 16;
+
+            for (int i = 0; i < columnCount; i++)
+            {
+                ColumnDefinition columnDefinition = new ColumnDefinition();
+                TileGrid.ColumnDefinitions.Add(columnDefinition);
+            }
+
+            for (int i = 0; i < rowCount; i++)
+            {
+                RowDefinition rowDefinition = new RowDefinition();
+                TileGrid.RowDefinitions.Add(rowDefinition);
+            }
         }
 
         public string FileName
@@ -94,6 +131,7 @@
             {
                 GenerateFailedOverlay.Visibility = Visibility.Hidden;
                 PreviewImage.Source = TileToImage.CreateBitmap(BuildingGenerator.Result);
+                UpdateGrid();
             }
             else
             {
@@ -253,6 +291,47 @@
                 BuildingGenerator.BuildingsRootPath = dialog.FileName;
                 Configs.LastBuildingsPath = dialog.FileName;
             }
+        }
+
+        private void TileGrid_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            Point point = Mouse.GetPosition(TileGrid);
+
+            int columnCount = TileGrid.ColumnDefinitions.Count;
+            int rowCount = TileGrid.RowDefinitions.Count;
+
+            double width = TileGrid.ActualWidth;
+            double height = TileGrid.ActualHeight;
+
+            int positionX = (int)(point.X / width * columnCount);
+            int positionY = (int)(point.Y / height * rowCount);
+
+            InformationText.Text = $"X: {positionX}, Y: {positionY}";
+        }
+
+        private void TileButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void HammerButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void EraserButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void PaintButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void InactiveButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
