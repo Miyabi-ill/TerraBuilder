@@ -1,4 +1,4 @@
-﻿namespace TUBGWorldGenerator.BuildingGenerator
+﻿namespace TUBGWorldGenerator.BuildingGenerator.Parts
 {
     using System;
     using System.Collections.ObjectModel;

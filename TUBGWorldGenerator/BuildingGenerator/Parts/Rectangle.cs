@@ -1,4 +1,4 @@
-﻿namespace TUBGWorldGenerator.BuildingGenerator
+﻿namespace TUBGWorldGenerator.BuildingGenerator.Parts
 {
     using System.Linq;
     using Newtonsoft.Json;

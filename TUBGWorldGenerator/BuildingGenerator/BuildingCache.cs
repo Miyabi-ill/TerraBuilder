@@ -14,6 +14,7 @@
     using System.Windows.Media.Imaging;
     using Newtonsoft.Json;
     using Terraria.ID;
+    using TUBGWorldGenerator.BuildingGenerator.Parts;
     using TUBGWorldGenerator.BuildingGenerator.UI;
 
     public class BuildingCache

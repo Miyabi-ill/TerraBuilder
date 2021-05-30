@@ -8,6 +8,7 @@
     using Microsoft.Win32;
     using Microsoft.WindowsAPICodePack.Dialogs;
     using Newtonsoft.Json;
+    using TUBGWorldGenerator.BuildingGenerator.Parts;
 
     /// <summary>
     /// Interaction logic for BuildingGeneratorWindow.xaml

@@ -3,6 +3,7 @@
     using System;
     using Newtonsoft.Json;
     using Terraria;
+    using TUBGWorldGenerator.BuildingGenerator.Parts;
 
     /// <summary>
     /// 建築ジェネレータ
