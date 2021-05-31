@@ -106,6 +106,11 @@
         /// <inheritdoc/>
         public override Tile[,] Build()
         {
+            if (TileID < 0)
+            {
+                return new Tile[0, 0];
+            }
+
             var tileObjectData = TileObjectData.GetTileData(TileID, Style, Alternate);
             if (tileObjectData == null)
             {

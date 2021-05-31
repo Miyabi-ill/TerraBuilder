@@ -13,7 +13,7 @@
 				<TextBlock Text="検索" Margin="0, 0, 5, 0"/>
 				<TextBox x:Name="SearchTextBox" TextChanged="SearchTextBox_TextChanged"/>
 			</DockPanel>
-			<ListView DockPanel.Dock="Bottom" Margin="0,5,0,0" x:Name="SearchResult" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+			<ListView DockPanel.Dock="Bottom" Margin="0,5,0,0" x:Name="SearchResult" SelectionChanged="SearchResult_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 				<ListView.ItemsPanel>
 					<ItemsPanelTemplate>
 						<vwp:VirtualizingWrapPanel/>

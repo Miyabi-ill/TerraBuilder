@@ -13,6 +13,7 @@
     using System.Windows;
     using System.Windows.Media.Imaging;
     using Newtonsoft.Json;
+    using Terraria;
     using Terraria.ID;
     using TUBGWorldGenerator.BuildingGenerator.Parts;
     using TUBGWorldGenerator.BuildingGenerator.UI;
@@ -42,7 +43,7 @@
 
         private HashAlgorithm HashAlgorithm { get; set; } = SHA256.Create();
 
-        //private Dictionary<string, BuildRoot> BuildingNameBuildDictionary { get; } = new Dictionary<string, BuildRoot>();
+        private Dictionary<string, BuildRoot> BuildingNameBuildDictionary { get; } = new Dictionary<string, BuildRoot>();
 
         private Dictionary<string, BitmapImage> BuildingNameBitmapDictionary { get; } = new Dictionary<string, BitmapImage>();
 
@@ -61,6 +62,7 @@
         {
             BuildingNameBitmapDictionary.Clear();
             CacheFileNameDictionary.Clear();
+            BuildingNameBuildDictionary.Clear();
 
             if (!Directory.Exists(CacheDirectory))
             {
@@ -140,6 +142,7 @@
                         {
                             BitmapImage image = TileToImage.CreateBitmap(build.Build());
                             BuildingNameBitmapDictionary.Add(buildingFileName, image);
+                            BuildingNameBuildDictionary.Add(buildingFileName, build);
 
                             BitmapEncoder encoder = new PngBitmapEncoder();
                             encoder.Frames.Add(BitmapFrame.Create(image));
@@ -209,6 +212,46 @@
             catch
             {
                 MessageBox.Show("キャッシュフォルダの削除に失敗しました。ファイルが開かれている可能性があります。");
+            }
+        }
+
+        public Tile[,] GetTilesFromSearchResult(SearchResult from)
+        {
+            string name = from.OriginalName;
+            if (CacheFileNameDictionary.ContainsKey(name))
+            {
+                BuildingGenerator.Root = GetBuildingFromBuildingName(name);
+                BuildingGenerator.Build();
+                return BuildingGenerator.Result == null ? new Tile[0, 0] : BuildingGenerator.Result;
+            }
+            else if (TileTags.ContainsKey(name))
+            {
+                Tile[,] tiles = new Parts.TileObject() { ItemName = name.Substring(5) }.Build();
+                if (tiles.GetLength(0) > 0)
+                {
+                    return tiles;
+                }
+                else
+                {
+                    if (name.StartsWith("Tile:"))
+                    {
+                        int tileId = TerrariaNameDict.ItemNameToItem[name.Substring(5)].createTile;
+                        string tileTypeName = TerrariaNameDict.TileNameToID.First(p => p.Value == tileId).Key;
+                        return new Parts.Rectangle() { FillTile = tileTypeName, Size = new Size() { Width = 1, Height = 1 } }.Build();
+                    }
+                    else if (name.StartsWith("Wall:"))
+                    {
+                        int wallId = TerrariaNameDict.ItemNameToItem[name.Substring(5)].createWall;
+                        string wallTypeName = TerrariaNameDict.WallNameToID.First(p => p.Value == wallId).Key;
+                        return new Parts.Rectangle() { FillWall = wallTypeName, Size = new Size() { Width = 1, Height = 1 } }.Build();
+                    }
+
+                    throw new ArgumentException("This could never happen.");
+                }
+            }
+            else
+            {
+                throw new ArgumentException("This could never happen.");
             }
         }
 
@@ -477,7 +520,7 @@
             try
             {
                 Bitmap image = (Bitmap)Image.FromFile(Path.Combine(CacheDirectory, buildingName + ".png"));
-                BitmapImage bitmapImage = Utils.WorldToImage.Convert(image);
+                BitmapImage bitmapImage = TUBGWorldGenerator.Utils.WorldToImage.Convert(image);
                 BuildingNameBitmapDictionary.Add(buildingName, bitmapImage);
                 return bitmapImage;
             }
@@ -487,7 +530,30 @@
 
         private BuildRoot GetBuildingFromBuildingName(string buildingName)
         {
-            throw new NotImplementedException();
+            if (BuildingNameBuildDictionary.ContainsKey(buildingName))
+            {
+                return BuildingNameBuildDictionary[buildingName];
+            }
+
+            string filePath = Path.Combine(BuildingGenerator.BuildingsRootPath, buildingName + ".json");
+            if (File.Exists(filePath))
+            {
+                using (var sr = new StreamReader(filePath))
+                {
+                    var build = JsonConvert.DeserializeObject<BuildRoot>(sr.ReadToEnd(), new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto });
+                    if (!string.IsNullOrEmpty(build.Name))
+                    {
+                        BuildingNameBuildDictionary.Add(buildingName, build);
+                        return build;
+                    }
+                }
+
+                return null;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private BitmapImage GetItemBitmapFromTile(string itemName)
@@ -511,7 +577,7 @@
 
                 try
                 {
-                    BitmapImage image = Utils.WorldToImage.Convert(TextureLoader.Instance.GetItem(TerrariaNameDict.ItemNameToItem[key].type));
+                    BitmapImage image = TUBGWorldGenerator.Utils.WorldToImage.Convert(TextureLoader.Instance.GetItem(TerrariaNameDict.ItemNameToItem[key].type));
                     ItemNameBitmapDictionary.Add(itemName, image);
                     return image;
                 }

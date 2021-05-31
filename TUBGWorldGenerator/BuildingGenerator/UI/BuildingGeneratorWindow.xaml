@@ -23,14 +23,14 @@
 				<RowDefinition Height="Auto"/>
 			</Grid.RowDefinitions>
 			<DockPanel LastChildFill="False">
-				<Button Margin="5" Click="TileButton_Click">タイル</Button>
-				<Button Margin="5" Click="HammerButton_Click">ハンマー</Button>
-				<Button Margin="5" Click="EraserButton_Click">消しゴム</Button>
-				<Button Margin="5" Click="PaintButton_Click">ペンキ</Button>
-				<Button Margin="5" Click="InactiveButton_Click">背景化</Button>
+				<ToggleButton Margin="5" x:Name="TileButton" Checked="TileButton_Checked" Unchecked="TileButton_Unchecked">タイル</ToggleButton>
+				<ToggleButton Margin="5" x:Name="HammerButton" Checked="HammerButton_Checked" Unchecked="HammerButton_Unchecked">ハンマー</ToggleButton>
+				<ToggleButton Margin="5" x:Name="EraserButton" Checked="EraserButton_Checked" Unchecked="EraserButton_Unchecked">消しゴム</ToggleButton>
+				<ToggleButton Margin="5" x:Name="PaintButton" Checked="PaintButton_Checked" Unchecked="PaintButton_Unchecked">ペンキ</ToggleButton>
+				<ToggleButton Margin="5" x:Name="InactiveButton" Checked="InactiveButton_Checked" Unchecked="InactiveButton_Unchecked">背景化</ToggleButton>
 			</DockPanel>
 			<Image Grid.Row="1" Margin="5" x:Name="PreviewImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
-			<Grid Grid.Row="1" x:Name="TileGrid" PreviewMouseMove="TileGrid_MouseMove" Width="{Binding ElementName=PreviewImage, Path=ActualWidth}" Height="{Binding ElementName=PreviewImage, Path=ActualHeight}" ShowGridLines="True" Panel.ZIndex="100"></Grid>
+			<Grid Grid.Row="1" x:Name="TileGrid" PreviewMouseDown="TileGrid_PreviewMouseDown" PreviewMouseMove="TileGrid_MouseMove" Background="Transparent" Width="{Binding ElementName=PreviewImage, Path=ActualWidth}" Height="{Binding ElementName=PreviewImage, Path=ActualHeight}" ShowGridLines="True" Panel.ZIndex="100"></Grid>
 			<Grid Grid.Row="1" Background="#33ffff00" Name="GenerateFailedOverlay" Visibility="Hidden">
 				<TextBlock Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">テキストからの生成に失敗しました</TextBlock>
 			</Grid>
@@ -42,9 +42,8 @@
 			<Grid.RowDefinitions>
 				<RowDefinition/>
 				<RowDefinition Height="Auto"/>
-				<RowDefinition/>
 			</Grid.RowDefinitions>
-			<DockPanel Grid.Column="2" LastChildFill="True">
+			<DockPanel LastChildFill="True">
 				<DockPanel DockPanel.Dock="Right" LastChildFill="True">
 					<Grid DockPanel.Dock="Top">
 						<Grid.RowDefinitions>
@@ -67,27 +66,8 @@
 						</Grid.ColumnDefinitions>
 					</Grid>
 					<TextBox AcceptsReturn="True" AcceptsTab="True" Margin="5" Width="200" TextChanged="InputTextBox_TextChanged" Text="{Binding JsonText}"></TextBox>
-					<TreeView ItemsSource="{Binding Builds}">
-						<TreeView.ItemTemplate>
-							<HierarchicalDataTemplate>
-								<StackPanel Orientation="Horizontal">
-									<TextBlock Text="{Binding DisplayName}"></TextBlock>
-								</StackPanel>
-							</HierarchicalDataTemplate>
-						</TreeView.ItemTemplate>
-					</TreeView>
 				</DockPanel>
 			</DockPanel>
-			<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Gray" Height="2"></GridSplitter>
-			<xctk:PropertyGrid
-				x:Name="BuildSettingProperty"
-				Grid.Row="2"
-				ShowTitle="True"
-				ShowDescriptionByTooltip="False"
-				ShowSearchBox="False"
-				ShowSortOptions="False"
-				ShowSummary="False"
-				DockPanel.Dock="Top"/>
 		</Grid>
 		<GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" Width="2"></GridSplitter>
 		<local:BuildingFinderControl Grid.Column="4" x:Name="BuildingFinder" Margin="5"/>

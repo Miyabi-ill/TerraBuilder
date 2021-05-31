@@ -22,6 +22,8 @@
     {
         public BuildingCache BuildingCache { get; set; }
 
+        public SearchResult SelectingResult { get; set; }
+
         public BuildingFinderControl()
         {
             InitializeComponent();
@@ -34,6 +36,18 @@
                 string searchText = textBox.Text.Trim();
                 var searchResults = await BuildingCache.Search(searchText);
                 SearchResult.Dispatcher.Invoke(() => SearchResult.ItemsSource = searchResults);
+            }
+        }
+
+        private void SearchResult_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (SearchResult.SelectedItem is SearchResult searchResult)
+            {
+                SelectingResult = searchResult;
+            }
+            else if (SearchResult.SelectedItem == null)
+            {
+                SelectingResult = null;
             }
         }
     }
