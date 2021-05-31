@@ -24,9 +24,9 @@
 			</Grid.RowDefinitions>
 			<DockPanel LastChildFill="False">
 				<ToggleButton Margin="5" x:Name="TileButton" Checked="TileButton_Checked" Unchecked="TileButton_Unchecked">タイル</ToggleButton>
-				<ToggleButton Margin="5" x:Name="HammerButton" Checked="HammerButton_Checked" Unchecked="HammerButton_Unchecked">ハンマー</ToggleButton>
+				<ToggleButton Margin="5" x:Name="HammerButton" Checked="HammerButton_Checked" Unchecked="HammerButton_Unchecked" MouseRightButtonDown="HammerButton_MouseRightButtonDown">ハンマー</ToggleButton>
 				<ToggleButton Margin="5" x:Name="EraserButton" Checked="EraserButton_Checked" Unchecked="EraserButton_Unchecked">消しゴム</ToggleButton>
-				<ToggleButton Margin="5" x:Name="PaintButton" Checked="PaintButton_Checked" Unchecked="PaintButton_Unchecked">ペンキ</ToggleButton>
+				<ToggleButton Margin="5" x:Name="PaintButton" Checked="PaintButton_Checked" Unchecked="PaintButton_Unchecked" MouseRightButtonDown="PaintButton_MouseRightButtonDown">ペンキ</ToggleButton>
 				<ToggleButton Margin="5" x:Name="InactiveButton" Checked="InactiveButton_Checked" Unchecked="InactiveButton_Unchecked">背景化</ToggleButton>
 			</DockPanel>
 			<Image Grid.Row="1" Margin="5" x:Name="PreviewImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/>

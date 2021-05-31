@@ -130,6 +130,12 @@
       <DependentUpon>BuildingGeneratorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="BuildingGenerator\UI\BuildNode.cs" />
+    <Compile Include="BuildingGenerator\UI\SelectHammerWindow.xaml.cs">
+      <DependentUpon>SelectHammerWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="BuildingGenerator\UI\SelectPaintWindow.xaml.cs">
+      <DependentUpon>SelectPaintWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="BuildingGenerator\UI\TextureLoader.cs" />
     <Compile Include="BuildingGenerator\UI\TileToImage.cs" />
     <Compile Include="ChestSimulator\ChestAccumulateResult.cs" />
@@ -178,6 +184,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="BuildingGenerator\UI\BuildingGeneratorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BuildingGenerator\UI\SelectHammerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BuildingGenerator\UI\SelectPaintWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

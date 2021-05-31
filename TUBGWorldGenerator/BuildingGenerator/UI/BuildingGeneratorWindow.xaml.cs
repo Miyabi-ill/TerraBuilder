@@ -48,6 +48,16 @@
             SwitchInactive = 0x10,
         }
 
+        public enum HammerType
+        {
+            Cycle,
+            HalfBrick,
+            RightBottom,
+            LeftBottom,
+            RightTop,
+            LeftTop,
+        }
+
         public string FileName
         {
             get => fileName;
@@ -70,6 +80,10 @@
         }
 
         private ToolState CurrentToolState { get; set; }
+
+        private HammerType CurrentHammerType { get; set; }
+
+        private string CurrentPaintName { get; set; } = "RedPaint";
 
         private Tile[,] Tiles { get; set; }
 
@@ -178,26 +192,58 @@
                     {
                         if (tile.active())
                         {
-                            if (tile.slope() == 0)
+                            if (CurrentHammerType == HammerType.Cycle)
                             {
-                                tile.halfBrick(true);
-                            }
-                            else if (tile.halfBrick())
-                            {
-                                tile.halfBrick(false);
-                                tile.slope(1);
-                            }
-                            else
-                            {
-                                int slope = tile.slope();
-                                if (slope + 1 >= 5)
+                                if (tile.slope() == 0)
                                 {
-                                    tile.slope(0);
-                                    tile.halfBrick(false);
+                                    if (tile.halfBrick())
+                                    {
+                                        tile.halfBrick(false);
+                                        tile.slope(1);
+                                    }
+                                    else
+                                    {
+                                        tile.halfBrick(true);
+                                    }
                                 }
                                 else
                                 {
-                                    tile.slope((byte)(slope + 1));
+                                    int slope = tile.slope();
+                                    if (slope + 1 >= 5)
+                                    {
+                                        tile.slope(0);
+                                        tile.halfBrick(false);
+                                    }
+                                    else
+                                    {
+                                        tile.slope((byte)(slope + 1));
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                switch (CurrentHammerType)
+                                {
+                                    case HammerType.HalfBrick:
+                                        tile.slope(0);
+                                        tile.halfBrick(true);
+                                        break;
+                                    case HammerType.RightBottom:
+                                        tile.halfBrick(false);
+                                        tile.slope(2);
+                                        break;
+                                    case HammerType.RightTop:
+                                        tile.halfBrick(false);
+                                        tile.slope(4);
+                                        break;
+                                    case HammerType.LeftBottom:
+                                        tile.halfBrick(false);
+                                        tile.slope(1);
+                                        break;
+                                    case HammerType.LeftTop:
+                                        tile.halfBrick(false);
+                                        tile.slope(3);
+                                        break;
                                 }
                             }
                         }
@@ -207,7 +253,10 @@
                     {
                         if (tile.active())
                         {
-                            tile.color(1);
+                            if (TerrariaNameDict.PaintNameToID.ContainsKey(CurrentPaintName))
+                            {
+                                tile.color(TerrariaNameDict.PaintNameToID[CurrentPaintName]);
+                            }
                         }
                     }
 
@@ -272,7 +321,10 @@
 
                     if (CurrentToolState.HasFlag(ToolState.Paint))
                     {
-                        tile.wallColor(1);
+                        if (TerrariaNameDict.PaintNameToID.ContainsKey(CurrentPaintName))
+                        {
+                            tile.wallColor(TerrariaNameDict.PaintNameToID[CurrentPaintName]);
+                        }
                     }
                 }
             }
@@ -562,6 +614,29 @@
         private void InactiveButton_Unchecked(object sender, RoutedEventArgs e)
         {
             CurrentToolState &= ~ToolState.SwitchInactive;
+        }
+
+        private void HammerButton_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var window = new SelectHammerWindow() { SelectedHammerType = CurrentHammerType };
+            Point point = Mouse.GetPosition(this);
+            window.Top = this.Top + point.Y;
+            window.Left = this.Left + point.X;
+            window.ShowDialog();
+            CurrentHammerType = window.SelectedHammerType;
+        }
+
+        private void PaintButton_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var window = new SelectPaintWindow();
+            Point point = Mouse.GetPosition(this);
+            window.Top = this.Top + point.Y;
+            window.Left = this.Left + point.X;
+            window.ShowDialog();
+            if (!string.IsNullOrEmpty(window.SelectedPaintName))
+            {
+                CurrentPaintName = window.SelectedPaintName;
+            }
         }
     }
 }
