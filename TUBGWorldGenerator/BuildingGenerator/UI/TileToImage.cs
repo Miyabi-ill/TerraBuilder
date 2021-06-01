@@ -244,7 +244,7 @@
                         image = baseImage.Clone(new Rectangle(0, 0, 16, 16), baseImage.PixelFormat);
                     }
 
-                    image = SimplePaintBitmap(image, tiles[tileX, tileY].color());
+                    image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
 
                     // プラットフォームの右下にテクスチャを描画
                     if (tile.slope() == 1
@@ -268,7 +268,7 @@
                         using (Graphics g = Graphics.FromImage(result))
                         {
                             Bitmap additional = baseImage.Clone(tileFrame, baseImage.PixelFormat);
-                            additional = SimplePaintBitmap(additional, tiles[tileX, tileY].color());
+                            additional = SimplePaintBitmap(additional, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                             g.DrawImageUnscaled(image, Point.Empty);
                             g.DrawImageUnscaled(image, new Point(0, 16));
                         }
@@ -299,7 +299,7 @@
                         using (Graphics g = Graphics.FromImage(result))
                         {
                             Bitmap additional = baseImage.Clone(tileFrame, baseImage.PixelFormat);
-                            additional = SimplePaintBitmap(additional, tiles[tileX, tileY].color());
+                            additional = SimplePaintBitmap(additional, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                             g.DrawImageUnscaled(image, Point.Empty);
                             g.DrawImageUnscaled(image, new Point(0, 16));
                         }
@@ -327,7 +327,7 @@
                         image = baseImage.Clone(new Rectangle(0, 0, 16, 16), baseImage.PixelFormat);
                     }
 
-                    image = SimplePaintBitmap(image, tiles[tileX, tileY].color());
+                    image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                     return image;
                 }
 
@@ -387,7 +387,7 @@
                                 new Rectangle(frame.X + offsetX, frame.Y + offsetY + num7, 16, 2),
                                 baseImage.PixelFormat),
                             new Point(0, num7));
-                        result = SimplePaintBitmap(result, tiles[tileX, tileY].color());
+                        result = SimplePaintBitmap(result, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                         return result;
                     }
                 }
@@ -469,13 +469,12 @@
                     image = baseImage.Clone(new Rectangle(0, 0, 16, 16), baseImage.PixelFormat);
                 }
 
-                image = SimplePaintBitmap(image, tiles[tileX, tileY].color());
+                image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                 return image;
             }
 
             // ブロックの下に空洞があるケース
-            const int halfBrickHeight = 8;
-            if (halfBrickHeight == 8
+            if (tile.halfBrick()
                 && tileY + 1 < tiles.GetLength(1)
                 && (!tiles[tileX, tileY + 1].active() || !Main.tileSolid[tiles[tileX, tileY + 1].type] || tiles[tileX, tileY + 1].halfBrick()))
             {
@@ -491,7 +490,7 @@
                         image = baseImage.Clone(new Rectangle(0, 0, 16, 16), baseImage.PixelFormat);
                     }
 
-                    image = SimplePaintBitmap(image, tiles[tileX, tileY].color());
+                    image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                     return image;
                 }
                 else
@@ -508,7 +507,7 @@
                             image = baseImage.Clone(new Rectangle(0, 0, 16, 16), baseImage.PixelFormat);
                         }
 
-                        image = SimplePaintBitmap(image, tiles[tileX, tileY].color());
+                        image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                         return image;
                     }
 
@@ -528,7 +527,7 @@
                             new Point(0, 12));
                     }
 
-                    result = SimplePaintBitmap(result, tiles[tileX, tileY].color());
+                    result = SimplePaintBitmap(result, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                     return result;
                 }
             }
@@ -545,20 +544,20 @@
                         new Point(0, 8));
                 }
 
-                result = SimplePaintBitmap(result, tiles[tileX, tileY].color());
+                result = SimplePaintBitmap(result, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                 return result;
             }
 
             try
             {
                 Bitmap image = baseImage.Clone(new Rectangle(frame.X, frame.Y, 16, 16), baseImage.PixelFormat);
-                image = SimplePaintBitmap(image, tiles[tileX, tileY].color());
+                image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                 return image;
             }
             catch (OutOfMemoryException)
             {
                 Bitmap image = baseImage.Clone(new Rectangle(0, 0, 16, 16), baseImage.PixelFormat);
-                image = SimplePaintBitmap(image, tiles[tileX, tileY].color());
+                image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                 return image;
             }
         }
@@ -643,9 +642,9 @@
             return wallFrameLookup[wallFlag][0];
         }
 
-        public static Bitmap SimplePaintBitmap(Bitmap image, int paintId, bool isWall = false)
+        public static Bitmap SimplePaintBitmap(Bitmap image, int paintId, bool isWall = false, bool inactive = false)
         {
-            if (paintId == 0 || paintId == 31)
+            if ((paintId == 0 || paintId == 31) && !inactive)
             {
                 return image;
             }
@@ -753,6 +752,16 @@
                 default:
                     paintFunc = (x) => x.ToArray();
                     break;
+            }
+
+            if (inactive)
+            {
+                var func = paintFunc;
+                paintFunc = (x) =>
+                {
+                    byte[] array = func(x);
+                    return new byte[] { (byte)(array[2] * 0.4), (byte)(array[1] * 0.4), (byte)(array[0] * 0.4) };
+                };
             }
 
             for (var i = 0; i < buffer.Length; i += 4)

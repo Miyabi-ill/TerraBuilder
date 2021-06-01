@@ -54,10 +54,11 @@
 							<ColumnDefinition/>
 							<ColumnDefinition/>
 						</Grid.ColumnDefinitions>
-						<Button Margin="5" Click="ReadButton_Click" Content="ファイルを読み込み"/>
-						<Button Grid.Column="1" Margin="5" Click="WriteButton_Click" Content="ファイルを書き込み"/>
+						<Button Margin="5" Visibility="Collapsed" Click="ReadButton_Click" Content="ファイルを読み込み"/>
+						<Button Visibility="Collapsed" Grid.Column="1" Margin="5" Click="WriteButton_Click" Content="ファイルを書き込み"/>
 						<Button Grid.Row="1" Margin="5" Click="SelectDirectoryButton_Click" Content="建築ディレクトリを指定"/>
-						<Button Grid.Row="1" Grid.Column="1" Margin="5" Click="OverwriteWithTemplateButton_Click" Content="テンプレートで上書き"/>
+						<Button Grid.Row="1" Visibility="Collapsed" Grid.Column="1" Margin="5" Click="OverwriteWithTemplateButton_Click" Content="テンプレートで上書き"/>
+						<Button Grid.Column="1" Grid.Row="1" Margin="5" Content="建築を再設定" Click="RegenerateFromMetaDataButton_Click"/>
 					</Grid>
 					<Grid DockPanel.Dock="Bottom">
 						<Grid.ColumnDefinitions>
@@ -65,7 +66,13 @@
 							<ColumnDefinition/>
 						</Grid.ColumnDefinitions>
 					</Grid>
-					<TextBox AcceptsReturn="True" AcceptsTab="True" Margin="5" Width="200" TextChanged="InputTextBox_TextChanged" Text="{Binding JsonText}"></TextBox>
+					<TextBox Visibility="Collapsed" AcceptsReturn="True" AcceptsTab="True" Margin="5" Width="200" TextChanged="InputTextBox_TextChanged" Text="{Binding JsonText}"></TextBox>
+
+					<xctk:PropertyGrid DockPanel.Dock="Top"
+									   x:Name="MetaDataPropertyGrid"
+									   SelectedObject="{Binding BuildingMetaData}"
+									   ShowSearchBox="False"
+									   ShowSortOptions="False"/>
 				</DockPanel>
 			</DockPanel>
 		</Grid>

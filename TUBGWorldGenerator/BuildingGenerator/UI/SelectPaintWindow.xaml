@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TUBGWorldGenerator.BuildingGenerator.UI"
         mc:Ignorable="d"
-        Title="ペンキを選択" Height="155" Width="490">
+        Title="ペンキを選択" Height="170" Width="500">
     <Grid>
 		<StackPanel>
 			<StackPanel Orientation="Horizontal">

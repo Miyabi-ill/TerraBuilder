@@ -79,6 +79,8 @@
             }
         }
 
+        public BuildingMetaData BuildingMetaData { get; set; } = new BuildingMetaData();
+
         private ToolState CurrentToolState { get; set; }
 
         private HammerType CurrentHammerType { get; set; }
@@ -637,6 +639,24 @@
             {
                 CurrentPaintName = window.SelectedPaintName;
             }
+        }
+
+        private void RegenerateFromMetaDataButton_Click(object sender, RoutedEventArgs e)
+        {
+            int width = BuildingMetaData.Size.Width;
+            int height = BuildingMetaData.Size.Height;
+            Tiles = new Tile[width, height];
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    Tiles[x, y] = new Tile();
+                }
+            }
+
+            PreviewImage.Source = TileToImage.CreateBitmap(Tiles);
+            UpdateGrid();
         }
     }
 }
