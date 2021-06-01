@@ -187,9 +187,14 @@
                     }
                 }
 
+                // ファイルが存在しないか確認後、削除
                 foreach (string name in deletedNames)
                 {
-                    CacheFileNameDictionary.Remove(name);
+                    string path = Path.Combine(CacheDirectory, name + ".png");
+                    if (!File.Exists(path))
+                    {
+                        CacheFileNameDictionary.Remove(name);
+                    }
                 }
             }
 
