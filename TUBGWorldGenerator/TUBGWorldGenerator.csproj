@@ -122,6 +122,7 @@
     <Compile Include="BuildingGenerator\Parts\Repeat.cs" />
     <Compile Include="BuildingGenerator\SearchResult.cs" />
     <Compile Include="BuildingGenerator\Size.cs" />
+    <Compile Include="BuildingGenerator\TEditScheme.cs" />
     <Compile Include="BuildingGenerator\TerrariaNameDict.cs" />
     <Compile Include="BuildingGenerator\Parts\TileObject.cs" />
     <Compile Include="BuildingGenerator\UI\BuildingFinderControl.xaml.cs">
