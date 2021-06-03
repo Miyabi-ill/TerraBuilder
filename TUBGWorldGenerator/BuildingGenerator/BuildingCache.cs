@@ -45,6 +45,8 @@
 
         private Dictionary<string, BuildRoot> BuildingNameBuildDictionary { get; } = new Dictionary<string, BuildRoot>();
 
+        private Dictionary<string, Tile[,]> BuildingNameTilesDictionary { get; } = new Dictionary<string, Tile[,]>();
+
         private Dictionary<string, BitmapImage> BuildingNameBitmapDictionary { get; } = new Dictionary<string, BitmapImage>();
 
         private Dictionary<string, BitmapImage> ItemNameBitmapDictionary { get; } = new Dictionary<string, BitmapImage>();
@@ -63,6 +65,7 @@
             BuildingNameBitmapDictionary.Clear();
             CacheFileNameDictionary.Clear();
             BuildingNameBuildDictionary.Clear();
+            BuildingNameTilesDictionary.Clear();
 
             if (!Directory.Exists(CacheDirectory))
             {
@@ -174,6 +177,62 @@
                 }
             }
 
+            // TEditSchファイルを読みこみ
+            foreach (string file in Directory.GetFiles(BuildingGenerator.BuildingsRootPath, "*.TEditSch", SearchOption.AllDirectories))
+            {
+                string buildingFileName = file.Replace(BuildingGenerator.BuildingsRootPath, string.Empty).Trim('\\');
+                buildingFileName = buildingFileName.Substring(0, buildingFileName.Length - 9);
+
+                byte[] data = File.ReadAllBytes(file);
+
+                if (CacheFileNameDictionary.ContainsKey(buildingFileName)
+                   && VerifyHash(data, CacheFileNameDictionary[buildingFileName].hash))
+                {
+                    // 画像は必要なときに読み込む
+                    continue;
+                }
+                else
+                {
+                    try
+                    {
+                        var scheme = TEditScheme.Read(data);
+                        if (!string.IsNullOrEmpty(scheme.name))
+                        {
+                            BitmapImage image = TileToImage.CreateBitmap(scheme.tiles);
+                            BuildingNameBitmapDictionary.Add(buildingFileName, image);
+                            BuildingNameTilesDictionary.Add(buildingFileName, scheme.tiles);
+
+                            BitmapEncoder encoder = new PngBitmapEncoder();
+                            encoder.Frames.Add(BitmapFrame.Create(image));
+
+                            string savePath = Path.Combine(CacheDirectory, buildingFileName + ".png");
+                            if (!Directory.Exists(Path.GetDirectoryName(savePath)))
+                            {
+                                Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+                            }
+
+                            using (var fileStream = new FileStream(savePath, FileMode.Create))
+                            {
+                                encoder.Save(fileStream);
+                            }
+
+                            // タグなしで登録とする
+                            if (CacheFileNameDictionary.ContainsKey(buildingFileName))
+                            {
+                                CacheFileNameDictionary[buildingFileName] = (scheme.name, CalculateHash(data), new ObservableCollection<string>());
+                            }
+                            else
+                            {
+                                CacheFileNameDictionary.Add(buildingFileName, (scheme.name, CalculateHash(data), new ObservableCollection<string>()));
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+
             if (CacheFileNameDictionary.Count != BuildingNameBitmapDictionary.Count)
             {
                 // キャッシュ辞書に存在していたエントリが消えているため、削除
@@ -225,9 +284,17 @@
             string name = from.OriginalName;
             if (CacheFileNameDictionary.ContainsKey(name))
             {
-                BuildingGenerator.Root = GetBuildingFromBuildingName(name);
-                BuildingGenerator.Build();
-                return BuildingGenerator.Result == null ? new Tile[0, 0] : BuildingGenerator.Result;
+                var build = GetBuildingFromBuildingName(name);
+                if (build != null)
+                {
+                    BuildingGenerator.Root = build;
+                    BuildingGenerator.Build();
+                    return BuildingGenerator.Result == null ? new Tile[0, 0] : BuildingGenerator.Result;
+                }
+                else
+                {
+                    return GetSchemeTilesFromBuildingName(name);
+                }
             }
             else if (TileTags.ContainsKey(name))
             {
@@ -397,7 +464,12 @@
 
         private string CalculateHash(string text)
         {
-            byte[] hashed = HashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(text));
+            return CalculateHash(Encoding.UTF8.GetBytes(text));
+        }
+
+        private string CalculateHash(byte[] value)
+        {
+            byte[] hashed = HashAlgorithm.ComputeHash(value);
             StringBuilder builder = new StringBuilder();
 
             for (int i = 0; i < hashed.Length; i++)
@@ -414,6 +486,14 @@
             StringComparer comparer = StringComparer.OrdinalIgnoreCase;
 
             return comparer.Compare(hashedText, hash) == 0;
+        }
+
+        private bool VerifyHash(byte[] value, string hash)
+        {
+            string hashedValue = CalculateHash(value);
+            StringComparer comparer = StringComparer.OrdinalIgnoreCase;
+
+            return comparer.Compare(hashedValue, hash) == 0;
         }
 
         private void LoadTileTags()
@@ -558,6 +638,27 @@
             else
             {
                 return null;
+            }
+        }
+
+        private Tile[,] GetSchemeTilesFromBuildingName(string buildingName)
+        {
+            if (BuildingNameTilesDictionary.ContainsKey(buildingName))
+            {
+                return BuildingNameTilesDictionary[buildingName];
+            }
+
+            string filePath = Path.Combine(BuildingGenerator.BuildingsRootPath, buildingName + ".TEditSch");
+            if (File.Exists(filePath))
+            {
+                var scheme = TEditScheme.Read(filePath);
+                BuildingNameTilesDictionary.Add(buildingName, scheme.tiles);
+
+                return new Tile[0, 0];
+            }
+            else
+            {
+                return new Tile[0, 0];
             }
         }
 

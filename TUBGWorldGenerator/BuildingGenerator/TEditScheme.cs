@@ -621,6 +621,322 @@
             throw new ArgumentException("File could not read");
         }
 
+        public static (Tile[,] tiles, string name, List<Chest> chests, List<Sign> signs, List<TileEntity> tileEntities) Read(byte[] data)
+        {
+            using (var stream = new MemoryStream(data))
+            using (var b = new BinaryReader(stream))
+            {
+                string name = b.ReadString();
+                int version = b.ReadInt32();
+                uint tVersion = (uint)version;
+
+                // 最新バージョンしかサポートしない
+                if (version >= 222)
+                {
+                    int sizeX = b.ReadInt32();
+                    int sizeY = b.ReadInt32();
+                    Tile[,] tiles = new Tile[sizeX, sizeY];
+
+                    for (int x = 0; x < sizeX; x++)
+                    {
+                        for (int y = 0; y < sizeY; y++)
+                        {
+                            Tile tile = DeserializeTileData(b, version, out int rle);
+
+                            tiles[x, y] = tile;
+                            while (rle > 0)
+                            {
+                                y++;
+
+                                if (y >= sizeY)
+                                {
+                                    break;
+                                    throw new IOException($"Invalid Tile Data: RLE Compression outside of bounds [{x},{y}]");
+                                }
+
+                                tiles[x, y] = (Tile)tile.Clone();
+                                rle--;
+                            }
+                        }
+                    }
+
+                    // チェスト読み込み
+                    List<Chest> chests = new List<Chest>();
+                    int totalChests = b.ReadInt16();
+                    int maxItems = b.ReadInt16();
+
+                    // overflow item check?
+                    int itemsPerChest;
+                    int overflowItems;
+                    if (maxItems > Chest.maxItems)
+                    {
+                        itemsPerChest = Chest.maxItems;
+                        overflowItems = maxItems - Chest.maxItems;
+                    }
+                    else
+                    {
+                        itemsPerChest = maxItems;
+                        overflowItems = 0;
+                    }
+
+                    // read chests
+                    for (int i = 0; i < totalChests; i++)
+                    {
+                        var chest = new Chest
+                        {
+                            x = b.ReadInt32(),
+                            y = b.ReadInt32(),
+                            name = b.ReadString(),
+                        };
+
+                        // read items in chest
+                        for (int slot = 0; slot < itemsPerChest; slot++)
+                        {
+                            var stackSize = b.ReadInt16();
+                            chest.item[slot].stack = stackSize;
+
+                            if (stackSize > 0)
+                            {
+                                int id = b.ReadInt32();
+                                byte prefix = b.ReadByte();
+
+                                chest.item[slot].netID = id;
+                                chest.item[slot].stack = stackSize;
+                                chest.item[slot].prefix = prefix;
+                            }
+                        }
+
+                        // dump overflow items
+                        for (int overflow = 0; overflow < overflowItems; overflow++)
+                        {
+                            var stackSize = b.ReadInt16();
+                            if (stackSize > 0)
+                            {
+                                b.ReadInt32();
+                                b.ReadByte();
+                            }
+                        }
+
+                        chests.Add(chest);
+                    }
+
+                    // 看板読み込み
+                    List<Sign> signs = new List<Sign>();
+                    short totalSigns = b.ReadInt16();
+
+                    for (int i = 0; i < totalSigns; i++)
+                    {
+                        string text = b.ReadString();
+                        int x = b.ReadInt32();
+                        int y = b.ReadInt32();
+                        signs.Add(new Sign() { x = x, y = y, text = text });
+                    }
+
+                    int numEntities = b.ReadInt32();
+                    var entities = new List<TileEntity>();
+                    for (int i = 0; i < numEntities; i++)
+                    {
+                        TileEntity entity;
+                        int type = b.ReadByte();
+                        int id = b.ReadInt32();
+                        int posX = b.ReadInt16();
+                        int posY = b.ReadInt16();
+                        switch ((TileEntityType)type)
+                        {
+                            case TileEntityType.TrainingDummy: //it is a dummys
+                                int npc = b.ReadInt16();
+                                entity = new TETrainingDummy()
+                                {
+                                    ID = id,
+                                    type = (byte)type,
+                                    Position = new Point16(posX, posY),
+                                    npc = npc,
+                                };
+                                break;
+                            case TileEntityType.ItemFrame: //it is a item frame
+                                {
+                                    int netId = (int)b.ReadInt16();
+                                    byte prefix = b.ReadByte();
+                                    int stackSize = b.ReadInt16();
+                                    Item item = new Item();
+                                    item.SetDefaults(netId);
+                                    item.prefix = prefix;
+                                    item.stack = stackSize;
+                                    entity = new TEItemFrame()
+                                    {
+                                        ID = id,
+                                        type = (byte)type,
+                                        Position = new Point16(posX, posY),
+                                        item = item,
+                                    };
+                                }
+
+                                break;
+                            case TileEntityType.LogicSensor: //it is a logic sensor
+                                byte logicCheck = b.ReadByte();
+                                bool on = b.ReadBoolean();
+                                entity = new TELogicSensor()
+                                {
+                                    ID = id,
+                                    type = (byte)type,
+                                    Position = new Point16(posX, posY),
+                                    logicCheck = (TELogicSensor.LogicCheckType)logicCheck,
+                                    On = on,
+                                };
+                                break;
+                            case TileEntityType.DisplayDoll: // display doll
+                                {
+                                    byte numSlots = 8;
+                                    var itemSlots = (BitsByte)b.ReadByte();
+                                    var dyeSlots = (BitsByte)b.ReadByte();
+                                    Item[] items = new Item[numSlots];
+                                    Item[] dyes = new Item[numSlots];
+                                    entity = new TEDisplayDoll()
+                                    {
+                                        ID = id,
+                                        type = (byte)type,
+                                        Position = new Point16(posX, posY),
+                                        _items = items,
+                                        _dyes = dyes,
+                                    };
+
+                                    for (int index = 0; index < numSlots; index++)
+                                    {
+                                        if (itemSlots[index])
+                                        {
+                                            items[index] = new Item();
+                                            items[index].SetDefaults(b.ReadInt16());
+                                            items[index].prefix = b.ReadByte();
+                                            items[index].stack = b.ReadInt16();
+                                        }
+                                    }
+
+                                    for (int index = 0; index < numSlots; index++)
+                                    {
+                                        if (dyeSlots[index])
+                                        {
+                                            dyes[index] = new Item();
+                                            dyes[index].SetDefaults(b.ReadInt16());
+                                            dyes[index].prefix = b.ReadByte();
+                                            dyes[index].stack = b.ReadInt16();
+                                        }
+                                    }
+                                }
+
+                                break;
+                            case TileEntityType.WeaponRack: // weapons rack
+                                {
+                                    int netId = (int)b.ReadInt16();
+                                    byte prefix = b.ReadByte();
+                                    int stackSize = b.ReadInt16();
+                                    Item item = new Item();
+                                    item.SetDefaults(netId);
+                                    item.prefix = prefix;
+                                    item.stack = stackSize;
+                                    entity = new TEWeaponsRack()
+                                    {
+                                        ID = id,
+                                        type = (byte)type,
+                                        Position = new Point16(posX, posY),
+                                        item = item,
+                                    };
+                                }
+
+                                break;
+                            case TileEntityType.HatRack: // hat rack 
+                                {
+                                    byte numSlots = 2;
+                                    var itemSlots = (BitsByte)b.ReadByte();
+                                    var dyeSlots = (BitsByte)b.ReadByte();
+                                    Item[] items = new Item[numSlots];
+                                    Item[] dyes = new Item[numSlots];
+                                    entity = new TEDisplayDoll()
+                                    {
+                                        ID = id,
+                                        type = (byte)type,
+                                        Position = new Point16(posX, posY),
+                                        _items = items,
+                                        _dyes = dyes,
+                                    };
+
+                                    for (int index = 0; index < numSlots; index++)
+                                    {
+                                        if (itemSlots[index])
+                                        {
+                                            items[index] = new Item();
+                                            items[index].SetDefaults(b.ReadInt16());
+                                            items[index].prefix = b.ReadByte();
+                                            items[index].stack = b.ReadInt16();
+                                        }
+                                    }
+
+                                    for (int index = 0; index < numSlots; index++)
+                                    {
+                                        if (dyeSlots[index])
+                                        {
+                                            dyes[index] = new Item();
+                                            dyes[index].SetDefaults(b.ReadInt16());
+                                            dyes[index].prefix = b.ReadByte();
+                                            dyes[index].stack = b.ReadInt16();
+                                        }
+                                    }
+                                }
+
+                                break;
+                            case TileEntityType.FoodPlatter: // food platter
+                                {
+                                    int netId = (int)b.ReadInt16();
+                                    byte prefix = b.ReadByte();
+                                    int stackSize = b.ReadInt16();
+                                    Item item = new Item();
+                                    item.SetDefaults(netId);
+                                    item.prefix = prefix;
+                                    item.stack = stackSize;
+                                    entity = new TEFoodPlatter()
+                                    {
+                                        ID = id,
+                                        type = (byte)type,
+                                        Position = new Point16(posX, posY),
+                                        item = item,
+                                    };
+                                }
+
+                                break;
+                            case TileEntityType.TeleportationPylon: // teleportation pylon
+                                entity = new TETeleportationPylon()
+                                {
+                                    ID = id,
+                                    type = (byte)type,
+                                    Position = new Point16(posX, posY),
+                                };
+                                break;
+                            default:
+                                throw new ArgumentException($"Invalid entity type: {type}");
+                        }
+
+                        entities.Add(entity);
+                    }
+
+                    string verifyName = b.ReadString();
+                    int verifyVersion = b.ReadInt32();
+                    int verifyX = b.ReadInt32();
+                    int verifyY = b.ReadInt32();
+                    if (name == verifyName &&
+                        version == verifyVersion &&
+                        sizeX == verifyX &&
+                        sizeY == verifyY)
+                    {
+                        // valid;
+                        return (tiles, name, chests, signs, entities);
+                    }
+
+                    b.Close();
+                }
+            }
+
+            throw new ArgumentException("File is not valid.");
+        }
+
         private static Tile DeserializeTileData(BinaryReader r, int version, out int rle)
         {
             Tile tile = new Tile();

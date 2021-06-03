@@ -19,9 +19,16 @@
 						<vwp:VirtualizingWrapPanel/>
 					</ItemsPanelTemplate>
 				</ListView.ItemsPanel>
+				<ListView.ItemContainerStyle>
+					<Style TargetType="ListViewItem">
+						<Setter Property="ToolTip" Value="{Binding Name}">
+							
+						</Setter>
+					</Style>
+				</ListView.ItemContainerStyle>
 				<ListView.ItemTemplate>
 					<DataTemplate>
-						<Image Height="50" Width="50" Source="{Binding Image}" ToolTip="{Binding Name}"/>
+						<Image Height="50" Width="50" Source="{Binding Image}"/>
 					</DataTemplate>
 				</ListView.ItemTemplate>
 			</ListView>
