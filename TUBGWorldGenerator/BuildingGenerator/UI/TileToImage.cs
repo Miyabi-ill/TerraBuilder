@@ -3,46 +3,22 @@
     using System;
     using System.Collections.Generic;
     using System.Drawing;
+    using System.Drawing.Imaging;
     using System.IO;
+    using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Windows.Media.Imaging;
     using Microsoft.Win32;
     using Terraria;
     using Terraria.ID;
     using Terraria.Map;
     using TUBGWorldGenerator.Utils;
-    using System.Linq;
-    using System.Drawing.Imaging;
-    using System.Runtime.InteropServices;
 
     public static class TileToImage
     {
-        private struct BlockStyle
-        {
-            public bool Top;
+        private static readonly Point WallFrameSize;
 
-            public bool Bottom;
-
-            public bool Left;
-
-            public bool Right;
-
-            public BlockStyle(bool up, bool down, bool left, bool right)
-            {
-                Top = up;
-                Bottom = down;
-                Left = left;
-                Right = right;
-            }
-
-            public void Clear()
-            {
-                Top = Bottom = Left = Right = false;
-            }
-        }
-
-        private static readonly Point wallFrameSize;
-
-        private static readonly Point frameSize8Way = new Point(18, 18);
+        private static readonly Point FrameSize8Way = new Point(18, 18);
 
         private static Point[][] wallFrameLookup;
 
@@ -52,9 +28,12 @@
 
         private static Point[][] selfFrame8WayLookup;
 
+        private static Dictionary<TileKey, Bitmap> bitmapCache;
+
         static TileToImage()
         {
-            wallFrameSize = new Point(36, 36);
+            bitmapCache = new Dictionary<TileKey, Bitmap>();
+            WallFrameSize = new Point(36, 36);
             wallFrameLookup = new Point[20][];
             AddWallFrameLookup(0, 9, 3, 10, 3, 11, 3, 6, 6);
             AddWallFrameLookup(1, 6, 3, 7, 3, 8, 3, 4, 6);
@@ -152,13 +131,30 @@
                 {
                     for (int j = 0; j < tiles.GetLength(1); j++)
                     {
-                        if (tiles[i, j].wall != 0)
+                        Tile tile = tiles[i, j];
+                        if (tile.wall != 0)
                         {
-                            Bitmap image = TextureLoader.Instance.GetWall(tiles[i, j].wall);
+                            var point = GetWallFrame(tiles, i, j);
+                            TileKey tileKey = new TileKey(
+                                isTile: false,
+                                id: (short)tile.wall,
+                                halfBrick: false,
+                                slope: 0,
+                                color: tile.wallColor(),
+                                frameX: (short)point.X,
+                                frameY: (short)point.Y,
+                                inActive: false);
+                            if (bitmapCache.ContainsKey(tileKey))
+                            {
+                                g.DrawImageUnscaled(bitmapCache[tileKey], i * 16, j * 16);
+                                continue;
+                            }
+
+                            Bitmap image = TextureLoader.Instance.GetWall(tile.wall);
                             if (image == null)
                             {
                                 var array = new byte[16 * 16 * 3];
-                                var mapTile = WorldToImage.CreateMapTileFromTile(tiles[i, j], i, j);
+                                var mapTile = WorldToImage.CreateMapTileFromTile(tile, i, j);
                                 var color = MapHelper.GetMapTileXnaColor(ref mapTile);
                                 for (int ind = 0; ind < array.Length; ind += 3)
                                 {
@@ -172,9 +168,9 @@
                             }
                             else
                             {
-                                var point = GetWallFrame(tiles, i, j);
                                 image = image.Clone(new Rectangle(point.X, point.Y, 32, 32), image.PixelFormat);
-                                image = SimplePaintBitmap(image, tiles[i, j].wallColor());
+                                image = SimplePaintBitmap(image, tile.wallColor());
+                                bitmapCache.Add(tileKey, image);
                                 g.DrawImageUnscaled(image, i * 16, j * 16);
                             }
                         }
@@ -185,24 +181,25 @@
                 {
                     for (int j = 0; j < tiles.GetLength(1); j++)
                     {
-                        if (tiles[i, j].active())
+                        Tile tile = tiles[i, j];
+                        if (tile.active())
                         {
-                            Bitmap image = TextureLoader.Instance.GetTile(tiles[i, j].type);
+                            Bitmap image = TextureLoader.Instance.GetTile(tile.type);
                             if (image != null)
                             {
                                 //Point frame = TileFrame(tiles, i, j);
-                                ////int frameX = tiles[i, j].frameX == -1 ? frame.X : tiles[i, j].frameX;
-                                ////int frameY = tiles[i, j].frameY == -1 ? frame.Y : tiles[i, j].frameY;
+                                ////int frameX = tile.frameX == -1 ? frame.X : tile.frameX;
+                                ////int frameY = tile.frameY == -1 ? frame.Y : tile.frameY;
                                 ////image = image.Clone(new Rectangle(frameX, frameY, 16, 16), image.PixelFormat);
                                 //try
                                 //{
                                 //    image = image.Clone(new Rectangle(frame.X, frame.Y, 16, 16), image.PixelFormat);
-                                //    image = SimplePaintBitmap(image, tiles[i, j].color());
+                                //    image = SimplePaintBitmap(image, tile.color());
                                 //}
                                 //catch (OutOfMemoryException)
                                 //{
                                 //    image = image.Clone(new Rectangle(0, 0, 16, 16), image.PixelFormat);
-                                //    image = SimplePaintBitmap(image, tiles[i, j].color());
+                                //    image = SimplePaintBitmap(image, tile.color());
                                 //}
 
                                 image = DrawBasicTile(tiles, i, j);
@@ -223,6 +220,17 @@
             Tile tile = tiles[tileX, tileY];
             int tileType = tile.type;
             Point frame = TileFrame(tiles, tileX, tileY);
+
+            TileKey tileKey = new TileKey(
+                isTile: true,
+                id: (short)tile.type,
+                halfBrick: tile.halfBrick(),
+                slope: tile.slope(),
+                color: tile.color(),
+                frameX: (short)frame.X,
+                frameY: (short)frame.Y,
+                inActive: tile.inActive());
+
             Rectangle normalTileRect = new Rectangle(frame.X, frame.Y, 16, 16);
 
             Bitmap baseImage = TextureLoader.Instance.GetTile(tiles[tileX, tileY].type);
@@ -235,16 +243,24 @@
                 if (TileID.Sets.Platforms[tile.type])
                 {
                     Bitmap image;
-                    try
+                    if (bitmapCache.ContainsKey(tileKey))
                     {
-                        image = baseImage.Clone(new Rectangle(frame.X, frame.Y, 16, 16), baseImage.PixelFormat);
+                        image = bitmapCache[tileKey];
                     }
-                    catch (OutOfMemoryException)
+                    else
                     {
-                        image = baseImage.Clone(new Rectangle(0, 0, 16, 16), baseImage.PixelFormat);
-                    }
+                        try
+                        {
+                            image = baseImage.Clone(new Rectangle(frame.X, frame.Y, 16, 16), baseImage.PixelFormat);
+                        }
+                        catch (OutOfMemoryException)
+                        {
+                            image = baseImage.Clone(new Rectangle(0, 0, 16, 16), baseImage.PixelFormat);
+                        }
 
-                    image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
+                        image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
+                        bitmapCache.Add(tileKey, image);
+                    }
 
                     // プラットフォームの右下にテクスチャを描画
                     if (tile.slope() == 1
@@ -270,7 +286,7 @@
                             Bitmap additional = baseImage.Clone(tileFrame, baseImage.PixelFormat);
                             additional = SimplePaintBitmap(additional, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                             g.DrawImageUnscaled(image, Point.Empty);
-                            g.DrawImageUnscaled(image, new Point(0, 16));
+                            g.DrawImageUnscaled(additional, new Point(0, 16));
                         }
 
                         return result;
@@ -301,7 +317,7 @@
                             Bitmap additional = baseImage.Clone(tileFrame, baseImage.PixelFormat);
                             additional = SimplePaintBitmap(additional, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                             g.DrawImageUnscaled(image, Point.Empty);
-                            g.DrawImageUnscaled(image, new Point(0, 16));
+                            g.DrawImageUnscaled(additional, new Point(0, 16));
                         }
 
                         return result;
@@ -317,6 +333,11 @@
                 // 斜めブロックがあるタイル 例：coveyerbelt
                 if (TileID.Sets.HasSlopeFrames[tile.type])
                 {
+                    if (bitmapCache.ContainsKey(tileKey))
+                    {
+                        return bitmapCache[tileKey];
+                    }
+
                     Bitmap image;
                     try
                     {
@@ -328,12 +349,18 @@
                     }
 
                     image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
+                    bitmapCache.Add(tileKey, image);
                     return image;
                 }
 
                 // 普通のブロック
                 // 斜めのボーダー描画
                 {
+                    if (bitmapCache.ContainsKey(tileKey))
+                    {
+                        return bitmapCache[tileKey];
+                    }
+
                     Bitmap result = new Bitmap(16, 16);
                     using (Graphics g = Graphics.FromImage(result))
                     {
@@ -388,6 +415,7 @@
                                 baseImage.PixelFormat),
                             new Point(0, num7));
                         result = SimplePaintBitmap(result, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
+                        bitmapCache.Add(tileKey, result);
                         return result;
                     }
                 }
@@ -448,6 +476,11 @@
             }
             */
 
+            if (bitmapCache.ContainsKey(tileKey))
+            {
+                return bitmapCache[tileKey];
+            }
+
             if (Main.tileSolid[tileType]
                 && !tile.halfBrick()
                 && !tile.inActive()
@@ -470,6 +503,7 @@
                 }
 
                 image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
+                bitmapCache.Add(tileKey, image);
                 return image;
             }
 
@@ -491,6 +525,7 @@
                     }
 
                     image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
+                    bitmapCache.Add(tileKey, image);
                     return image;
                 }
                 else
@@ -508,6 +543,7 @@
                         }
 
                         image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
+                        bitmapCache.Add(tileKey, image);
                         return image;
                     }
 
@@ -528,6 +564,7 @@
                     }
 
                     result = SimplePaintBitmap(result, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
+                    bitmapCache.Add(tileKey, result);
                     return result;
                 }
             }
@@ -545,6 +582,7 @@
                 }
 
                 result = SimplePaintBitmap(result, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
+                bitmapCache.Add(tileKey, result);
                 return result;
             }
 
@@ -552,12 +590,14 @@
             {
                 Bitmap image = baseImage.Clone(new Rectangle(frame.X, frame.Y, 16, 16), baseImage.PixelFormat);
                 image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
+                bitmapCache.Add(tileKey, image);
                 return image;
             }
             catch (OutOfMemoryException)
             {
                 Bitmap image = baseImage.Clone(new Rectangle(0, 0, 16, 16), baseImage.PixelFormat);
                 image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
+                bitmapCache.Add(tileKey, image);
                 return image;
             }
         }
@@ -1014,9 +1054,9 @@
         {
             Point[] array = new Point[3]
             {
-                new Point(point1X * frameSize8Way.X, point1Y * frameSize8Way.Y),
-                new Point(point2X * frameSize8Way.X, point2Y * frameSize8Way.Y),
-                new Point(point3X * frameSize8Way.X, point3Y * frameSize8Way.Y),
+                new Point(point1X * FrameSize8Way.X, point1Y * FrameSize8Way.Y),
+                new Point(point2X * FrameSize8Way.X, point2Y * FrameSize8Way.Y),
+                new Point(point3X * FrameSize8Way.X, point3Y * FrameSize8Way.Y),
             };
             selfFrame8WayLookup[lookup] = array;
         }
@@ -1025,9 +1065,9 @@
         {
             Point[] array = new Point[3]
             {
-                new Point(x * frameSize8Way.X, y * frameSize8Way.Y),
-                new Point(x * frameSize8Way.X, y * frameSize8Way.Y),
-                new Point(x * frameSize8Way.X, y * frameSize8Way.Y),
+                new Point(x * FrameSize8Way.X, y * FrameSize8Way.Y),
+                new Point(x * FrameSize8Way.X, y * FrameSize8Way.Y),
+                new Point(x * FrameSize8Way.X, y * FrameSize8Way.Y),
             };
             selfFrame8WayLookup[lookup] = array;
         }
@@ -1036,10 +1076,10 @@
         {
             Point[] array = new Point[4]
             {
-                new Point(point1X * wallFrameSize.X, point1Y * wallFrameSize.Y),
-                new Point(point2X * wallFrameSize.X, point2Y * wallFrameSize.Y),
-                new Point(point3X * wallFrameSize.X, point3Y * wallFrameSize.Y),
-                new Point(point4X * wallFrameSize.X, point4Y * wallFrameSize.Y),
+                new Point(point1X * WallFrameSize.X, point1Y * WallFrameSize.Y),
+                new Point(point2X * WallFrameSize.X, point2Y * WallFrameSize.Y),
+                new Point(point3X * WallFrameSize.X, point3Y * WallFrameSize.Y),
+                new Point(point4X * WallFrameSize.X, point4Y * WallFrameSize.Y),
             };
             wallFrameLookup[lookup] = array;
         }
@@ -2903,6 +2943,81 @@
             }
 
             return new Point((short)tileFrame.X, (short)tileFrame.Y);
+        }
+
+        private struct BlockStyle
+        {
+            public bool Top;
+
+            public bool Bottom;
+
+            public bool Left;
+
+            public bool Right;
+
+            public BlockStyle(bool up, bool down, bool left, bool right)
+            {
+                Top = up;
+                Bottom = down;
+                Left = left;
+                Right = right;
+            }
+
+            public void Clear()
+            {
+                Top = Bottom = Left = Right = false;
+            }
+        }
+
+        private readonly struct TileKey
+        {
+            public readonly bool IsTile;
+
+            public readonly short ID;
+
+            public readonly byte Color;
+
+            public readonly short FrameX;
+
+            public readonly short FrameY;
+
+            public readonly bool InActive;
+
+            public readonly bool HalfBrick;
+
+            public readonly byte Slope;
+
+            private readonly int hash;
+
+            public TileKey(bool isTile, short id, bool halfBrick, byte slope, byte color, short frameX, short frameY, bool inActive)
+            {
+                IsTile = isTile;
+                ID = id;
+                Color = color;
+                FrameX = frameX;
+                FrameY = frameY;
+                InActive = inActive;
+                HalfBrick = halfBrick;
+                Slope = slope;
+
+                // 6bit x 2
+                hash = (((frameX / 18) & 0x3F) << 6) | ((frameY / 18) & 0x3F);
+                int tileShape = halfBrick ? 1 : (slope == 0 ? 0 : slope + 1);
+
+                // id = id * 6 + tileShape: maximum 3738 in 1.4.2.3 = < 4096 = 12bit
+                hash |= ((id * 6) + tileShape) << 12;
+
+                // paint: 5bit
+                hash |= Color << 24;
+
+                // isTile, inActive (1bit each)
+                hash |= (isTile.GetHashCode() << 1 | inActive.GetHashCode()) << 29;
+            }
+
+            public override int GetHashCode()
+            {
+                return hash;
+            }
         }
     }
 }
