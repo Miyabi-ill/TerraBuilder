@@ -145,7 +145,9 @@
 			</DockPanel>
 			<DockPanel Grid.Row="1" LastChildFill="True">
 				<TextBlock Margin="5" x:Name="MessageTextBlock" DockPanel.Dock="Bottom"/>
-				<Image x:Name="MapImage"/>
+				<xctk:Zoombox MinScale="0.5" MaxScale="100">
+					<Image x:Name="MapImage"/>
+				</xctk:Zoombox>
 			</DockPanel>
 		</Grid>
 		<Grid x:Name="RunningOverlay" Visibility="Collapsed">

@@ -24,6 +24,9 @@
         /// </summary>
         public MainWindow()
         {
+            Terraria.Main.Map = new Terraria.Map.WorldMap(1, 1);
+            Terraria.Map.MapHelper.Initialize();
+
             Sandbox = new WorldSandbox();
             Runner = new WorldGenerationRunner();
             InitializeComponent();
