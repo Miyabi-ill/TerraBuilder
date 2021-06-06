@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -18,11 +19,33 @@
     /// <summary>
     /// Interaction logic for BuildingFinderControl.xaml
     /// </summary>
-    public partial class BuildingFinderControl : UserControl
+    public partial class BuildingFinderControl : UserControl, INotifyPropertyChanged
     {
-        public BuildingCache BuildingCache { get; set; }
+        private BuildingCache buildingCache;
+        private SearchResult selectingResult;
 
-        public SearchResult SelectingResult { get; set; }
+        /// <inheritdoc/>
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public BuildingCache BuildingCache
+        {
+            get => buildingCache;
+            set
+            {
+                buildingCache = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BuildingCache)));
+            }
+        }
+
+        public SearchResult SelectingResult
+        {
+            get => selectingResult;
+            set
+            {
+                selectingResult = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectingResult)));
+            }
+        }
 
         public BuildingFinderControl()
         {

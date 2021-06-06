@@ -28,6 +28,7 @@
 				<MenuItem Header="ツール">
 					<MenuItem Header="チェストシミュレータ" Click="ChestSimulatorMenuItem_Click"></MenuItem>
 					<MenuItem Header="建築ジェネレータ" Click="BuildingGeneratorMenuItem_Click"></MenuItem>
+					<MenuItem Header="建材検索" Click="BuildingSearchWindowMenuItem_Click"></MenuItem>
 				</MenuItem>
 			</Menu>
 			<GridSplitter Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Background="Gray" Width="3"/>

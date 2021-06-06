@@ -110,7 +110,8 @@
 
             if (string.IsNullOrEmpty(BuildingGenerator.BuildingsRootPath))
             {
-                BuildingGenerator.BuildingsRootPath = string.Empty;
+                // パス未設定、スキップ
+                return;
             }
 
             if (!Directory.Exists(BuildingGenerator.BuildingsRootPath))

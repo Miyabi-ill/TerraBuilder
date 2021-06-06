@@ -35,9 +35,13 @@
         {
             get
             {
-                if (ViewTiles == null && Sandbox != null)
+                if (Sandbox != null)
                 {
                     return true;
+                }
+                else if (ViewTiles == null)
+                {
+                    return false;
                 }
 
                 return Math.Max(ViewTiles.GetLength(0), ViewTiles.GetLength(1)) <= 100;
@@ -145,7 +149,7 @@
                     }
                 }
 
-                var map = WorldToImage.CreateMapArray(tiles);
+                var map = WorldToImage.CreateMapArray(tiles, bytesPerPixel: writeableBitmap.Format.BitsPerPixel / 8);
                 writeableBitmap.WritePixels(new Int32Rect(minX, minY, maxX - minX, maxY - minY), map.array, map.stride, 0);
             }
         }

@@ -10,6 +10,7 @@
     using System.Windows.Media.Imaging;
     using Microsoft.Win32;
     using Microsoft.WindowsAPICodePack.Dialogs;
+    using TUBGWorldGenerator.BuildingGenerator;
     using TUBGWorldGenerator.ChestSimulator;
     using TUBGWorldGenerator.Views;
     using TUBGWorldGenerator.WorldGeneration;
@@ -19,6 +20,8 @@
     /// </summary>
     public partial class MainWindow : Window
     {
+        private BuildingCache buildingCache;
+
         /// <summary>
         /// コンストラクタ。
         /// </summary>
@@ -40,6 +43,8 @@
             Window = this;
 
             Configs.RecoverConfigsFromSaved();
+
+            buildingCache = new BuildingCache(new BuildingGenerator.BuildingGenerator() { BuildingsRootPath = Configs.LastBuildingsPath });
         }
 
         internal static MainWindow Window { get; private set; }
@@ -225,6 +230,25 @@
         private void RandomSeedButton_Click(object sender, RoutedEventArgs e)
         {
             WorldGenerationRunner.CurrentRunner.GlobalContext.Seed = new Random().Next();
+        }
+
+        private void BuildingSearchWindowMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new BuildingSearchWindow(buildingCache);
+            window.Height = this.ActualHeight;
+            window.PropertyChanged += BuildingSearchWindow_PropertyChanged;
+            window.Show();
+        }
+
+        private void BuildingSearchWindow_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (sender is BuildingSearchWindow window)
+            {
+                if (e.PropertyName == nameof(window.SelectedResult))
+                {
+                    TileEditor.ToolTile = window.GetSelectedBuildTiles();
+                }
+            }
         }
     }
 }

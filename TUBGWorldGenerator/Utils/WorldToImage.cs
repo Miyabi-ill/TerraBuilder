@@ -86,12 +86,12 @@
             return Convert(bitmap);
         }
 
-        public static (int stride, Array array) CreateMapArray(Tile[,] tiles)
+        public static (int stride, Array array) CreateMapArray(Tile[,] tiles, int bytesPerPixel = 3)
         {
             int w = tiles.GetLength(0);
             int h = tiles.GetLength(1);
 
-            int stride = (w * 3) + (w % 4);
+            int stride = (w * bytesPerPixel) + (w % 4);
             var array = new byte[stride * h];
 
             for (int y = 0; y < h; y++)
@@ -101,9 +101,9 @@
                     var mapTile = CreateMapTileFromTile(tiles[x, y], x, y);
                     var color = MapHelper.GetMapTileXnaColor(ref mapTile);
 
-                    array[(x * 3) + (y * stride)] = color.B;
-                    array[(x * 3) + (y * stride) + 1] = color.G;
-                    array[(x * 3) + (y * stride) + 2] = color.R;
+                    array[(x * bytesPerPixel) + (y * stride)] = color.B;
+                    array[(x * bytesPerPixel) + (y * stride) + 1] = color.G;
+                    array[(x * bytesPerPixel) + (y * stride) + 2] = color.R;
                 }
             }
 
