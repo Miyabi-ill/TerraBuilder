@@ -35,7 +35,7 @@
 
             ActionList.ItemsSource = Runner.WorldGenerationActions;
 
-            WorldViewer.Sandbox = Sandbox;
+            TileEditor.Sandbox = Sandbox;
 
             Window = this;
 
@@ -83,7 +83,7 @@
                 ShowMessage("生成が正常に終了しました。");
             }
 
-            WorldViewer.UpdateMap();
+            TileEditor.UpdateMap();
             RunningOverlay.Visibility = Visibility.Collapsed;
         }
 
@@ -91,7 +91,7 @@
         {
             RunningOverlay.Visibility = Visibility.Visible;
             bool success = await Task.Run(() => Sandbox.Reset()).ConfigureAwait(true);
-            WorldViewer.UpdateMap();
+            TileEditor.UpdateMap();
             RunningOverlay.Visibility = Visibility.Collapsed;
         }
 
@@ -101,7 +101,7 @@
             {
                 RunningOverlay.Visibility = Visibility.Visible;
                 bool success = await Task.Run(() => generationAction.Run(Sandbox)).ConfigureAwait(true);
-                WorldViewer.UpdateMap();
+                TileEditor.UpdateMap();
                 RunningOverlay.Visibility = Visibility.Collapsed;
             }
         }
@@ -122,7 +122,7 @@
             {
                 string path = Sandbox.Save(null);
                 ShowMessage(string.Format("{0}に保存しました。", path));
-                WorldViewer.UpdateMap();
+                TileEditor.UpdateMap();
             }
         }
 

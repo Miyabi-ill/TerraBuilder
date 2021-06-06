@@ -158,8 +158,8 @@
     <Compile Include="Views\PieChart.xaml.cs">
       <DependentUpon>PieChart.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\WorldViewer.xaml.cs">
-      <DependentUpon>WorldViewer.xaml</DependentUpon>
+    <Compile Include="Views\TileEditor.xaml.cs">
+      <DependentUpon>TileEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="WorldGeneration\ActionContext.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Caverns.cs" />
@@ -228,7 +228,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\WorldViewer.xaml">
+    <Page Include="Views\TileEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

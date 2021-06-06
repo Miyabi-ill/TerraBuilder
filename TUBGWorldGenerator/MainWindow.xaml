@@ -146,7 +146,7 @@
 			</DockPanel>
 			<DockPanel Grid.Row="1" LastChildFill="True">
 				<TextBlock Margin="5" x:Name="MessageTextBlock" DockPanel.Dock="Bottom"/>
-				<views:WorldViewer x:Name="WorldViewer"></views:WorldViewer>
+				<views:TileEditor x:Name="TileEditor"></views:TileEditor>
 			</DockPanel>
 		</Grid>
 		<Grid x:Name="RunningOverlay" Visibility="Collapsed">
