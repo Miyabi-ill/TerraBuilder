@@ -52,11 +52,11 @@
                 viewTiles = value;
                 if (UseMapImageAsBackground)
                 {
-                    WorldMapImage.Source = WorldToImage.CreateMapImage(viewTiles);
+                    WorldMapImage.Source = new WriteableBitmap(WorldToImage.CreateMapImage(viewTiles));
                 }
                 else
                 {
-                    WorldMapImage.Source = TileToImage.CreateBitmap(viewTiles);
+                    WorldMapImage.Source = new WriteableBitmap(WorldToImage.CreateMapImage(viewTiles));
                 }
             }
         }
@@ -75,7 +75,7 @@
             set
             {
                 sandbox = value;
-                WorldMapImage.Source = WorldToImage.CreateMapImage(sandbox);
+                WorldMapImage.Source = new WriteableBitmap(WorldToImage.CreateMapImage(sandbox));
             }
         }
 
@@ -100,6 +100,7 @@
         [Flags]
         private enum ToolState
         {
+            None = 0x0,
             PlaceTile = 0x1,
             Hammer = 0x2,
             Eraser = 0x4,
@@ -116,16 +117,36 @@
             {
                 if (UseMapImageAsBackground)
                 {
-                    WorldMapImage.Source = WorldToImage.CreateMapImage(viewTiles);
+                    WorldMapImage.Source = new WriteableBitmap(WorldToImage.CreateMapImage(viewTiles));
                 }
                 else
                 {
-                    WorldMapImage.Source = TileToImage.CreateBitmap(viewTiles);
+                    WorldMapImage.Source = new WriteableBitmap(WorldToImage.CreateMapImage(viewTiles));
                 }
             }
             else
             {
-                WorldMapImage.Source = WorldToImage.CreateMapImage(Sandbox);
+                WorldMapImage.Source = new WriteableBitmap(WorldToImage.CreateMapImage(Sandbox));
+            }
+
+            UpdateDetailImage();
+        }
+
+        public void UpdateMapWithArea(int minX, int minY, int maxX, int maxY)
+        {
+            if (WorldMapImage.Source is WriteableBitmap writeableBitmap)
+            {
+                Tile[,] tiles = new Tile[maxX - minX, maxY - minY];
+                for (int x = minX; x < maxX; x++)
+                {
+                    for (int y = minY; y < maxY; y++)
+                    {
+                        tiles[x - minX, y - minY] = GetTile(x, y);
+                    }
+                }
+
+                var map = WorldToImage.CreateMapArray(tiles);
+                writeableBitmap.WritePixels(new Int32Rect(minX, minY, maxX - minX, maxY - minY), map.array, map.stride, 0);
             }
         }
 
@@ -147,6 +168,67 @@
             {
                 RowDefinition rowDefinition = new RowDefinition();
                 TileGrid.RowDefinitions.Add(rowDefinition);
+            }
+        }
+
+        private void UpdateDetailImage()
+        {
+            if (UseMapImageAsBackground)
+            {
+                int minSize = (int)Math.Min(ZoomControl.Viewport.Width, ZoomControl.Viewport.Height);
+                if (minSize <= 50)
+                {
+                    if (ViewTiles != null)
+                    {
+                        int minX = ZoomControl.Viewport.Left - 2 < 0 ? 0 : (int)ZoomControl.Viewport.Left - 2;
+                        int minY = ZoomControl.Viewport.Top - 2 < 0 ? 0 : (int)ZoomControl.Viewport.Top - 2;
+                        int maxX = ZoomControl.Viewport.Right + 2 > ViewTiles.GetLength(0) ? ViewTiles.GetLength(0) : (int)ZoomControl.Viewport.Right + 2;
+                        int maxY = ZoomControl.Viewport.Bottom + 2 > ViewTiles.GetLength(1) ? ViewTiles.GetLength(1) : (int)ZoomControl.Viewport.Bottom + 2;
+
+                        Tile[,] tiles = new Tile[maxX - minX, maxY - minY];
+                        for (int x = minX; x < maxX; x++)
+                        {
+                            for (int y = minY; y < maxY; y++)
+                            {
+                                tiles[x - minX, y - minY] = ViewTiles[x, y];
+                            }
+                        }
+
+                        DetailImage.Source = TileToImage.CreateBitmap(tiles);
+                        DetailImage.Width = maxX - minX;
+                        DetailImage.Height = maxY - minY;
+
+                        DetailImage.SetValue(Canvas.TopProperty, (double)minY);
+                        DetailImage.SetValue(Canvas.LeftProperty, (double)minX);
+                    }
+                    else
+                    {
+                        int minX = ZoomControl.Viewport.Left - 2 < 0 ? 0 : (int)ZoomControl.Viewport.Left - 2;
+                        int minY = ZoomControl.Viewport.Top - 2 < 0 ? 0 : (int)ZoomControl.Viewport.Top - 2;
+                        int maxX = ZoomControl.Viewport.Right + 2 > Sandbox.TileCountX ? Sandbox.TileCountX : (int)ZoomControl.Viewport.Right + 2;
+                        int maxY = ZoomControl.Viewport.Bottom + 2 > Sandbox.TileCountY ? Sandbox.TileCountY : (int)ZoomControl.Viewport.Bottom + 2;
+
+                        Tile[,] tiles = new Tile[maxX - minX, maxY - minY];
+                        for (int x = minX; x < maxX; x++)
+                        {
+                            for (int y = minY; y < maxY; y++)
+                            {
+                                tiles[x - minX, y - minY] = (Tile)Sandbox.Tiles[x, y];
+                            }
+                        }
+
+                        DetailImage.Source = TileToImage.CreateBitmap(tiles);
+                        DetailImage.Width = maxX - minX;
+                        DetailImage.Height = maxY - minY;
+
+                        DetailImage.SetValue(Canvas.TopProperty, (double)minY);
+                        DetailImage.SetValue(Canvas.LeftProperty, (double)minX);
+                    }
+                }
+                else
+                {
+                    DetailImage.Source = null;
+                }
             }
         }
 
@@ -205,12 +287,20 @@
                 return;
             }
 
+            if (isDragging
+                && (CurrentToolState.HasFlag(ToolState.PlaceTile) && !CurrentToolState.HasFlag(ToolState.Eraser) && (ToolTile.GetLength(0) != 1 || ToolTile.GetLength(1) != 1)))
+            {
+                return;
+            }
+
             if (GetTile(tileX, tileY) == null)
             {
                 SetTile(tileX, tileY, new Tile());
             }
 
             Tile tile = GetTile(tileX, tileY);
+            int maxX = tileX + 1;
+            int maxY = tileY + 1;
             if (leftClick)
             {
                 if (CurrentToolState.HasFlag(ToolState.Eraser))
@@ -250,6 +340,9 @@
                     {
                         int width = ToolTile.GetLength(0);
                         int height = ToolTile.GetLength(1);
+
+                        maxX = tileX + width;
+                        maxY = tileY + height;
 
                         for (int x = tileX; x < GetTileCountX() && x < tileX + width; x++)
                         {
@@ -385,6 +478,9 @@
                         int width = ToolTile.GetLength(0);
                         int height = ToolTile.GetLength(1);
 
+                        maxX = tileX + width;
+                        maxY = tileY + height;
+
                         for (int x = tileX; x < GetTileCountX() && x < tileX + width; x++)
                         {
                             for (int y = tileY; y < GetTileCountY() && y < tileY + height; y++)
@@ -418,37 +514,52 @@
                 }
             }
 
-            UpdateMap();
+            UpdateMapWithArea(tileX, tileY, maxX, maxY);
+            UpdateDetailImage();
         }
 
         private void TileGrid_PreviewMouseMove(object sender, MouseEventArgs e)
         {
+            int minSize = (int)Math.Min(ZoomControl.Viewport.Width, ZoomControl.Viewport.Height);
+            if (minSize > 50
+                || CurrentToolState == ToolState.None
+                || !(e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed))
+            {
+                return;
+            }
+
             Point point = Mouse.GetPosition(TileGrid);
 
-            int columnCount = TileGrid.ColumnDefinitions.Count;
-            int rowCount = TileGrid.RowDefinitions.Count;
+            double width = Math.Round(TileGrid.ActualWidth);
+            double height = Math.Round(TileGrid.ActualHeight);
 
-            double width = TileGrid.ActualWidth;
-            double height = TileGrid.ActualHeight;
+            int positionX = (int)(point.X / width * GetTileCountX());
+            int positionY = (int)(point.Y / height * GetTileCountY());
 
-            int positionX = (int)(point.X / width * columnCount) + 1;
-            int positionY = rowCount - (int)(point.Y / height * rowCount) + 1;
+            e.Handled = true;
 
             ModifyTile(positionX, positionY, e.LeftButton == MouseButtonState.Pressed, e.RightButton == MouseButtonState.Pressed, true);
         }
 
         private void TileGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
+            int minSize = (int)Math.Min(ZoomControl.Viewport.Width, ZoomControl.Viewport.Height);
+            if (minSize > 50
+                    || CurrentToolState == ToolState.None
+                    || !(e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed))
+            {
+                return;
+            }
+
             Point point = Mouse.GetPosition(TileGrid);
 
-            int columnCount = TileGrid.ColumnDefinitions.Count;
-            int rowCount = TileGrid.RowDefinitions.Count;
+            double width = Math.Round(TileGrid.ActualWidth);
+            double height = Math.Round(TileGrid.ActualHeight);
 
-            double width = TileGrid.ActualWidth;
-            double height = TileGrid.ActualHeight;
+            int positionX = (int)(point.X / width * GetTileCountX());
+            int positionY = (int)(point.Y / height * GetTileCountY());
 
-            int positionX = (int)(point.X / width * columnCount);
-            int positionY = (int)(point.Y / height * rowCount);
+            e.Handled = true;
 
             ModifyTile(positionX, positionY, e.LeftButton == MouseButtonState.Pressed, e.RightButton == MouseButtonState.Pressed, false);
         }
@@ -523,62 +634,9 @@
 
         private void ZoomControl_CurrentViewChanged(object sender, Xceed.Wpf.Toolkit.Zoombox.ZoomboxViewChangedEventArgs e)
         {
-            if (e.NewViewStackIndex != -1 && UseMapImageAsBackground)
+            if (e.NewViewStackIndex != -1)
             {
-                int minSize = (int)Math.Min(ZoomControl.Viewport.Width, ZoomControl.Viewport.Height);
-                if (minSize <= 50)
-                {
-                    if (ViewTiles != null)
-                    {
-                        int minX = ZoomControl.Viewport.Left - 2 < 0 ? 0 : (int)ZoomControl.Viewport.Left - 2;
-                        int minY = ZoomControl.Viewport.Top - 2 < 0 ? 0 : (int)ZoomControl.Viewport.Top - 2;
-                        int maxX = ZoomControl.Viewport.Right + 2 > ViewTiles.GetLength(0) ? ViewTiles.GetLength(0) : (int)ZoomControl.Viewport.Right + 2;
-                        int maxY = ZoomControl.Viewport.Bottom + 2 > ViewTiles.GetLength(1) ? ViewTiles.GetLength(1) : (int)ZoomControl.Viewport.Bottom + 2;
-
-                        Tile[,] tiles = new Tile[maxX - minX, maxY - minY];
-                        for (int x = minX; x < maxX; x++)
-                        {
-                            for (int y = minY; y < maxY; y++)
-                            {
-                                tiles[x - minX, y - minY] = ViewTiles[x, y];
-                            }
-                        }
-
-                        DetailImage.Source = TileToImage.CreateBitmap(tiles);
-                        DetailImage.Width = maxX - minX;
-                        DetailImage.Height = maxY - minY;
-
-                        DetailImage.SetValue(Canvas.TopProperty, (double)minY);
-                        DetailImage.SetValue(Canvas.LeftProperty, (double)minX);
-                    }
-                    else
-                    {
-                        int minX = ZoomControl.Viewport.Left - 2 < 0 ? 0 : (int)ZoomControl.Viewport.Left - 2;
-                        int minY = ZoomControl.Viewport.Top - 2 < 0 ? 0 : (int)ZoomControl.Viewport.Top - 2;
-                        int maxX = ZoomControl.Viewport.Right + 2 > Sandbox.TileCountX ? Sandbox.TileCountX : (int)ZoomControl.Viewport.Right + 2;
-                        int maxY = ZoomControl.Viewport.Bottom + 2 > Sandbox.TileCountY ? Sandbox.TileCountY : (int)ZoomControl.Viewport.Bottom + 2;
-
-                        Tile[,] tiles = new Tile[maxX - minX, maxY - minY];
-                        for (int x = minX; x < maxX; x++)
-                        {
-                            for (int y = minY; y < maxY; y++)
-                            {
-                                tiles[x - minX, y - minY] = (Tile)Sandbox.Tiles[x, y];
-                            }
-                        }
-
-                        DetailImage.Source = TileToImage.CreateBitmap(tiles);
-                        DetailImage.Width = maxX - minX;
-                        DetailImage.Height = maxY - minY;
-
-                        DetailImage.SetValue(Canvas.TopProperty, (double)minY);
-                        DetailImage.SetValue(Canvas.LeftProperty, (double)minX);
-                    }
-                }
-                else
-                {
-                    DetailImage.Source = null;
-                }
+                UpdateDetailImage();
             }
         }
     }

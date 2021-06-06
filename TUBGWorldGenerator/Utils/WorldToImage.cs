@@ -33,7 +33,7 @@
             if (Main.Map == null)
             {
                 Main.Map = worldMap;
-            } 
+            }
 
             for (int y = 0; y < sandbox.TileCountY; y++)
             {
@@ -84,6 +84,30 @@
 
             Bitmap bitmap = CreateBitmap(w, h, array);
             return Convert(bitmap);
+        }
+
+        public static (int stride, Array array) CreateMapArray(Tile[,] tiles)
+        {
+            int w = tiles.GetLength(0);
+            int h = tiles.GetLength(1);
+
+            int stride = (w * 3) + (w % 4);
+            var array = new byte[stride * h];
+
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    var mapTile = CreateMapTileFromTile(tiles[x, y], x, y);
+                    var color = MapHelper.GetMapTileXnaColor(ref mapTile);
+
+                    array[(x * 3) + (y * stride)] = color.B;
+                    array[(x * 3) + (y * stride) + 1] = color.G;
+                    array[(x * 3) + (y * stride) + 2] = color.R;
+                }
+            }
+
+            return (stride, array);
         }
 
         public static MapTile CreateMapTileFromTile(Tile tile, int x, int y)
