@@ -1,7 +1,7 @@
 ﻿namespace TUBGWorldGenerator.BuildingGenerator.UI
 {
     using System.Windows;
-    using static TUBGWorldGenerator.BuildingGenerator.UI.BuildingGeneratorWindow;
+    using static TUBGWorldGenerator.Views.TileEditor;
 
     /// <summary>
     /// Interaction logic for SelectHammerWindow.xaml

@@ -8,13 +8,32 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-		<xctk:Zoombox x:Name="ZoomControl" RenderOptions.BitmapScalingMode="NearestNeighbor" RelativeZoomModifiers="None" DragModifiers="None" CurrentViewChanged="ZoomControl_CurrentViewChanged">
-			<Grid>
-			    <Image x:Name="WorldMapImage"></Image>
-				<Canvas Width="{Binding ActualWidth, ElementName=WorldMapImage}" Height="{Binding ActualHeight, ElementName=WorldMapImage}" Panel.ZIndex="1">
-					<Image x:Name="DetailImage"></Image>
-				</Canvas>
-			</Grid>
-		</xctk:Zoombox>
-    </Grid>
+		<DockPanel>
+			<DockPanel LastChildFill="False">
+				<ToggleButton Margin="5" x:Name="TileButton" Checked="TileButton_Checked" Unchecked="TileButton_Unchecked">タイル</ToggleButton>
+				<ToggleButton Margin="5" x:Name="HammerButton" Checked="HammerButton_Checked" Unchecked="HammerButton_Unchecked" MouseRightButtonDown="HammerButton_MouseRightButtonDown">ハンマー</ToggleButton>
+				<ToggleButton Margin="5" x:Name="EraserButton" Checked="EraserButton_Checked" Unchecked="EraserButton_Unchecked">消しゴム</ToggleButton>
+				<ToggleButton Margin="5" x:Name="PaintButton" Checked="PaintButton_Checked" Unchecked="PaintButton_Unchecked" MouseRightButtonDown="PaintButton_MouseRightButtonDown">ペンキ</ToggleButton>
+				<ToggleButton Margin="5" x:Name="InactiveButton" Checked="InactiveButton_Checked" Unchecked="InactiveButton_Unchecked">背景化</ToggleButton>
+			</DockPanel>
+			<xctk:Zoombox x:Name="ZoomControl" RenderOptions.BitmapScalingMode="NearestNeighbor" RelativeZoomModifiers="None" DragModifiers="None" CurrentViewChanged="ZoomControl_CurrentViewChanged">
+				<Grid>
+					<Image x:Name="WorldMapImage"></Image>
+					<Grid
+						Grid.Row="1"
+						x:Name="TileGrid"
+						PreviewMouseDown="TileGrid_PreviewMouseDown"
+						PreviewMouseMove="TileGrid_PreviewMouseMove"
+						Background="Transparent"
+						Width="{Binding ElementName=WorldMapImage, Path=ActualWidth}"
+						Height="{Binding ElementName=WorldMapImage, Path=ActualHeight}"
+						ShowGridLines="True"
+						Panel.ZIndex="100"></Grid>
+					<Canvas Width="{Binding ActualWidth, ElementName=WorldMapImage}" Height="{Binding ActualHeight, ElementName=WorldMapImage}" Panel.ZIndex="1">
+						<Image x:Name="DetailImage"></Image>
+					</Canvas>
+				</Grid>
+			</xctk:Zoombox>
+		</DockPanel>
+	</Grid>
 </UserControl>

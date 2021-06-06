@@ -38,26 +38,6 @@
         /// <inheritdoc/>
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [Flags]
-        private enum ToolState
-        {
-            PlaceTile = 0x1,
-            Hammer = 0x2,
-            Eraser = 0x4,
-            Paint = 0x8,
-            SwitchInactive = 0x10,
-        }
-
-        public enum HammerType
-        {
-            Cycle,
-            HalfBrick,
-            RightBottom,
-            LeftBottom,
-            RightTop,
-            LeftTop,
-        }
-
         public string FileName
         {
             get => fileName;
@@ -81,12 +61,6 @@
 
         public BuildingMetaData BuildingMetaData { get; set; } = new BuildingMetaData();
 
-        private ToolState CurrentToolState { get; set; }
-
-        private HammerType CurrentHammerType { get; set; }
-
-        private string CurrentPaintName { get; set; } = "RedPaint";
-
         private Tile[,] Tiles { get; set; }
 
         public BuildingGenerator BuildingGenerator
@@ -109,252 +83,6 @@
             }
         }
 
-        private void ModifyTile(int tileX, int tileY, bool leftClick, bool rightClick)
-        {
-            if (Tiles.GetLength(0) <= tileX || Tiles.GetLength(1) <= tileY)
-            {
-                return;
-            }
-
-            if (Tiles[tileX, tileY] == null)
-            {
-                Tiles[tileX, tileY] = new Tile();
-            }
-
-            Tile tile = Tiles[tileX, tileY];
-            if (leftClick)
-            {
-                if (CurrentToolState.HasFlag(ToolState.Eraser))
-                {
-                    if (CurrentToolState.HasFlag(ToolState.PlaceTile))
-                    {
-                        tile.active(false);
-                        tile.type = 0;
-                        tile.color(0);
-                        tile.inActive(false);
-                        tile.halfBrick(false);
-                        tile.slope(0);
-                        tile.frameX = 0;
-                        tile.frameY = 0;
-                    }
-
-                    if (CurrentToolState.HasFlag(ToolState.Hammer))
-                    {
-                        tile.halfBrick(false);
-                        tile.slope(0);
-                    }
-
-                    if (CurrentToolState.HasFlag(ToolState.Paint))
-                    {
-                        tile.color(0);
-                    }
-
-                    if (CurrentToolState.HasFlag(ToolState.SwitchInactive))
-                    {
-                        tile.inActive(false);
-                    }
-                }
-                else
-                {
-                    if (CurrentToolState.HasFlag(ToolState.PlaceTile)
-                        && BuildingFinder.SelectingResult != null)
-                    {
-                        Tile[,] toPlaces = BuildingFinder.BuildingCache.GetTilesFromSearchResult(BuildingFinder.SelectingResult);
-                        int width = toPlaces.GetLength(0);
-                        int height = toPlaces.GetLength(1);
-
-                        for (int x = tileX; x < Tiles.GetLength(0) && x < tileX + width; x++)
-                        {
-                            for (int y = tileY; y < Tiles.GetLength(1) && y < tileY + height; y++)
-                            {
-                                Tile toPlace;
-                                if (Tiles[x, y] == null)
-                                {
-                                    toPlace = new Tile();
-                                    Tiles[x, y] = toPlace;
-                                }
-                                else
-                                {
-                                    toPlace = Tiles[x, y];
-                                }
-
-                                toPlace.active(toPlaces[x - tileX, y - tileY].active());
-                                toPlace.type = toPlaces[x - tileX, y - tileY].type;
-                                toPlace.frameX = toPlaces[x - tileX, y - tileY].frameX;
-                                toPlace.frameY = toPlaces[x - tileX, y - tileY].frameY;
-                                toPlace.color(0);
-                                toPlace.inActive(false);
-                                toPlace.halfBrick(false);
-                                toPlace.slope(0);
-                            }
-                        }
-                    }
-
-                    if (CurrentToolState.HasFlag(ToolState.Hammer))
-                    {
-                        if (tile.active())
-                        {
-                            if (CurrentHammerType == HammerType.Cycle)
-                            {
-                                if (tile.slope() == 0)
-                                {
-                                    if (tile.halfBrick())
-                                    {
-                                        tile.halfBrick(false);
-                                        tile.slope(1);
-                                    }
-                                    else
-                                    {
-                                        tile.halfBrick(true);
-                                    }
-                                }
-                                else
-                                {
-                                    int slope = tile.slope();
-                                    if (slope + 1 >= 5)
-                                    {
-                                        tile.slope(0);
-                                        tile.halfBrick(false);
-                                    }
-                                    else
-                                    {
-                                        tile.slope((byte)(slope + 1));
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                switch (CurrentHammerType)
-                                {
-                                    case HammerType.HalfBrick:
-                                        tile.slope(0);
-                                        tile.halfBrick(true);
-                                        break;
-                                    case HammerType.RightBottom:
-                                        tile.halfBrick(false);
-                                        tile.slope(2);
-                                        break;
-                                    case HammerType.RightTop:
-                                        tile.halfBrick(false);
-                                        tile.slope(4);
-                                        break;
-                                    case HammerType.LeftBottom:
-                                        tile.halfBrick(false);
-                                        tile.slope(1);
-                                        break;
-                                    case HammerType.LeftTop:
-                                        tile.halfBrick(false);
-                                        tile.slope(3);
-                                        break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (CurrentToolState.HasFlag(ToolState.Paint))
-                    {
-                        if (tile.active())
-                        {
-                            if (TerrariaNameDict.PaintNameToID.ContainsKey(CurrentPaintName))
-                            {
-                                tile.color(TerrariaNameDict.PaintNameToID[CurrentPaintName]);
-                            }
-                        }
-                    }
-
-                    if (CurrentToolState.HasFlag(ToolState.SwitchInactive))
-                    {
-                        if (tile.active())
-                        {
-                            tile.inActive(true);
-                        }
-                    }
-                }
-            }
-
-            if (rightClick)
-            {
-                if (CurrentToolState.HasFlag(ToolState.Eraser))
-                {
-                    if (CurrentToolState.HasFlag(ToolState.PlaceTile))
-                    {
-                        tile.wall = 0;
-                        tile.wallColor(0);
-                        tile.wallFrameX(0);
-                        tile.wallFrameY(0);
-                    }
-
-                    if (CurrentToolState.HasFlag(ToolState.Paint))
-                    {
-                        tile.wallColor(0);
-                    }
-                }
-                else
-                {
-                    if (CurrentToolState.HasFlag(ToolState.PlaceTile)
-                        && BuildingFinder.SelectingResult != null)
-                    {
-                        Tile[,] toPlaces = BuildingFinder.BuildingCache.GetTilesFromSearchResult(BuildingFinder.SelectingResult);
-                        int width = toPlaces.GetLength(0);
-                        int height = toPlaces.GetLength(1);
-
-                        for (int x = tileX; x < Tiles.GetLength(0) && x < tileX + width; x++)
-                        {
-                            for (int y = tileY; y < Tiles.GetLength(1) && y < tileY + height; y++)
-                            {
-                                Tile toPlace;
-                                if (Tiles[x, y] == null)
-                                {
-                                    toPlace = new Tile();
-                                    Tiles[x, y] = toPlace;
-                                }
-                                else
-                                {
-                                    toPlace = Tiles[x, y];
-                                }
-
-                                toPlace.wall = toPlaces[x - tileX, y - tileY].wall;
-                                toPlace.wallColor(toPlaces[x - tileX, y - tileY].wallColor());
-                                toPlace.wallFrameX(toPlaces[x - tileX, y - tileY].wallFrameX());
-                                toPlace.wallFrameY(toPlaces[x - tileX, y - tileY].wallFrameY());
-                            }
-                        }
-                    }
-
-                    if (CurrentToolState.HasFlag(ToolState.Paint))
-                    {
-                        if (TerrariaNameDict.PaintNameToID.ContainsKey(CurrentPaintName))
-                        {
-                            tile.wallColor(TerrariaNameDict.PaintNameToID[CurrentPaintName]);
-                        }
-                    }
-                }
-            }
-
-            PreviewImage.Source = TileToImage.CreateBitmap(Tiles);
-        }
-
-        private void UpdateGrid()
-        {
-            TileGrid.ColumnDefinitions.Clear();
-            TileGrid.RowDefinitions.Clear();
-
-            int columnCount = (int)Math.Round(PreviewImage.Source.Width) / 16;
-            int rowCount = (int)Math.Round(PreviewImage.Source.Height) / 16;
-
-            for (int i = 0; i < columnCount; i++)
-            {
-                ColumnDefinition columnDefinition = new ColumnDefinition();
-                TileGrid.ColumnDefinitions.Add(columnDefinition);
-            }
-
-            for (int i = 0; i < rowCount; i++)
-            {
-                RowDefinition rowDefinition = new RowDefinition();
-                TileGrid.RowDefinitions.Add(rowDefinition);
-            }
-        }
-
         private void ParseJson()
         {
             BuildingGenerator.ImportJson(JsonText);
@@ -374,7 +102,7 @@
                 GenerateFailedOverlay.Visibility = Visibility.Hidden;
                 Tiles = BuildingGenerator.Result;
                 PreviewImage.Source = TileToImage.CreateBitmap(BuildingGenerator.Result);
-                UpdateGrid();
+                //UpdateGrid();
             }
             else
             {
@@ -536,111 +264,6 @@
             }
         }
 
-        private void TileGrid_MouseMove(object sender, MouseEventArgs e)
-        {
-            Point point = Mouse.GetPosition(TileGrid);
-
-            int columnCount = TileGrid.ColumnDefinitions.Count;
-            int rowCount = TileGrid.RowDefinitions.Count;
-
-            double width = TileGrid.ActualWidth;
-            double height = TileGrid.ActualHeight;
-
-            int positionX = (int)(point.X / width * columnCount) + 1;
-            int positionY = rowCount - (int)(point.Y / height * rowCount) + 1;
-
-            InformationText.Text = $"X: {positionX}, Y: {positionY}";
-        }
-
-        private void TileGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            Point point = Mouse.GetPosition(TileGrid);
-
-            int columnCount = TileGrid.ColumnDefinitions.Count;
-            int rowCount = TileGrid.RowDefinitions.Count;
-
-            double width = TileGrid.ActualWidth;
-            double height = TileGrid.ActualHeight;
-
-            int positionX = (int)(point.X / width * columnCount);
-            int positionY = (int)(point.Y / height * rowCount);
-
-            ModifyTile(positionX, positionY, e.LeftButton == MouseButtonState.Pressed, e.RightButton == MouseButtonState.Pressed);
-        }
-
-        private void TileButton_Checked(object sender, RoutedEventArgs e)
-        {
-            CurrentToolState |= ToolState.PlaceTile;
-        }
-
-        private void TileButton_Unchecked(object sender, RoutedEventArgs e)
-        {
-            CurrentToolState &= ~ToolState.PlaceTile;
-        }
-
-        private void HammerButton_Checked(object sender, RoutedEventArgs e)
-        {
-            CurrentToolState |= ToolState.Hammer;
-        }
-
-        private void HammerButton_Unchecked(object sender, RoutedEventArgs e)
-        {
-            CurrentToolState &= ~ToolState.Hammer;
-        }
-
-        private void EraserButton_Checked(object sender, RoutedEventArgs e)
-        {
-            CurrentToolState |= ToolState.Eraser;
-        }
-
-        private void EraserButton_Unchecked(object sender, RoutedEventArgs e)
-        {
-            CurrentToolState &= ~ToolState.Eraser;
-        }
-
-        private void PaintButton_Checked(object sender, RoutedEventArgs e)
-        {
-            CurrentToolState |= ToolState.Paint;
-        }
-
-        private void PaintButton_Unchecked(object sender, RoutedEventArgs e)
-        {
-            CurrentToolState &= ~ToolState.Paint;
-        }
-
-        private void InactiveButton_Checked(object sender, RoutedEventArgs e)
-        {
-            CurrentToolState |= ToolState.SwitchInactive;
-        }
-
-        private void InactiveButton_Unchecked(object sender, RoutedEventArgs e)
-        {
-            CurrentToolState &= ~ToolState.SwitchInactive;
-        }
-
-        private void HammerButton_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            var window = new SelectHammerWindow() { SelectedHammerType = CurrentHammerType };
-            Point point = Mouse.GetPosition(this);
-            window.Top = this.Top + point.Y;
-            window.Left = this.Left + point.X;
-            window.ShowDialog();
-            CurrentHammerType = window.SelectedHammerType;
-        }
-
-        private void PaintButton_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            var window = new SelectPaintWindow();
-            Point point = Mouse.GetPosition(this);
-            window.Top = this.Top + point.Y;
-            window.Left = this.Left + point.X;
-            window.ShowDialog();
-            if (!string.IsNullOrEmpty(window.SelectedPaintName))
-            {
-                CurrentPaintName = window.SelectedPaintName;
-            }
-        }
-
         private void RegenerateFromMetaDataButton_Click(object sender, RoutedEventArgs e)
         {
             int width = BuildingMetaData.Size.Width;
@@ -656,7 +279,7 @@
             }
 
             PreviewImage.Source = TileToImage.CreateBitmap(Tiles);
-            UpdateGrid();
+            //UpdateGrid();
         }
     }
 }
