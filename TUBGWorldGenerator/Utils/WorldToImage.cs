@@ -22,8 +22,9 @@
         /// <returns>画像</returns>
         public static BitmapImage CreateMapImage(WorldSandbox sandbox)
         {
+            const int bitDepth = 4;
             int arrayIndex = 0;
-            var array = new byte[sandbox.TileCountX * sandbox.TileCountY * 3];
+            var array = new byte[sandbox.TileCountX * sandbox.TileCountY * bitDepth];
 
             WorldMap worldMap = new WorldMap(sandbox.TileCountX, sandbox.TileCountY)
             {
@@ -42,9 +43,10 @@
                     var mapTile = MapHelper.CreateMapTile(x, y, 255);
                     var color = MapHelper.GetMapTileXnaColor(ref mapTile);
 
-                    array[arrayIndex * 3] = color.B;
-                    array[(arrayIndex * 3) + 1] = color.G;
-                    array[(arrayIndex * 3) + 2] = color.R;
+                    array[arrayIndex * bitDepth] = color.B;
+                    array[(arrayIndex * bitDepth) + 1] = color.G;
+                    array[(arrayIndex * bitDepth) + 2] = color.R;
+                    array[(arrayIndex * bitDepth) + 3] = 255;
                     arrayIndex++;
 
                     worldMap._tiles[x, y] = mapTile;
@@ -65,8 +67,9 @@
             int w = tiles.GetLength(0);
             int h = tiles.GetLength(1);
 
+            const int bitDepth = 4;
             int arrayIndex = 0;
-            var array = new byte[w * h * 3];
+            var array = new byte[w * h * bitDepth];
 
             for (int y = 0; y < h; y++)
             {
@@ -75,9 +78,10 @@
                     var mapTile = CreateMapTileFromTile(tiles[x, y], x, y);
                     var color = MapHelper.GetMapTileXnaColor(ref mapTile);
 
-                    array[arrayIndex * 3] = color.B;
-                    array[(arrayIndex * 3) + 1] = color.G;
-                    array[(arrayIndex * 3) + 2] = color.R;
+                    array[arrayIndex * bitDepth] = color.B;
+                    array[(arrayIndex * bitDepth) + 1] = color.G;
+                    array[(arrayIndex * bitDepth) + 2] = color.R;
+                    array[(arrayIndex * bitDepth) + 3] = 255;
                     arrayIndex++;
                 }
             }
@@ -104,6 +108,7 @@
                     array[(x * bytesPerPixel) + (y * stride)] = color.B;
                     array[(x * bytesPerPixel) + (y * stride) + 1] = color.G;
                     array[(x * bytesPerPixel) + (y * stride) + 2] = color.R;
+                    array[(x * bytesPerPixel) + (y * stride) + 3] = 255;
                 }
             }
 
@@ -200,7 +205,7 @@
         public static BitmapImage Convert(Bitmap src)
         {
             MemoryStream ms = new MemoryStream();
-            src.Save(ms, ImageFormat.Bmp);
+            src.Save(ms, ImageFormat.Png);
             BitmapImage image = new BitmapImage();
             image.BeginInit();
             ms.Seek(0, SeekOrigin.Begin);
@@ -212,7 +217,7 @@
 
         public static Bitmap CreateBitmap(int width, int height, byte[] datas)
         {
-            var b = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+            var b = new Bitmap(width, height, PixelFormat.Format32bppArgb);
 
             var boundsRect = new Rectangle(0, 0, width, height);
             BitmapData bmpData = b.LockBits(

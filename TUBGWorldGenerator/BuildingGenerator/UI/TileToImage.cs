@@ -153,14 +153,16 @@
                             Bitmap image = TextureLoader.Instance.GetWall(tile.wall);
                             if (image == null)
                             {
-                                var array = new byte[16 * 16 * 3];
+                                const int bitDepth = 4;
+                                var array = new byte[16 * 16 * bitDepth];
                                 var mapTile = WorldToImage.CreateMapTileFromTile(tile, i, j);
                                 var color = MapHelper.GetMapTileXnaColor(ref mapTile);
-                                for (int ind = 0; ind < array.Length; ind += 3)
+                                for (int ind = 0; ind < array.Length; ind += bitDepth)
                                 {
-                                    array[ind] = color.B;
-                                    array[ind + 1] = color.G;
-                                    array[ind + 2] = color.R;
+                                    array[ind] = 255;
+                                    array[ind + 1] = color.B;
+                                    array[ind + 2] = color.G;
+                                    array[ind + 3] = color.R;
                                 }
 
                                 image = WorldToImage.CreateBitmap(16, 16, array);
