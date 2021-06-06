@@ -4,8 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TUBGWorldGenerator"
-		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        mc:Ignorable="d"
+		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:views="clr-namespace:TUBGWorldGenerator.Views"
+		mc:Ignorable="d"
 		DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="TUBGワールドジェネレータ" Height="720" Width="1280">
 	<Window.Resources>
@@ -146,7 +146,7 @@
 			</DockPanel>
 			<DockPanel Grid.Row="1" LastChildFill="True">
 				<TextBlock Margin="5" x:Name="MessageTextBlock" DockPanel.Dock="Bottom"/>
-				<Image x:Name="MapImage"/>
+				<views:WorldViewer x:Name="WorldViewer"></views:WorldViewer>
 			</DockPanel>
 		</Grid>
 		<Grid x:Name="RunningOverlay" Visibility="Collapsed">

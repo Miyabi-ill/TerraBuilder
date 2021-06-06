@@ -8,10 +8,12 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-		<xctk:Zoombox x:Name="ZoomControl">
+		<xctk:Zoombox x:Name="ZoomControl" RenderOptions.BitmapScalingMode="NearestNeighbor" RelativeZoomModifiers="None" DragModifiers="None" CurrentViewChanged="ZoomControl_CurrentViewChanged">
 			<Grid>
 			    <Image x:Name="WorldMapImage"></Image>
-			    <Image x:Name="DetailImage"></Image>
+				<Canvas Width="{Binding ActualWidth, ElementName=WorldMapImage}" Height="{Binding ActualHeight, ElementName=WorldMapImage}" Panel.ZIndex="1">
+					<Image x:Name="DetailImage"></Image>
+				</Canvas>
 			</Grid>
 		</xctk:Zoombox>
     </Grid>

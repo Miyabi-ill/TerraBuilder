@@ -35,7 +35,7 @@
 
             ActionList.ItemsSource = Runner.WorldGenerationActions;
 
-            UpdateMapView();
+            WorldViewer.Sandbox = Sandbox;
 
             Window = this;
 
@@ -74,14 +74,6 @@
             }));
         }
 
-        /// <summary>
-        /// マップを更新する。
-        /// </summary>
-        public void UpdateMapView()
-        {
-            MapImage.Source = Utils.WorldToImage.CreateMapImage(Sandbox);
-        }
-
         private async void RunAllButton_Click(object sender, RoutedEventArgs e)
         {
             RunningOverlay.Visibility = Visibility.Visible;
@@ -91,7 +83,7 @@
                 ShowMessage("生成が正常に終了しました。");
             }
 
-            UpdateMapView();
+            WorldViewer.UpdateMap();
             RunningOverlay.Visibility = Visibility.Collapsed;
         }
 
@@ -99,7 +91,7 @@
         {
             RunningOverlay.Visibility = Visibility.Visible;
             bool success = await Task.Run(() => Sandbox.Reset()).ConfigureAwait(true);
-            UpdateMapView();
+            WorldViewer.UpdateMap();
             RunningOverlay.Visibility = Visibility.Collapsed;
         }
 
@@ -109,7 +101,7 @@
             {
                 RunningOverlay.Visibility = Visibility.Visible;
                 bool success = await Task.Run(() => generationAction.Run(Sandbox)).ConfigureAwait(true);
-                UpdateMapView();
+                WorldViewer.UpdateMap();
                 RunningOverlay.Visibility = Visibility.Collapsed;
             }
         }
@@ -130,7 +122,7 @@
             {
                 string path = Sandbox.Save(null);
                 ShowMessage(string.Format("{0}に保存しました。", path));
-                UpdateMapView();
+                WorldViewer.UpdateMap();
             }
         }
 

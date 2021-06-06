@@ -14,6 +14,7 @@
     using System.Windows.Media.Imaging;
     using System.Windows.Navigation;
     using System.Windows.Shapes;
+    using Terraria;
     using TUBGWorldGenerator.Utils;
     using TUBGWorldGenerator.WorldGeneration;
 
@@ -37,8 +38,6 @@
         public WorldViewer()
         {
             InitializeComponent();
-
-            ZoomControl.AnimationCompleted += ZoomControl_AnimationCompleted;
         }
 
         public void UpdateMap()
@@ -46,9 +45,38 @@
             WorldMapImage.Source = WorldToImage.CreateMapImage(Sandbox);
         }
 
-        private void ZoomControl_AnimationCompleted(object sender, RoutedEventArgs e)
+        private void ZoomControl_CurrentViewChanged(object sender, Xceed.Wpf.Toolkit.Zoombox.ZoomboxViewChangedEventArgs e)
         {
-            Console.WriteLine("Animation Completed");
+            if (e.NewViewStackIndex != -1)
+            {
+                int minSize = (int)Math.Min(ZoomControl.Viewport.Width, ZoomControl.Viewport.Height);
+                if (minSize <= 50)
+                {
+                    int minX = ZoomControl.Viewport.Left - 2 < 0 ? 0 : (int)ZoomControl.Viewport.Left - 2;
+                    int minY = ZoomControl.Viewport.Top - 2 < 0 ? 0 : (int)ZoomControl.Viewport.Top - 2;
+                    int maxX = ZoomControl.Viewport.Right + 2 > Sandbox.TileCountX ? Sandbox.TileCountX : (int)ZoomControl.Viewport.Right + 2;
+                    int maxY = ZoomControl.Viewport.Bottom + 2 > Sandbox.TileCountY ? Sandbox.TileCountY : (int)ZoomControl.Viewport.Bottom + 2;
+
+                    Tile[,] tiles = new Tile[maxX - minX, maxY - minY];
+                    for (int x = minX; x < maxX; x++)
+                    {
+                        for (int y = minY; y < maxY; y++)
+                        {
+                            tiles[x - minX, y - minY] = (Tile)Sandbox.Tiles[x, y];
+                        }
+                    }
+
+                    DetailImage.Source = BuildingGenerator.UI.TileToImage.CreateBitmap(tiles);
+                    DetailImage.Width = maxX - minX;
+                    DetailImage.Height = maxY - minY;
+                    DetailImage.SetValue(Canvas.TopProperty, (double)minY);
+                    DetailImage.SetValue(Canvas.LeftProperty, (double)minX);
+                }
+                else
+                {
+                    DetailImage.Source = null;
+                }
+            }
         }
     }
 }

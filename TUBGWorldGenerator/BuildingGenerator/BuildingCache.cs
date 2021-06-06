@@ -108,6 +108,11 @@
                 }
             }
 
+            if (string.IsNullOrEmpty(BuildingGenerator.BuildingsRootPath))
+            {
+                BuildingGenerator.BuildingsRootPath = string.Empty;
+            }
+
             if (!Directory.Exists(BuildingGenerator.BuildingsRootPath))
             {
                 Directory.CreateDirectory(BuildingGenerator.BuildingsRootPath);
