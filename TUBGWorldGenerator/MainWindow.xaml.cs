@@ -45,6 +45,13 @@
             Configs.RecoverConfigsFromSaved();
 
             buildingCache = new BuildingCache(new BuildingGenerator.BuildingGenerator() { BuildingsRootPath = Configs.LastBuildingsPath });
+
+            AppDomain.CurrentDomain.FirstChanceException += FirstChanceException;
+        }
+
+        private void FirstChanceException(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
+        {
+            Utils.ErrorLogger.Log(e.Exception);
         }
 
         internal static MainWindow Window { get; private set; }

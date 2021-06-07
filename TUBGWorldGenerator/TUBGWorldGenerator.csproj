@@ -146,6 +146,7 @@
     </Compile>
     <Compile Include="Configs.cs" />
     <Compile Include="Utils\Colors.cs" />
+    <Compile Include="Utils\ErrorLogger.cs" />
     <Compile Include="Utils\GenerateChest.cs" />
     <Compile Include="Utils\Liquids.cs" />
     <Compile Include="Utils\PerlinNoise.cs" />
