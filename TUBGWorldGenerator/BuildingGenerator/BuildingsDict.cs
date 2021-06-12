@@ -14,7 +14,7 @@
 
         private Dictionary<string, BuildBase> buildingsDictionary = new Dictionary<string, BuildBase>();
 
-        public string BuildingsDirectory { get; set; }
+        public string BuildingsDirectory { get; set; } = string.Empty;
 
         public BuildBase this[string buildingName]
         {

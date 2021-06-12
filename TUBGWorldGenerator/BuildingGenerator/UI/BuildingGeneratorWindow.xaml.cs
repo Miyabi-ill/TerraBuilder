@@ -4,6 +4,7 @@
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.IO;
+    using System.Text.RegularExpressions;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
@@ -18,6 +19,9 @@
     /// </summary>
     public partial class BuildingGeneratorWindow : Window, INotifyPropertyChanged
     {
+        private static readonly string RegexSearch = new string(Path.GetInvalidFileNameChars());
+        private static readonly Regex FileNameRe = new Regex(string.Format("[{0}]", Regex.Escape(RegexSearch)));
+
         private string fileName;
         private string jsonText;
         private BuildingGenerator buildingGenerator;
@@ -271,6 +275,7 @@
             {
                 BuildingGenerator.BuildingsRootPath = dialog.FileName;
                 Configs.LastBuildingsPath = dialog.FileName;
+                BuildingFinder.BuildingCache.BuildingDirectory = dialog.FileName;
             }
         }
 
@@ -318,6 +323,28 @@
                 }
 
                 TileEditor.ToolTile = BuildingFinder.BuildingCache.GetTilesFromSearchResult(BuildingFinder.SelectingResult);
+            }
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(BuildingMetaData.Name))
+            {
+                MessageBox.Show("先に名前を指定してください");
+                return;
+            }
+
+            var dialog = new SaveFileDialog()
+            {
+                InitialDirectory = BuildingGenerator.BuildingsRootPath,
+                FileName = FileNameRe.Replace(BuildingMetaData.Name + ".TEditSch", string.Empty),
+                Filter = "TEditSchemeファイル(*.TEditSch)|*.TEditSch",
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                TEditScheme.Write(Tiles, dialog.FileName, BuildingMetaData.Name);
+                BuildingFinder.BuildingCache.ReloadFile(dialog.FileName);
             }
         }
     }

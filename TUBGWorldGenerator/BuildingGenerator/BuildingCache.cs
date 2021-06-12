@@ -39,6 +39,12 @@
             }
         }
 
+        public string BuildingDirectory
+        {
+            get => BuildingGenerator.BuildingsRootPath;
+            set => BuildingGenerator.BuildingsRootPath = value;
+        }
+
         private BuildingGenerator BuildingGenerator { get; }
 
         private HashAlgorithm HashAlgorithm { get; set; } = SHA256.Create();
@@ -59,6 +65,125 @@
         private Dictionary<string, (string name, string hash, ObservableCollection<string> tags)> CacheFileNameDictionary { get; set; } = new Dictionary<string, (string name, string hash, ObservableCollection<string> tags)>();
 
         private Regex FileNameRegex { get; set; } = new Regex(@"Cache\\(.*)\.png");
+
+        public void ReloadFile(string fileName)
+        {
+            if (string.Equals(Path.GetExtension(fileName), ".json", StringComparison.InvariantCultureIgnoreCase))
+            {
+                // 親ディレクトリの名前と拡張子を省く
+                string buildingFileName = string.IsNullOrEmpty(BuildingDirectory) ? fileName : fileName.Replace(BuildingDirectory, string.Empty).Trim('\\');
+                buildingFileName = buildingFileName.Substring(0, buildingFileName.Length - 5);
+
+                string text;
+                using (StreamReader sr = new StreamReader(fileName))
+                {
+                    text = sr.ReadToEnd();
+                }
+
+                // ファイル名がある かつ ハッシュ一致
+                if (CacheFileNameDictionary.ContainsKey(buildingFileName)
+                    && VerifyHash(text, CacheFileNameDictionary[buildingFileName].hash))
+                {
+                    // 画像は必要なときに読み込む
+                    return;
+                }
+
+                // それ以外は新規作成
+                else
+                {
+                    try
+                    {
+                        var build = JsonConvert.DeserializeObject<BuildRoot>(text, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto });
+                        if (!string.IsNullOrEmpty(build.Name))
+                        {
+                            BitmapImage image = TileToImage.CreateBitmap(build.Build());
+                            BuildingNameBitmapDictionary.Add(buildingFileName, image);
+                            BuildingNameBuildDictionary.Add(buildingFileName, build);
+
+                            BitmapEncoder encoder = new PngBitmapEncoder();
+                            encoder.Frames.Add(BitmapFrame.Create(image));
+
+                            string savePath = Path.Combine(CacheDirectory, buildingFileName + ".png");
+                            if (!Directory.Exists(Path.GetDirectoryName(savePath)))
+                            {
+                                Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+                            }
+
+                            using (var fileStream = new FileStream(savePath, FileMode.Create))
+                            {
+                                encoder.Save(fileStream);
+                            }
+
+                            if (CacheFileNameDictionary.ContainsKey(buildingFileName))
+                            {
+                                CacheFileNameDictionary[buildingFileName] = (build.Name, CalculateHash(text), build.Tags);
+                            }
+                            else
+                            {
+                                CacheFileNameDictionary.Add(buildingFileName, (build.Name, CalculateHash(text), build.Tags));
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+            else if (string.Equals(Path.GetExtension(fileName), ".TEditSch", StringComparison.InvariantCultureIgnoreCase))
+            {
+                string buildingFileName = string.IsNullOrEmpty(BuildingDirectory) ? fileName : fileName.Replace(BuildingDirectory, string.Empty).Trim('\\');
+                buildingFileName = buildingFileName.Substring(0, buildingFileName.Length - 9);
+
+                byte[] data = File.ReadAllBytes(fileName);
+
+                if (CacheFileNameDictionary.ContainsKey(buildingFileName)
+                   && VerifyHash(data, CacheFileNameDictionary[buildingFileName].hash))
+                {
+                    // 画像は必要なときに読み込む
+                    return;
+                }
+                else
+                {
+                    try
+                    {
+                        var scheme = TEditScheme.Read(data);
+                        if (!string.IsNullOrEmpty(scheme.name))
+                        {
+                            BitmapImage image = TileToImage.CreateBitmap(scheme.tiles);
+                            BuildingNameBitmapDictionary.Add(buildingFileName, image);
+                            BuildingNameTilesDictionary.Add(buildingFileName, scheme.tiles);
+
+                            BitmapEncoder encoder = new PngBitmapEncoder();
+                            encoder.Frames.Add(BitmapFrame.Create(image));
+
+                            string savePath = Path.Combine(CacheDirectory, buildingFileName + ".png");
+                            if (!Directory.Exists(Path.GetDirectoryName(savePath)))
+                            {
+                                Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+                            }
+
+                            using (var fileStream = new FileStream(savePath, FileMode.Create))
+                            {
+                                encoder.Save(fileStream);
+                            }
+
+                            // タグなしで登録とする
+                            if (CacheFileNameDictionary.ContainsKey(buildingFileName))
+                            {
+                                CacheFileNameDictionary[buildingFileName] = (scheme.name, CalculateHash(data), new ObservableCollection<string>());
+                            }
+                            else
+                            {
+                                CacheFileNameDictionary.Add(buildingFileName, (scheme.name, CalculateHash(data), new ObservableCollection<string>()));
+                            }
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+        }
 
         public void ReloadDirectory()
         {
@@ -108,135 +233,22 @@
                 }
             }
 
-            if (string.IsNullOrEmpty(BuildingGenerator.BuildingsRootPath))
+            if (string.IsNullOrEmpty(BuildingDirectory))
             {
                 // パス未設定、スキップ
                 return;
             }
 
-            if (!Directory.Exists(BuildingGenerator.BuildingsRootPath))
+            if (!Directory.Exists(BuildingDirectory))
             {
-                Directory.CreateDirectory(BuildingGenerator.BuildingsRootPath);
+                Directory.CreateDirectory(BuildingDirectory);
             }
 
-            // まず建築物のjsonを確認し、ハッシュを確認。
-            // ハッシュ不一致またはファイルが辞書に存在しなければ、新規作成
-            foreach (string file in Directory.GetFiles(BuildingGenerator.BuildingsRootPath, "*.json", SearchOption.AllDirectories))
+            // json, TEditSchファイルを読みこみ
+            foreach (string file in Directory.EnumerateFiles(BuildingDirectory, "*.*", SearchOption.AllDirectories)
+                .Where(s => s.EndsWith(".json") || s.EndsWith(".TEditSch")))
             {
-                // 親ディレクトリの名前と拡張子を省く
-                string buildingFileName = file.Replace(BuildingGenerator.BuildingsRootPath, string.Empty).Trim('\\');
-                buildingFileName = buildingFileName.Substring(0, buildingFileName.Length - 5);
-
-                string text;
-                using (StreamReader sr = new StreamReader(file))
-                {
-                    text = sr.ReadToEnd();
-                }
-
-                // ファイル名がある かつ ハッシュ一致
-                if (CacheFileNameDictionary.ContainsKey(buildingFileName)
-                    && VerifyHash(text, CacheFileNameDictionary[buildingFileName].hash))
-                {
-                    // 画像は必要なときに読み込む
-                    continue;
-                }
-
-                // それ以外は新規作成
-                else
-                {
-                    try
-                    {
-                        var build = JsonConvert.DeserializeObject<BuildRoot>(text, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto });
-                        if (!string.IsNullOrEmpty(build.Name))
-                        {
-                            BitmapImage image = TileToImage.CreateBitmap(build.Build());
-                            BuildingNameBitmapDictionary.Add(buildingFileName, image);
-                            BuildingNameBuildDictionary.Add(buildingFileName, build);
-
-                            BitmapEncoder encoder = new PngBitmapEncoder();
-                            encoder.Frames.Add(BitmapFrame.Create(image));
-
-                            string savePath = Path.Combine(CacheDirectory, buildingFileName + ".png");
-                            if (!Directory.Exists(Path.GetDirectoryName(savePath)))
-                            {
-                                Directory.CreateDirectory(Path.GetDirectoryName(savePath));
-                            }
-
-                            using (var fileStream = new FileStream(savePath, FileMode.Create))
-                            {
-                                encoder.Save(fileStream);
-                            }
-
-                            if (CacheFileNameDictionary.ContainsKey(buildingFileName))
-                            {
-                                CacheFileNameDictionary[buildingFileName] = (build.Name, CalculateHash(text), build.Tags);
-                            }
-                            else
-                            {
-                                CacheFileNameDictionary.Add(buildingFileName, (build.Name, CalculateHash(text), build.Tags));
-                            }
-                        }
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
-
-            // TEditSchファイルを読みこみ
-            foreach (string file in Directory.GetFiles(BuildingGenerator.BuildingsRootPath, "*.TEditSch", SearchOption.AllDirectories))
-            {
-                string buildingFileName = file.Replace(BuildingGenerator.BuildingsRootPath, string.Empty).Trim('\\');
-                buildingFileName = buildingFileName.Substring(0, buildingFileName.Length - 9);
-
-                byte[] data = File.ReadAllBytes(file);
-
-                if (CacheFileNameDictionary.ContainsKey(buildingFileName)
-                   && VerifyHash(data, CacheFileNameDictionary[buildingFileName].hash))
-                {
-                    // 画像は必要なときに読み込む
-                    continue;
-                }
-                else
-                {
-                    try
-                    {
-                        var scheme = TEditScheme.Read(data);
-                        if (!string.IsNullOrEmpty(scheme.name))
-                        {
-                            BitmapImage image = TileToImage.CreateBitmap(scheme.tiles);
-                            BuildingNameBitmapDictionary.Add(buildingFileName, image);
-                            BuildingNameTilesDictionary.Add(buildingFileName, scheme.tiles);
-
-                            BitmapEncoder encoder = new PngBitmapEncoder();
-                            encoder.Frames.Add(BitmapFrame.Create(image));
-
-                            string savePath = Path.Combine(CacheDirectory, buildingFileName + ".png");
-                            if (!Directory.Exists(Path.GetDirectoryName(savePath)))
-                            {
-                                Directory.CreateDirectory(Path.GetDirectoryName(savePath));
-                            }
-
-                            using (var fileStream = new FileStream(savePath, FileMode.Create))
-                            {
-                                encoder.Save(fileStream);
-                            }
-
-                            // タグなしで登録とする
-                            if (CacheFileNameDictionary.ContainsKey(buildingFileName))
-                            {
-                                CacheFileNameDictionary[buildingFileName] = (scheme.name, CalculateHash(data), new ObservableCollection<string>());
-                            }
-                            else
-                            {
-                                CacheFileNameDictionary.Add(buildingFileName, (scheme.name, CalculateHash(data), new ObservableCollection<string>()));
-                            }
-                        }
-                    }
-                    catch
-                    {
-                    }
-                }
+                ReloadFile(file);
             }
 
             if (CacheFileNameDictionary.Count != BuildingNameBitmapDictionary.Count)
@@ -287,6 +299,11 @@
 
         public Tile[,] GetTilesFromSearchResult(SearchResult from)
         {
+            if (from == null)
+            {
+                return new Tile[0, 0];
+            }
+
             string name = from.OriginalName;
             if (CacheFileNameDictionary.ContainsKey(name))
             {
@@ -626,7 +643,7 @@
                 return BuildingNameBuildDictionary[buildingName];
             }
 
-            string filePath = Path.Combine(BuildingGenerator.BuildingsRootPath, buildingName + ".json");
+            string filePath = string.IsNullOrEmpty(BuildingDirectory) ? buildingName + ".json" : Path.Combine(BuildingDirectory, buildingName + ".json");
             if (File.Exists(filePath))
             {
                 using (var sr = new StreamReader(filePath))
@@ -654,7 +671,7 @@
                 return BuildingNameTilesDictionary[buildingName];
             }
 
-            string filePath = Path.Combine(BuildingGenerator.BuildingsRootPath, buildingName + ".TEditSch");
+            string filePath = string.IsNullOrEmpty(BuildingDirectory) ? buildingName + ".TEditSch" : Path.Combine(BuildingDirectory, buildingName + ".TEditSch");
             if (File.Exists(filePath))
             {
                 var scheme = TEditScheme.Read(filePath);

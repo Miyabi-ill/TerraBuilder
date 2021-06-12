@@ -25,11 +25,11 @@
             TeleportationPylon = 7,
         }
 
-        public static void WriteTiles(Tile[,] tiles, string path, string name, List<Chest> chests = null, List<Sign> signs = null, List<TileEntity> tileEntities = null)
+        public static void Write(Tile[,] tiles, string path, string name, List<Chest> chests = null, List<Sign> signs = null, List<TileEntity> tileEntities = null)
         {
             int sizeX = tiles.GetLength(0);
             int sizeY = tiles.GetLength(1);
-            using (var stream = new FileStream(path, FileMode.Open))
+            using (var stream = new FileStream(path, FileMode.OpenOrCreate))
             {
                 using (var b = new BinaryWriter(stream))
                 {
@@ -1212,7 +1212,8 @@
             }
 
             // brick style
-            byte brickStyle = tile.halfBrick() ? (byte)(1 << 4) : (byte)((byte)(tile.slope() + 1) << 4);
+            byte brickStyle = tile.halfBrick() ? (byte)1 : (tile.slope() > 0 ? (byte)(tile.slope() + 1) : (byte)0);
+            brickStyle = (byte)(brickStyle << 4);
             // set bits[4,5,6] of header2
             header2 = (byte)(header2 | brickStyle);
 
