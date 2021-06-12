@@ -20,8 +20,6 @@
     /// </summary>
     public partial class MainWindow : Window
     {
-        private BuildingCache buildingCache;
-
         /// <summary>
         /// コンストラクタ。
         /// </summary>
@@ -44,7 +42,7 @@
 
             Configs.RecoverConfigsFromSaved();
 
-            buildingCache = new BuildingCache(new BuildingGenerator.BuildingGenerator() { BuildingsRootPath = Configs.LastBuildingsPath });
+            BuildingCache = new BuildingCache(new BuildingGenerator.BuildingGenerator() { BuildingsRootPath = Configs.LastBuildingsPath });
 
             AppDomain.CurrentDomain.FirstChanceException += FirstChanceException;
         }
@@ -59,6 +57,8 @@
         private WorldSandbox Sandbox { get; }
 
         private WorldGenerationRunner Runner { get; }
+
+        internal BuildingCache BuildingCache { get; private set; }
 
         /// <summary>
         /// ユーザーにメッセージを表示する。
@@ -241,7 +241,7 @@
 
         private void BuildingSearchWindowMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var window = new BuildingSearchWindow(buildingCache);
+            var window = new BuildingSearchWindow(BuildingCache);
             window.Height = this.ActualHeight;
             window.PropertyChanged += BuildingSearchWindow_PropertyChanged;
             window.Show();

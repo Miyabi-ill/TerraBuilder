@@ -4,8 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TUBGWorldGenerator.BuildingGenerator.UI"
-		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        mc:Ignorable="d"
+		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:views="clr-namespace:TUBGWorldGenerator.Views"
+		mc:Ignorable="d"
         Title="建築ジェネレータ" Height="450" Width="800"
 		DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
 	<Grid>
@@ -18,16 +18,15 @@
 		</Grid.ColumnDefinitions>
 		<Grid Grid.Column="0" Margin="5">
 			<Grid.RowDefinitions>
-				<RowDefinition Height="Auto"/>
 				<RowDefinition/>
 				<RowDefinition Height="Auto"/>
 			</Grid.RowDefinitions>
-			<Image Grid.Row="1" Margin="5" x:Name="PreviewImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
-			<Grid Grid.Row="1" Background="#33ffff00" Name="GenerateFailedOverlay" Visibility="Hidden">
+			<views:TileEditor x:Name="TileEditor"></views:TileEditor>
+			<Grid Background="#33ffff00" Name="GenerateFailedOverlay" Visibility="Hidden">
 				<TextBlock Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">テキストからの生成に失敗しました</TextBlock>
 			</Grid>
 
-			<TextBlock Grid.Row="2" x:Name="InformationText"/>
+			<TextBlock Grid.Row="1" x:Name="InformationText"/>
 		</Grid>
 		<GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" Width="2"></GridSplitter>
 		<Grid Grid.Column="2">
@@ -69,6 +68,6 @@
 			</DockPanel>
 		</Grid>
 		<GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" Width="2"></GridSplitter>
-		<local:BuildingFinderControl Grid.Column="4" x:Name="BuildingFinder" Margin="5"/>
+		<local:BuildingFinderControl Grid.Column="4" x:Name="BuildingFinder" PropertyChanged="BuildingFinder_PropertyChanged" Margin="5"/>
 	</Grid>
 </Window>

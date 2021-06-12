@@ -44,7 +44,7 @@
                     return false;
                 }
 
-                return Math.Max(ViewTiles.GetLength(0), ViewTiles.GetLength(1)) <= 100;
+                return Math.Max(ViewTiles.GetLength(0), ViewTiles.GetLength(1)) > 100;
             }
         }
 
@@ -60,7 +60,7 @@
                 }
                 else
                 {
-                    WorldMapImage.Source = new WriteableBitmap(WorldToImage.CreateMapImage(viewTiles));
+                    WorldMapImage.Source = new WriteableBitmap(TileToImage.CreateBitmap(viewTiles, true));
                 }
             }
         }
@@ -125,7 +125,7 @@
                 }
                 else
                 {
-                    WorldMapImage.Source = new WriteableBitmap(WorldToImage.CreateMapImage(viewTiles));
+                    WorldMapImage.Source = new WriteableBitmap(TileToImage.CreateBitmap(viewTiles, true));
                 }
             }
             else
@@ -138,7 +138,8 @@
 
         public void UpdateMapWithArea(int minX, int minY, int maxX, int maxY)
         {
-            if (WorldMapImage.Source is WriteableBitmap writeableBitmap)
+            if (WorldMapImage.Source is WriteableBitmap writeableBitmap
+                && UseMapImageAsBackground)
             {
                 Tile[,] tiles = new Tile[maxX - minX, maxY - minY];
                 for (int x = minX; x < maxX; x++)
@@ -292,7 +293,14 @@
             }
 
             if (isDragging
-                && (CurrentToolState.HasFlag(ToolState.PlaceTile) && !CurrentToolState.HasFlag(ToolState.Eraser) && (ToolTile.GetLength(0) != 1 || ToolTile.GetLength(1) != 1)))
+                && (
+                    (CurrentToolState.HasFlag(ToolState.PlaceTile)
+                        && !CurrentToolState.HasFlag(ToolState.Eraser)
+                        && (ToolTile.GetLength(0) != 1 || ToolTile.GetLength(1) != 1))
+                    || (CurrentToolState.HasFlag(ToolState.Hammer)
+                        && !CurrentToolState.HasFlag(ToolState.Eraser)
+                        && CurrentHammerType == HammerType.Cycle)
+                ))
             {
                 return;
             }
@@ -518,14 +526,21 @@
                 }
             }
 
-            UpdateMapWithArea(tileX, tileY, maxX, maxY);
-            UpdateDetailImage();
+            if (!UseMapImageAsBackground)
+            {
+                UpdateMap();
+            }
+            else
+            {
+                UpdateMapWithArea(tileX, tileY, maxX, maxY);
+                UpdateDetailImage();
+            }
         }
 
         private void TileGrid_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             int minSize = (int)Math.Min(ZoomControl.Viewport.Width, ZoomControl.Viewport.Height);
-            if (minSize > 50
+            if ((minSize > 50 && UseMapImageAsBackground)
                 || CurrentToolState == ToolState.None
                 || !(e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed))
             {
@@ -548,7 +563,7 @@
         private void TileGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             int minSize = (int)Math.Min(ZoomControl.Viewport.Width, ZoomControl.Viewport.Height);
-            if (minSize > 50
+            if ((minSize > 50 && UseMapImageAsBackground)
                     || CurrentToolState == ToolState.None
                     || !(e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed))
             {

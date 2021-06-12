@@ -23,6 +23,8 @@
         private BuildingGenerator buildingGenerator;
         private ObservableCollection<BuildNode> buildNodes = new ObservableCollection<BuildNode>();
 
+        private Tile[,] tiles;
+
         public BuildingGeneratorWindow()
         {
             InitializeComponent();
@@ -32,7 +34,7 @@
                 BuildingsRootPath = Configs.LastBuildingsPath,
             };
 
-            BuildingFinder.BuildingCache = new BuildingCache(new BuildingGenerator() { BuildingsRootPath = Configs.LastBuildingsPath });
+            BuildingFinder.BuildingCache = MainWindow.Window.BuildingCache;
         }
 
         /// <inheritdoc/>
@@ -61,7 +63,16 @@
 
         public BuildingMetaData BuildingMetaData { get; set; } = new BuildingMetaData();
 
-        private Tile[,] Tiles { get; set; }
+        private Tile[,] Tiles
+        {
+            get => tiles;
+            set
+            {
+                tiles = value;
+                TileEditor.ViewTiles = tiles;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Tiles)));
+            }
+        }
 
         public BuildingGenerator BuildingGenerator
         {
@@ -101,7 +112,6 @@
             {
                 GenerateFailedOverlay.Visibility = Visibility.Hidden;
                 Tiles = BuildingGenerator.Result;
-                PreviewImage.Source = TileToImage.CreateBitmap(BuildingGenerator.Result);
                 //UpdateGrid();
             }
             else
@@ -268,18 +278,47 @@
         {
             int width = BuildingMetaData.Size.Width;
             int height = BuildingMetaData.Size.Height;
-            Tiles = new Tile[width, height];
 
+            int oldWidth = 0;
+            int oldHeight = 0;
+            Tile[,] oldTiles = null;
+            if (Tiles != null)
+            {
+                oldWidth = Tiles.GetLength(0);
+                oldHeight = Tiles.GetLength(1);
+                oldTiles = Tiles;
+            }
+
+            var tiles = new Tile[width, height];
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
-                    Tiles[x, y] = new Tile();
+                    int currentY = height - y - 1;
+                    tiles[x, currentY] = new Tile();
+
+                    if (oldWidth > x
+                        && oldHeight > y)
+                    {
+                        tiles[x, currentY].CopyFrom(oldTiles[x, oldHeight - y - 1]);
+                    }
                 }
             }
 
-            PreviewImage.Source = TileToImage.CreateBitmap(Tiles);
-            //UpdateGrid();
+            Tiles = tiles;
+        }
+
+        private void BuildingFinder_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(BuildingFinder.SelectingResult))
+            {
+                if (BuildingFinder.SelectingResult == null)
+                {
+                    TileEditor.ToolTile = new Tile[0, 0];
+                }
+
+                TileEditor.ToolTile = BuildingFinder.BuildingCache.GetTilesFromSearchResult(BuildingFinder.SelectingResult);
+            }
         }
     }
 }

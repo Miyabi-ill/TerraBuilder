@@ -121,7 +121,7 @@
             Add8WayLookup(255, 1, 1, 2, 1, 3, 1);
         }
 
-        public static BitmapImage CreateBitmap(Tile[,] tiles)
+        public static BitmapImage CreateBitmap(Tile[,] tiles, bool createBackground = false)
         {
             // 上下左右に8pxづつ余裕を持たせる
             Bitmap result = new Bitmap((tiles.GetLength(0) * 16) + 16, (tiles.GetLength(1) * 16) + 16);
@@ -132,6 +132,11 @@
                     for (int j = 0; j < tiles.GetLength(1); j++)
                     {
                         Tile tile = tiles[i, j];
+                        if (tile == null)
+                        {
+                            continue;
+                        }
+
                         if (tile.wall != 0)
                         {
                             var point = GetWallFrame(tiles, i, j);
@@ -176,6 +181,10 @@
                                 g.DrawImageUnscaled(image, i * 16, j * 16);
                             }
                         }
+                        else if (createBackground)
+                        {
+                            g.FillRectangle(new SolidBrush(Color.FromArgb(255, 97, 113, 255)), (i * 16) + 8, (j * 16) + 8, 16, 16);
+                        }
                     }
                 }
 
@@ -184,6 +193,11 @@
                     for (int j = 0; j < tiles.GetLength(1); j++)
                     {
                         Tile tile = tiles[i, j];
+                        if (tile == null)
+                        {
+                            continue;
+                        }
+
                         if (tile.active())
                         {
                             Bitmap image = TextureLoader.Instance.GetTile(tile.type);

@@ -28,7 +28,7 @@
 
         private void BuildingFinder_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-           if (e.PropertyName == nameof(BuildingFinder.SelectingResult))
+            if (e.PropertyName == nameof(BuildingFinder.SelectingResult))
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedResult)));
             }
