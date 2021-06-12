@@ -1,19 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
-
-namespace TUBGWorldGenerator.BuildingGenerator
+﻿namespace TUBGWorldGenerator.BuildingGenerator
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using System.Windows.Media.Imaging;
+
     public class SearchResult : INotifyPropertyChanged
     {
         private BitmapImage image;
         private string name;
         private string originalName;
         private IEnumerable<string> tags;
+        private bool isEditable;
+        private bool isFavorite;
 
         private Func<BitmapImage> getImageFunction;
 
@@ -82,6 +84,26 @@ namespace TUBGWorldGenerator.BuildingGenerator
             {
                 tags = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Tags)));
+            }
+        }
+
+        public bool IsEditable
+        {
+            get => isEditable;
+            set
+            {
+                isEditable = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsEditable)));
+            }
+        }
+
+        public bool IsFavorite
+        {
+            get => isFavorite;
+            set
+            {
+                isFavorite = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsFavorite)));
             }
         }
     }

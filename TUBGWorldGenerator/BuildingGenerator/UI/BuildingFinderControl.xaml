@@ -21,9 +21,28 @@
 				</ListView.ItemsPanel>
 				<ListView.ItemContainerStyle>
 					<Style TargetType="ListViewItem">
-						<Setter Property="ToolTip" Value="{Binding Name}">
-							
+						<Setter Property="ToolTip" Value="{Binding Name}"/>
+						<Setter Property="ContextMenu">
+							<Setter.Value>
+								<ContextMenu MenuItem.Click="ContextMenu_Click">
+									<ContextMenu.ItemContainerStyle>
+										<Style TargetType="MenuItem">
+											<EventSetter Event="MenuItem.Click" Handler="MenuItem_Click"/>
+										</Style>
+									</ContextMenu.ItemContainerStyle>
+									<MenuItem Header="お気に入り" IsCheckable="True" IsChecked="{Binding IsFavorite}"/>
+									<MenuItem Header="編集" IsEnabled="{Binding IsEditable}"/>
+								</ContextMenu>
+							</Setter.Value>
 						</Setter>
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding IsFavorite}" Value="True">
+								<Setter Property="Background" Value="Gold"/>
+							</DataTrigger>
+							<DataTrigger Binding="{Binding IsFavorite}" Value="False">
+								<Setter Property="Background" Value="Transparent"/>
+							</DataTrigger>
+						</Style.Triggers>
 					</Style>
 				</ListView.ItemContainerStyle>
 				<ListView.ItemTemplate>

@@ -12,6 +12,7 @@
     public class BuildingMetaData : INotifyPropertyChanged
     {
         private string name;
+        private string originalName;
         private ObservableCollection<string> tags = new ObservableCollection<string>();
         private Size size = new Size() { Width = 1, Height = 1 };
 
@@ -26,6 +27,17 @@
             {
                 name = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+            }
+        }
+
+        [Browsable(false)]
+        public string OriginalName
+        {
+            get => originalName;
+            set
+            {
+                originalName = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(OriginalName)));
             }
         }
 

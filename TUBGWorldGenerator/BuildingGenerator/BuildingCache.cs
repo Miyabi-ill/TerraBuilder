@@ -26,6 +26,8 @@
         {
             BuildingGenerator = buildingGenerator;
             ReloadDirectory();
+
+            LoadFavorites();
         }
 
         public string CacheDirectory
@@ -44,6 +46,8 @@
             get => BuildingGenerator.BuildingsRootPath;
             set => BuildingGenerator.BuildingsRootPath = value;
         }
+
+        public BuildingFavorites Favorites { get; set; }
 
         private BuildingGenerator BuildingGenerator { get; }
 
@@ -369,12 +373,16 @@
             {
                 foreach (string name in CacheFileNameDictionary.Keys)
                 {
+                    // TEditSch形式なら編集可能
+                    bool editable = !BuildingNameBuildDictionary.ContainsKey(name);
                     results.Add(new SearchResult()
                     {
                         Name = CacheFileNameDictionary[name].name,
                         OriginalName = name,
                         ImageGetFunction = () => GetBitmapFromBuildingName(name),
                         Tags = CacheFileNameDictionary[name].tags,
+                        IsFavorite = Favorites.IsFavorite(name),
+                        IsEditable = editable,
                     });
                 }
 
@@ -386,10 +394,11 @@
                         OriginalName = tileTag.Key,
                         ImageGetFunction = () => GetItemBitmapFromTile(tileTag.Key),
                         Tags = tileTag.Value.tags,
+                        IsFavorite = Favorites.IsFavorite(tileTag.Key),
                     });
                 }
 
-                return results;
+                return new List<SearchResult>(results.OrderByDescending(x => x.IsFavorite));
             }
 
             // 検索が空以外なら、ファイル名、名前、タグから検索
@@ -397,7 +406,7 @@
             string[] searches = search.Split(' ', '　');
             if (searches.Length < 2)
             {
-                return new List<SearchResult>(InitialSearch(keywords));
+                return new List<SearchResult>(InitialSearch(keywords).OrderByDescending(x => x.IsFavorite));
             }
 
             IEnumerable<SearchResult> searchResults = InitialSearch(searches[0]);
@@ -424,7 +433,7 @@
                 });
             }
 
-            return new List<SearchResult>(searchResults);
+            return new List<SearchResult>(searchResults.OrderByDescending(x => x.IsFavorite));
 
             IEnumerable<SearchResult> InitialSearch(string keyword)
             {
@@ -433,12 +442,16 @@
                     if (cache.Key.ToLowerInvariant().Contains(keyword)
                         || cache.Value.name.ToLowerInvariant().Contains(keyword))
                     {
+                        // TEditSch形式なら編集可能
+                        bool editable = !BuildingNameBuildDictionary.ContainsKey(cache.Key);
                         yield return new SearchResult()
                         {
                             Name = CacheFileNameDictionary[cache.Key].name,
                             OriginalName = cache.Key,
                             ImageGetFunction = () => GetBitmapFromBuildingName(cache.Key),
                             Tags = CacheFileNameDictionary[cache.Key].tags,
+                            IsFavorite = Favorites.IsFavorite(cache.Key),
+                            IsEditable = editable,
                         };
                     }
                     else
@@ -447,12 +460,16 @@
                         {
                             if (string.Equals(tag, keyword, StringComparison.OrdinalIgnoreCase))
                             {
+                                // TEditSch形式なら編集可能
+                                bool editable = !BuildingNameBuildDictionary.ContainsKey(cache.Key);
                                 yield return new SearchResult()
                                 {
                                     Name = CacheFileNameDictionary[cache.Key].name,
                                     OriginalName = cache.Key,
                                     ImageGetFunction = () => GetBitmapFromBuildingName(cache.Key),
                                     Tags = CacheFileNameDictionary[cache.Key].tags,
+                                    IsFavorite = Favorites.IsFavorite(cache.Key),
+                                    IsEditable = editable,
                                 };
                                 break;
                             }
@@ -471,6 +488,7 @@
                             OriginalName = tileTag.Key,
                             ImageGetFunction = () => GetItemBitmapFromTile(tileTag.Key),
                             Tags = tileTag.Value.tags,
+                            IsFavorite = Favorites.IsFavorite(tileTag.Key),
                         };
                     }
                     else
@@ -485,12 +503,36 @@
                                     OriginalName = tileTag.Key,
                                     ImageGetFunction = () => GetItemBitmapFromTile(tileTag.Key),
                                     Tags = tileTag.Value.tags,
+                                    IsFavorite = Favorites.IsFavorite(tileTag.Key),
                                 };
                                 break;
                             }
                         }
                     }
                 }
+            }
+        }
+
+        public void SaveFavorites()
+        {
+            using (var sw = new StreamWriter("favorites.json"))
+            {
+                sw.WriteLine(JsonConvert.SerializeObject(Favorites));
+            }
+        }
+
+        private void LoadFavorites()
+        {
+            if (File.Exists("favorites.json"))
+            {
+                using (var sr = new StreamReader("favorites.json"))
+                {
+                    Favorites = JsonConvert.DeserializeObject<BuildingFavorites>(sr.ReadToEnd());
+                }
+            }
+            else
+            {
+                Favorites = new BuildingFavorites();
             }
         }
 

@@ -357,12 +357,18 @@
             var dialog = new SaveFileDialog()
             {
                 InitialDirectory = BuildingGenerator.BuildingsRootPath,
-                FileName = FileNameRe.Replace(BuildingMetaData.Name + ".TEditSch", string.Empty),
+                FileName = string.IsNullOrEmpty(BuildingMetaData.OriginalName) ? FileNameRe.Replace(BuildingMetaData.Name + ".TEditSch", string.Empty) : BuildingMetaData.OriginalName + ".TEditSch",
                 Filter = "TEditSchemeファイル(*.TEditSch)|*.TEditSch",
             };
 
             if (dialog.ShowDialog() == true)
             {
+                BuildingMetaData.OriginalName = Path.GetFileNameWithoutExtension(dialog.FileName);
+                if (!string.IsNullOrEmpty(BuildingGenerator.BuildingsRootPath))
+                {
+                    BuildingMetaData.OriginalName = BuildingMetaData.OriginalName.Replace(BuildingGenerator.BuildingsRootPath, string.Empty).Trim('\\', '/');
+                }
+
                 TEditScheme.Write(Tiles, dialog.FileName, BuildingMetaData.Name);
                 BuildingFinder.BuildingCache.ReloadFile(dialog.FileName, true);
             }

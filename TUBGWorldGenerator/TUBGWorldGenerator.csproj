@@ -108,6 +108,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BuildingGenerator\BuildingCache.cs" />
+    <Compile Include="BuildingGenerator\BuildingFavorites.cs" />
     <Compile Include="BuildingGenerator\BuildingMetaData.cs" />
     <Compile Include="BuildingGenerator\Parts\Box.cs" />
     <Compile Include="BuildingGenerator\BuildingGenerator.cs" />

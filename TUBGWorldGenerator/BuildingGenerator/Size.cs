@@ -15,6 +15,12 @@
         /// </summary>
         public int Height { get; set; }
 
+        public Size(int width, int height)
+        {
+            Width = width;
+            Height = height;
+        }
+
         /// <inheritdoc/>
         public override string ToString()
         {
