@@ -16,6 +16,7 @@
     using System.Windows.Media.Imaging;
     using System.Windows.Navigation;
     using System.Windows.Shapes;
+    using Terraria;
 
     /// <summary>
     /// Interaction logic for BuildingFinderControl.xaml
@@ -121,7 +122,7 @@
                             }
 
                             var window = new BuildingGeneratorWindow();
-                            window.TileEditor.ViewTiles = BuildingCache.GetTilesFromSearchResult(searchResult);
+                            window.TileEditor.ViewTiles = CloneTile(BuildingCache.GetTilesFromSearchResult(searchResult));
                             window.BuildingMetaData.Name = searchResult.Name;
                             window.BuildingMetaData.Tags = new ObservableCollection<string>(searchResult.Tags);
                             window.BuildingMetaData.Size = new TerraBuilder.BuildingGenerator.Size(window.TileEditor.ViewTiles.GetLength(0), window.TileEditor.ViewTiles.GetLength(1));
@@ -130,6 +131,24 @@
                         }
                 }
             }
+        }
+
+        private static Tile[,] CloneTile(Tile[,] from)
+        {
+            Tile[,] tiles = new Tile[from.GetLength(0), from.GetLength(1)];
+            for (int x = 0; x < from.GetLength(0); x++)
+            {
+                for (int y = 0; y < from.GetLength(1); y++)
+                {
+                    tiles[x, y] = new Tile();
+                    if (from[x, y] != null)
+                    {
+                        tiles[x, y].CopyFrom(from[x, y]);
+                    }
+                }
+            }
+
+            return tiles;
         }
     }
 }

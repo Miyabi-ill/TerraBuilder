@@ -697,14 +697,21 @@
             string filePath = string.IsNullOrEmpty(BuildingDirectory) ? buildingName + ".json" : Path.Combine(BuildingDirectory, buildingName + ".json");
             if (File.Exists(filePath))
             {
-                using (var sr = new StreamReader(filePath))
+                try
                 {
-                    var build = JsonConvert.DeserializeObject<BuildRoot>(sr.ReadToEnd(), new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto });
-                    if (!string.IsNullOrEmpty(build.Name))
+                    using (var sr = new StreamReader(filePath))
                     {
-                        BuildingNameBuildDictionary.Add(buildingName, build);
-                        return build;
+                        var build = JsonConvert.DeserializeObject<BuildRoot>(sr.ReadToEnd(), new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto });
+                        if (!string.IsNullOrEmpty(build.Name))
+                        {
+                            BuildingNameBuildDictionary.Add(buildingName, build);
+                            return build;
+                        }
                     }
+                }
+                catch
+                {
+                    return null;
                 }
 
                 return null;

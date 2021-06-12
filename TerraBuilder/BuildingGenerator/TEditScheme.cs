@@ -1056,7 +1056,7 @@
 
                 // grab bits[4, 5, 6] and shift 4 places to 0,1,2. This byte is our brick style
                 byte brickStyle = (byte)((header2 & 112) >> 4);
-                if (brickStyle != 0 && tile.type < TileID.Count && TileID.Sets.HasSlopeFrames[tile.type])
+                if (brickStyle != 0 && tile.type < TileID.Count && !TileID.Sets.HasSlopeFrames[tile.type])
                 {
                     if (brickStyle == 1)
                     {

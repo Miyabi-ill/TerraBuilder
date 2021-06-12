@@ -123,6 +123,12 @@
 
         public static BitmapImage CreateBitmap(Tile[,] tiles, bool createBackground = false)
         {
+            if (tiles.GetLength(0) == 0
+                || tiles.GetLength(1) == 0)
+            {
+                return new BitmapImage();
+            }
+
             // 上下左右に8pxづつ余裕を持たせる
             Bitmap result = new Bitmap((tiles.GetLength(0) * 16) + 16, (tiles.GetLength(1) * 16) + 16);
             using (Graphics g = Graphics.FromImage(result))
