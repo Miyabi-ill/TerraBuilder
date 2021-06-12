@@ -334,6 +334,26 @@
                 return;
             }
 
+            if (string.IsNullOrEmpty(buildingGenerator.BuildingsRootPath))
+            {
+                var result = MessageBox.Show("建材の保存に使うフォルダが指定されていません。指定しますか？", "ディレクトリを選択", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    var dirDialog = new CommonOpenFileDialog()
+                    {
+                        IsFolderPicker = true,
+                        DefaultDirectory = BuildingGenerator.BuildingsRootPath,
+                    };
+
+                    if (dirDialog.ShowDialog() == CommonFileDialogResult.Ok)
+                    {
+                        BuildingGenerator.BuildingsRootPath = dirDialog.FileName;
+                        Configs.LastBuildingsPath = dirDialog.FileName;
+                        BuildingFinder.BuildingCache.BuildingDirectory = dirDialog.FileName;
+                    }
+                }
+            }
+
             var dialog = new SaveFileDialog()
             {
                 InitialDirectory = BuildingGenerator.BuildingsRootPath,
@@ -344,7 +364,7 @@
             if (dialog.ShowDialog() == true)
             {
                 TEditScheme.Write(Tiles, dialog.FileName, BuildingMetaData.Name);
-                BuildingFinder.BuildingCache.ReloadFile(dialog.FileName);
+                BuildingFinder.BuildingCache.ReloadFile(dialog.FileName, true);
             }
         }
     }

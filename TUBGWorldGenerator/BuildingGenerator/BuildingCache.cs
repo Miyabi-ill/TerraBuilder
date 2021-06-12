@@ -66,7 +66,7 @@
 
         private Regex FileNameRegex { get; set; } = new Regex(@"Cache\\(.*)\.png");
 
-        public void ReloadFile(string fileName)
+        public void ReloadFile(string fileName, bool saveCacheDict = false)
         {
             if (string.Equals(Path.GetExtension(fileName), ".json", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -181,6 +181,15 @@
                     catch
                     {
                     }
+                }
+            }
+
+            if (saveCacheDict)
+            {
+                // Json書き込み
+                using (var sw = new StreamWriter(Path.Combine(CacheDirectory, "cache.json")))
+                {
+                    sw.Write(JsonConvert.SerializeObject(CacheFileNameDictionary));
                 }
             }
         }
