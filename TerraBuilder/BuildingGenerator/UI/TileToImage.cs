@@ -243,6 +243,18 @@
             int tileType = tile.type;
             Point frame = TileFrame(tiles, tileX, tileY);
 
+            int offsetX = 0;
+            int offsetY = 0;
+            int tileWidth = 16;
+            int tileHeight = 16;
+            switch (tileType)
+            {
+                case TileID.Torches:
+                    tileWidth = 20;
+                    tileHeight = 20;
+                    break;
+            }
+
             TileKey tileKey = new TileKey(
                 isTile: true,
                 id: (short)tile.type,
@@ -253,12 +265,8 @@
                 frameY: (short)frame.Y,
                 inActive: tile.inActive());
 
-            Rectangle normalTileRect = new Rectangle(frame.X, frame.Y, 16, 16);
-
+            Rectangle normalTileRect = new Rectangle(frame.X, frame.Y, tileWidth, tileHeight);
             Bitmap baseImage = TextureLoader.Instance.GetTile(tiles[tileX, tileY].type);
-
-            int offsetX = 0;
-            int offsetY = 0;
             if (tile.slope() > 0)
             {
                 // プラットフォームを描画
@@ -456,7 +464,6 @@
                     Bitmap result = new Bitmap(16, 16);
                     using (Graphics g = Graphics.FromImage(result))
                     {
-                        const int tileWidth = 16;
                         g.DrawImageUnscaled(
                             baseImage.Clone(
                                 new Rectangle(normalTileRect.X + offsetX, normalTileRect.Y + offsetY + 8, tileWidth, 8),
@@ -490,7 +497,6 @@
                     Bitmap result = new Bitmap(16, 16);
                     using (Graphics g = Graphics.FromImage(result))
                     {
-                        const int tileWidth = 16;
                         g.DrawImageUnscaled(
                             baseImage.Clone(
                                 new Rectangle(normalTileRect.X + offsetX, normalTileRect.Y + offsetY + 8, tileWidth, 8),
@@ -532,7 +538,6 @@
                     Bitmap result = new Bitmap(16, 16);
                     using (Graphics g = Graphics.FromImage(result))
                     {
-                        const int tileWidth = 16;
                         g.DrawImageUnscaled(
                             baseImage.Clone(
                                 new Rectangle(normalTileRect.X + offsetX, normalTileRect.Y + offsetY + 8, tileWidth, 8),
@@ -639,7 +644,6 @@
                     Bitmap result = new Bitmap(16, 16);
                     using (Graphics g = Graphics.FromImage(result))
                     {
-                        const int tileWidth = 16;
                         g.DrawImageUnscaled(
                             baseImage.Clone(
                                 new Rectangle(normalTileRect.Location, new Size(normalTileRect.Width, normalTileRect.Height - 4)),
@@ -677,7 +681,7 @@
 
             try
             {
-                Bitmap image = baseImage.Clone(new Rectangle(frame.X, frame.Y, 16, 16), baseImage.PixelFormat);
+                Bitmap image = baseImage.Clone(normalTileRect, baseImage.PixelFormat);
                 image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                 bitmapCache.Add(tileKey, image);
                 return image;
@@ -1355,7 +1359,7 @@
                 return default;
             }
 
-            if (Main.tileFrameImportant[tileType] && tileType != 4)
+            if (Main.tileFrameImportant[tileType])
             {
                 return new Point(tiles[x, y].frameX, tiles[x, y].frameY);
             }

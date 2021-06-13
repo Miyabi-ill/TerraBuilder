@@ -303,8 +303,7 @@
                         && (ToolTile.GetLength(0) != 1 || ToolTile.GetLength(1) != 1))
                     || (CurrentToolState.HasFlag(ToolState.Hammer)
                         && !CurrentToolState.HasFlag(ToolState.Eraser)
-                        && CurrentHammerType == HammerType.Cycle)
-                ))
+                        && CurrentHammerType == HammerType.Cycle)))
             {
                 return;
             }

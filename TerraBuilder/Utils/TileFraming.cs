@@ -305,18 +305,17 @@
         private static void FrameTorch(Tile[,] tiles, int x, int y)
         {
             Tile tile = tiles[x, y];
-            Tile topTile = tiles[x, y - 1];
-            Tile bottomTile = tiles[x, y + 1];
-            Tile leftTile = tiles[x - 1, y];
-            Tile rightTile = tiles[x + 1, y];
-            Tile leftBottomTile = tiles[x - 1, y + 1];
-            Tile rightBottomTile = tiles[x + 1, y + 1];
-            Tile leftTopTile = tiles[x - 1, y - 1];
-            Tile rightTopTile = tiles[x + 1, y - 1];
-            short num = 0;
+            Tile bottomTile = y + 1 < tiles.GetLength(1) ? tiles[x, y + 1] : null;
+            Tile leftTile = x - 1 >= 0 ? tiles[x - 1, y] : null;
+            Tile rightTile = x + 1 < tiles.GetLength(0) ? tiles[x + 1, y] : null;
+            Tile leftBottomTile = (x - 1 >= 0) && (y + 1 < tiles.GetLength(1)) ? tiles[x - 1, y + 1] : null;
+            Tile rightBottomTile = (x + 1 < tiles.GetLength(0)) && (y + 1 < tiles.GetLength(1)) ? tiles[x + 1, y + 1] : null;
+            Tile leftTopTile = (x - 1 >= 0) && (y - 1 >= 0) ? tiles[x - 1, y - 1] : null;
+            Tile rightTopTile = (x + 1 < tiles.GetLength(0)) && (y - 1 >= 0) ? tiles[x + 1, y - 1] : null;
+            short frameX = 0;
             if (tile.frameX >= 66)
             {
-                num = 66;
+                frameX = 66;
             }
 
             int bottomType = -1;
@@ -364,19 +363,19 @@
 
             if (bottomType >= 0 && Main.tileSolid[bottomType] && (!Main.tileNoAttach[bottomType] || TileID.Sets.Platforms[bottomType]))
             {
-                tile.frameX = num;
+                tile.frameX = frameX;
             }
             else if ((leftType >= 0 && Main.tileSolid[leftType] && !Main.tileNoAttach[leftType]) || (leftType >= 0 && TileID.Sets.IsBeam[leftType]) || (IsTreeType(leftType) && IsTreeType(leftTopType) && IsTreeType(leftBottomType)))
             {
-                tile.frameX = (short)(22 + num);
+                tile.frameX = (short)(22 + frameX);
             }
             else if ((rightType >= 0 && Main.tileSolid[rightType] && !Main.tileNoAttach[rightType]) || (rightType >= 0 && TileID.Sets.IsBeam[rightType]) || (IsTreeType(rightType) && IsTreeType(rightTopType) && IsTreeType(rightBottomType)))
             {
-                tile.frameX = (short)(44 + num);
+                tile.frameX = (short)(44 + frameX);
             }
             else if (tile.wall > 0)
             {
-                tile.frameX = num;
+                tile.frameX = frameX;
             }
             else
             {
