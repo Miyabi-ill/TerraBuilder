@@ -33,6 +33,8 @@
             Runner = new WorldGenerationRunner();
             InitializeComponent();
 
+            this.Title = "TerraBuilder - v" + Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
             // グローバルコンテキストをプロパティグリッドに表示
             GlobalContextProperty.SelectedObject = Runner.GlobalContext;
 
@@ -256,6 +258,28 @@
                 if (e.PropertyName == nameof(window.SelectedResult))
                 {
                     TileEditor.ToolTile = window.GetSelectedBuildTiles();
+                }
+            }
+        }
+
+        private void LoadWorldMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog()
+            {
+                InitialDirectory = System.IO.Path.Combine(Terraria.Main.SavePath, "Worlds"),
+                Title = "読み込むワールドを選択",
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    Sandbox.Load(dialog.FileName);
+                    TileEditor.UpdateMap();
+                }
+                catch
+                {
+                    Sandbox.Reset();
                 }
             }
         }

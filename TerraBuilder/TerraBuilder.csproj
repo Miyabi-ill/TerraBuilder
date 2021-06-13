@@ -153,6 +153,7 @@
     <Compile Include="Utils\Liquids.cs" />
     <Compile Include="Utils\PerlinNoise.cs" />
     <Compile Include="Utils\RandGen.cs" />
+    <Compile Include="Utils\TileFraming.cs" />
     <Compile Include="Utils\WeightedRandom.cs" />
     <Compile Include="Utils\WorldToImage.cs" />
     <Compile Include="Views\AddActionWindow.xaml.cs">

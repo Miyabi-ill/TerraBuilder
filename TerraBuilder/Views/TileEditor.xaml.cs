@@ -60,7 +60,11 @@
                 }
                 else
                 {
-                    WorldMapImage.Source = new WriteableBitmap(TileToImage.CreateBitmap(viewTiles, true));
+                    var image = TileToImage.CreateBitmap(viewTiles, true);
+                    if (image != null)
+                    {
+                        WorldMapImage.Source = new WriteableBitmap(image);
+                    }
                 }
             }
         }
@@ -299,8 +303,7 @@
                         && (ToolTile.GetLength(0) != 1 || ToolTile.GetLength(1) != 1))
                     || (CurrentToolState.HasFlag(ToolState.Hammer)
                         && !CurrentToolState.HasFlag(ToolState.Eraser)
-                        && CurrentHammerType == HammerType.Cycle)
-                ))
+                        && CurrentHammerType == HammerType.Cycle)))
             {
                 return;
             }
@@ -381,6 +384,11 @@
                                 toPlace.inActive(ToolTile[x - tileX, y - tileY].inActive());
                             }
                         }
+
+                        if (width == 1 && height == 1)
+                        {
+                            TileFraming.FrameAroundTile(ViewTiles, tileX, tileY);
+                        }
                     }
 
                     if (CurrentToolState.HasFlag(ToolState.Hammer))
@@ -441,6 +449,8 @@
                                         break;
                                 }
                             }
+
+                            TileFraming.FrameAroundTile(ViewTiles, tileX, tileY);
                         }
                     }
 

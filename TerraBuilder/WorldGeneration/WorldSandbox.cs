@@ -144,57 +144,93 @@
         /// <returns>保存したパス</returns>
         public string Save(string path)
         {
-            if (string.IsNullOrEmpty(path))
+            lock (locker)
             {
-                string fileName = DateTime.Now.ToString("yy-MM-dd HH-mm-ss") + ".wld";
-                path = Path.Combine(Main.SavePath, "Worlds", fileName);
-            }
-
-            for (int x = 0; x < TileCountX; x++)
-            {
-                for (int y = 0; y < TileCountY; y++)
+                if (string.IsNullOrEmpty(path))
                 {
-                    if (Main.tile[x, y] == null)
+                    string fileName = DateTime.Now.ToString("yy-MM-dd HH-mm-ss") + ".wld";
+                    path = Path.Combine(Main.SavePath, "Worlds", fileName);
+                }
+
+                for (int x = 0; x < TileCountX; x++)
+                {
+                    for (int y = 0; y < TileCountY; y++)
                     {
-                        Main.tile[x, y] = new Tile();
+                        if (Main.tile[x, y] == null)
+                        {
+                            Main.tile[x, y] = new Tile();
+                        }
                     }
                 }
-            }
 
-            Main.WorldFileMetadata = FileMetadata.FromCurrentSettings(FileType.World);
-            Main.ActiveWorldFileData = new WorldFileData(path, false)
-            {
-                CreationTime = DateTime.Now,
-                UniqueId = Guid.NewGuid(),
-                WorldGeneratorVersion = 0UL,
-                Metadata = Main.WorldFileMetadata,
-            };
-
-            Main.ActiveWorldFileData.SetSeed("42");
-            Main.worldID = 42;
-
-            Main.treeX[0] = TileCountX;
-            Main.treeX[1] = TileCountX;
-            Main.treeX[2] = TileCountX;
-
-            Main.caveBackX[0] = TileCountX;
-            Main.caveBackX[1] = TileCountX;
-            Main.caveBackX[2] = TileCountX;
-
-            Main.worldSurface = WorldGenerationRunner.CurrentRunner.GlobalContext.SurfaceLevel;
-            Main.rockLayer = 800;
-
-            Main.worldName = "TUBG";
-
-            using (FileStream stream = File.OpenWrite(path))
-            {
-                using (BinaryWriter binaryWriter = new BinaryWriter(stream))
+                Main.WorldFileMetadata = FileMetadata.FromCurrentSettings(FileType.World);
+                Main.ActiveWorldFileData = new WorldFileData(path, false)
                 {
-                    WorldFile.SaveWorld_Version2(binaryWriter);
+                    CreationTime = DateTime.Now,
+                    UniqueId = Guid.NewGuid(),
+                    WorldGeneratorVersion = 0UL,
+                    Metadata = Main.WorldFileMetadata,
+                };
+
+                Main.ActiveWorldFileData.SetSeed(WorldGenerationRunner.CurrentRunner.GlobalContext.Seed.ToString());
+                Main.worldID = 42;
+
+                Main.treeX[0] = TileCountX;
+                Main.treeX[1] = TileCountX;
+                Main.treeX[2] = TileCountX;
+
+                Main.caveBackX[0] = TileCountX;
+                Main.caveBackX[1] = TileCountX;
+                Main.caveBackX[2] = TileCountX;
+
+                Main.worldSurface = WorldGenerationRunner.CurrentRunner.GlobalContext.SurfaceLevel;
+                Main.rockLayer = 800;
+
+                Main.worldName = string.IsNullOrEmpty(Main.worldName) ? "TerraBuild" : Main.worldName;
+
+                using (FileStream stream = File.OpenWrite(path))
+                {
+                    using (BinaryWriter binaryWriter = new BinaryWriter(stream))
+                    {
+                        WorldFile.SaveWorld_Version2(binaryWriter);
+                    }
+                }
+
+                return path;
+            }
+        }
+
+        public void Load(string path)
+        {
+            if (File.Exists(path))
+            {
+                lock (locker)
+                {
+                    using (FileStream stream = File.OpenRead(path))
+                    {
+                        using (BinaryReader binaryWriter = new BinaryReader(stream))
+                        {
+                            WorldFile.LoadWorld_Version2(binaryWriter);
+                        }
+                    }
+
+                    TileCountX = Main.maxTilesX;
+                    TileCountY = Main.maxTilesY;
+
+                    Tiles = Main.tile;
+                    Chests = Main.chest;
+
+                    // Seedの再設定により、Randomインスタンスを生成しなおす。
+                    // 追加のコンテキストもクリアしておく
+                    if (WorldGenerationRunner.CurrentRunner != null)
+                    {
+                        WorldGenerationRunner.CurrentRunner.GlobalContext.Seed = Main.ActiveWorldFileData.Seed;
+                        WorldGenerationRunner.CurrentRunner.GlobalContext.ClearAdditionalContext();
+                    }
+
+                    TileProtectionMap = new TileProtectionMap(this);
                 }
             }
-
-            return path;
         }
     }
 }
