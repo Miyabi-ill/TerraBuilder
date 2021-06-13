@@ -259,5 +259,27 @@
                 }
             }
         }
+
+        private void LoadWorldMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog()
+            {
+                InitialDirectory = System.IO.Path.Combine(Terraria.Main.SavePath, "Worlds"),
+                Title = "読み込むワールドを選択",
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    Sandbox.Load(dialog.FileName);
+                    TileEditor.UpdateMap();
+                }
+                catch
+                {
+                    Sandbox.Reset();
+                }
+            }
+        }
     }
 }
