@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="TerraBuilder.Views.PieChart"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TerraBuilder.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="180" d:DesignWidth="200">
+    <Grid x:Name="BaseGrid">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition/>
+		</Grid.RowDefinitions>
+		<TextBlock Text="{Binding Header}"/>
+		<Viewbox Grid.Row="1">
+			<Grid x:Name="PieBaseGrid">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="150"/>
+				</Grid.ColumnDefinitions>
+				<Grid x:Name="PiePlaceHolder"
+					  HorizontalAlignment="Center"
+					  MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"  
+					  MaxWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}">
+				</Grid>
+				<ListView x:Name="LegendList" 
+						  Grid.Column="1"
+						  MinHeight="{Binding Height}" 
+						  MaxHeight="{Binding Height}" 
+						  ScrollViewer.VerticalScrollBarVisibility="Auto">
+					<ListView.ItemTemplate>
+						<DataTemplate>
+							<DockPanel>
+								<Rectangle
+									Margin="2"
+									MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
+									MaxWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
+									Stroke="Black"
+									Fill="{Binding Color}"/>
+								<TextBlock Text="{Binding PieHeader}"/>
+							</DockPanel>
+						</DataTemplate>
+					</ListView.ItemTemplate>
+				</ListView>
+			</Grid>
+		</Viewbox>
+    </Grid>
+</UserControl>
