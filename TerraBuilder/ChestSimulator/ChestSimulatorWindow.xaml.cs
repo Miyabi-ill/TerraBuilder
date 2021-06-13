@@ -138,6 +138,7 @@
 
         private void FromWorldButton_Click(object sender, RoutedEventArgs e)
         {
+            Configs.LoadAllChestConfigs(Configs.LastChestConfigsDir);
             ErrorMessageBox.Text = string.Empty;
 
             var results = ChestAccumulateResult.CreateResultFromWorld(Sandbox);
@@ -157,6 +158,8 @@
             {
                 try
                 {
+                    Configs.LoadAllChestConfigs(Configs.LastChestConfigsDir);
+
                     var results = ChestAccumulateResult.CreateResultFromChestGroupWithStep(ChestGroupNameBox.Text, chestCount);
                     var accResult = ChestAccumulateResult.CreateOverrollResult(results.chestAccResults.Values);
                     var allResults = new List<ChestAccumulateResult>();
@@ -177,7 +180,7 @@
                     resultsChart.AddRange(CreatePieChartsFromDictionary(itemDict));
                     CircleGraphList.ItemsSource = resultsChart;
                 }
-                catch
+                catch (Exception ex)
                 {
                     ErrorMessageBox.Text = "チェストグループ名が正しくありません";
                     return;
