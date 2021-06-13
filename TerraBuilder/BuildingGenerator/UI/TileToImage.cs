@@ -126,7 +126,7 @@
             if (tiles.GetLength(0) == 0
                 || tiles.GetLength(1) == 0)
             {
-                return new BitmapImage();
+                return null;
             }
 
             // 上下左右に8pxづつ余裕を持たせる
@@ -443,60 +443,127 @@
                 }
             }
 
-            // 左右にハーフブロックがある場合
-            /*
+            // 左か右にハーフブロックがある場合
             if (!TileID.Sets.Platforms[tileType]
                 && !TileID.Sets.IgnoresNearbyHalfbricksWhenDrawn[tileType]
                 && Main.tileSolid[tileType]
                 && !TileID.Sets.NotReallySolid[tileType]
                 && !tile.halfBrick()
-                && (Main.tile[tileX - 1, tileY].halfBrick() || Main.tile[tileX + 1, tileY].halfBrick()))
+                && ((tileX - 1 >= 0 && tiles[tileX - 1, tileY].halfBrick()) || (tileX + 1 < tiles.GetLength(0) && tiles[tileX + 1, tileY].halfBrick())))
             {
-                if (Main.tile[tileX - 1, tileY].halfBrick() && Main.tile[tileX + 1, tileY].halfBrick())
+                if (tiles[tileX - 1, tileY].halfBrick() && tiles[tileX + 1, tileY].halfBrick())
                 {
-                    Main.spriteBatch.Draw(drawData.drawTexture, normalTilePosition + new Vector2(0f, 8f), new Rectangle(frame.X + offsetX, offsetY + frame.Y + 8, drawData.tileWidth, 8), drawData.finalColor, 0f, _zero, 1f, drawData.tileSpriteEffect, 0f);
-                    Rectangle value3 = new Rectangle(126 + offsetX, offsetY, 16, 8);
-                    if (Main.tile[tileX, tileY - 1].active()
-                        && !Main.tile[tileX, tileY - 1].bottomSlope()
-                        && Main.tile[tileX, tileY - 1].type == tileType)
+                    Bitmap result = new Bitmap(16, 16);
+                    using (Graphics g = Graphics.FromImage(result))
                     {
-                        value3 = new Rectangle(90 + offsetX, offsetY, 16, 8);
+                        const int tileWidth = 16;
+                        g.DrawImageUnscaled(
+                            baseImage.Clone(
+                                new Rectangle(normalTileRect.X + offsetX, normalTileRect.Y + offsetY + 8, tileWidth, 8),
+                                baseImage.PixelFormat),
+                            new Point(0, 8));
+                        Rectangle rect = new Rectangle(126 + offsetX, offsetY, tileWidth, 8);
+                        if (tiles[tileX, tileY - 1].active()
+                            && !tiles[tileX, tileY - 1].bottomSlope()
+                            && tiles[tileX, tileY - 1].type == tileType)
+                        {
+                            rect = new Rectangle(90 + offsetX, offsetY, tileWidth, 8);
+                        }
+
+                        g.DrawImageUnscaled(
+                            baseImage.Clone(
+                                rect,
+                                baseImage.PixelFormat),
+                            new Point(0, 12));
                     }
-                    Main.spriteBatch.Draw(drawData.drawTexture, normalTilePosition, value3, drawData.finalColor, 0f, _zero, 1f, drawData.tileSpriteEffect, 0f);
+
+                    return SimplePaintBitmap(result, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                 }
-                else if (Main.tile[tileX - 1, tileY].halfBrick())
+                else if (tiles[tileX - 1, tileY].halfBrick())
                 {
-                    int num8 = 4;
+                    int fixBorder = 4;
                     if (TileID.Sets.AllBlocksWithSmoothBordersToResolveHalfBlockIssue[tileType])
                     {
-                        num8 = 2;
+                        fixBorder = 2;
                     }
-                    Main.spriteBatch.Draw(drawData.drawTexture, normalTilePosition + new Vector2(0f, 8f), new Rectangle(frame.X + offsetX, offsetY + frame.Y + 8, drawData.tileWidth, 8), drawData.finalColor, 0f, _zero, 1f, drawData.tileSpriteEffect, 0f);
-                    Main.spriteBatch.Draw(drawData.drawTexture, normalTilePosition + new Vector2(num8, 0f), new Rectangle(frame.X + num8 + offsetX, offsetY + frame.Y, drawData.tileWidth - num8, drawData.tileHeight), drawData.finalColor, 0f, _zero, 1f, drawData.tileSpriteEffect, 0f);
-                    Main.spriteBatch.Draw(drawData.drawTexture, normalTilePosition, new Rectangle(144 + offsetX, offsetY, num8, 8), drawData.finalColor, 0f, _zero, 1f, drawData.tileSpriteEffect, 0f);
-                    if (num8 == 2)
+
+                    Bitmap result = new Bitmap(16, 16);
+                    using (Graphics g = Graphics.FromImage(result))
                     {
-                        Main.spriteBatch.Draw(drawData.drawTexture, normalTilePosition, new Rectangle(148 + offsetX, offsetY, 2, 2), drawData.finalColor, 0f, _zero, 1f, drawData.tileSpriteEffect, 0f);
+                        const int tileWidth = 16;
+                        g.DrawImageUnscaled(
+                            baseImage.Clone(
+                                new Rectangle(normalTileRect.X + offsetX, normalTileRect.Y + offsetY + 8, tileWidth, 8),
+                                baseImage.PixelFormat),
+                            new Point(0, 8));
+
+                        g.DrawImageUnscaled(
+                            baseImage.Clone(
+                                new Rectangle(normalTileRect.X + offsetX + fixBorder, normalTileRect.Y + offsetY + 8, tileWidth - fixBorder, normalTileRect.Height),
+                                baseImage.PixelFormat),
+                            new Point(fixBorder, 8));
+
+                        g.DrawImageUnscaled(
+                            baseImage.Clone(
+                                new Rectangle(144 + offsetX, offsetY, fixBorder, 8),
+                                baseImage.PixelFormat),
+                            new Point(0, 0));
+
+                        if (fixBorder == 2)
+                        {
+                            g.DrawImageUnscaled(
+                            baseImage.Clone(
+                                new Rectangle(148 + offsetX, offsetY, 2, 2),
+                                baseImage.PixelFormat),
+                            new Point(0, 0));
+                        }
                     }
+
+                    return SimplePaintBitmap(result, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                 }
-                else if (Main.tile[tileX + 1, tileY].halfBrick())
+                else if (tiles[tileX + 1, tileY].halfBrick())
                 {
-                    int num9 = 4;
+                    int fixBorder = 4;
                     if (TileID.Sets.AllBlocksWithSmoothBordersToResolveHalfBlockIssue[tileType])
                     {
-                        num9 = 2;
+                        fixBorder = 2;
                     }
-                    Main.spriteBatch.Draw(drawData.drawTexture, normalTilePosition + new Vector2(0f, 8f), new Rectangle(frame.X + offsetX, offsetY + frame.Y + 8, drawData.tileWidth, 8), drawData.finalColor, 0f, _zero, 1f, drawData.tileSpriteEffect, 0f);
-                    Main.spriteBatch.Draw(drawData.drawTexture, normalTilePosition, new Rectangle(frame.X + offsetX, offsetY + frame.Y, drawData.tileWidth - num9, drawData.tileHeight), drawData.finalColor, 0f, _zero, 1f, drawData.tileSpriteEffect, 0f);
-                    Main.spriteBatch.Draw(drawData.drawTexture, normalTilePosition + new Vector2(16 - num9, 0f), new Rectangle(144 + (16 - num9), 0, num9, 8), drawData.finalColor, 0f, _zero, 1f, drawData.tileSpriteEffect, 0f);
-                    if (num9 == 2)
+
+                    Bitmap result = new Bitmap(16, 16);
+                    using (Graphics g = Graphics.FromImage(result))
                     {
-                        Main.spriteBatch.Draw(drawData.drawTexture, normalTilePosition + new Vector2(14f, 0f), new Rectangle(156, 0, 2, 2), drawData.finalColor, 0f, _zero, 1f, drawData.tileSpriteEffect, 0f);
+                        const int tileWidth = 16;
+                        g.DrawImageUnscaled(
+                            baseImage.Clone(
+                                new Rectangle(normalTileRect.X + offsetX, normalTileRect.Y + offsetY + 8, tileWidth, 8),
+                                baseImage.PixelFormat),
+                            new Point(0, 8));
+
+                        g.DrawImageUnscaled(
+                            baseImage.Clone(
+                                new Rectangle(normalTileRect.X + offsetX, normalTileRect.Y + offsetY, tileWidth - fixBorder, normalTileRect.Height),
+                                baseImage.PixelFormat),
+                            new Point(0, 0));
+
+                        g.DrawImageUnscaled(
+                            baseImage.Clone(
+                                new Rectangle(144 + (16 - fixBorder), 0, fixBorder, 8),
+                                baseImage.PixelFormat),
+                            new Point(16 - fixBorder, 0));
+
+                        if (fixBorder == 2)
+                        {
+                            g.DrawImageUnscaled(
+                            baseImage.Clone(
+                                new Rectangle(156, 0, 2, 2),
+                                baseImage.PixelFormat),
+                            new Point(14, 0));
+                        }
                     }
+
+                    return SimplePaintBitmap(result, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                 }
-                return;
             }
-            */
 
             if (bitmapCache.ContainsKey(tileKey))
             {
@@ -536,19 +603,19 @@
             {
                 if (TileID.Sets.Platforms[tileType])
                 {
-                    Bitmap image;
-                    try
+                    Bitmap result = new Bitmap(16, 16);
+                    using (Graphics g = Graphics.FromImage(result))
                     {
-                        image = baseImage.Clone(new Rectangle(frame.X, frame.Y, 16, 16), baseImage.PixelFormat);
-                    }
-                    catch (OutOfMemoryException)
-                    {
-                        image = baseImage.Clone(new Rectangle(0, 0, 16, 16), baseImage.PixelFormat);
+                        g.DrawImageUnscaled(
+                            baseImage.Clone(
+                                new Rectangle(normalTileRect.Location, new Size(normalTileRect.Width, normalTileRect.Height - 8)),
+                                baseImage.PixelFormat),
+                            new Point(0, 8));
                     }
 
-                    image = SimplePaintBitmap(image, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
-                    bitmapCache.Add(tileKey, image);
-                    return image;
+                    result = SimplePaintBitmap(result, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
+                    bitmapCache.Add(tileKey, result);
+                    return result;
                 }
                 else
                 {
