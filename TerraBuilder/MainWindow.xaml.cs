@@ -33,6 +33,8 @@
             Runner = new WorldGenerationRunner();
             InitializeComponent();
 
+            this.Title = "TerraBuilder - v" + Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
             // グローバルコンテキストをプロパティグリッドに表示
             GlobalContextProperty.SelectedObject = Runner.GlobalContext;
 
