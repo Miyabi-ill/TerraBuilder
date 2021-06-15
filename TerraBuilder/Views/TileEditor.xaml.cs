@@ -69,6 +69,10 @@
             }
         }
 
+        public System.Drawing.Rectangle? Selection { get; set; }
+
+        public Point? SelectionStart { get; set; }
+
         public Tile[,] ToolTile { get; set; } = new Tile[0, 0];
 
         private ToolState CurrentToolState { get; set; }
@@ -549,6 +553,32 @@
 
         private void TileGrid_PreviewMouseMove(object sender, MouseEventArgs e)
         {
+            Point point = Mouse.GetPosition(TileGrid);
+
+            double width = Math.Round(TileGrid.ActualWidth);
+            double height = Math.Round(TileGrid.ActualHeight);
+
+            int positionX = (int)(point.X / width * GetTileCountX());
+            int positionY = (int)(point.Y / height * GetTileCountY());
+
+            if (SelectAreaButton.IsChecked == true && e.LeftButton == MouseButtonState.Pressed && Selection.HasValue)
+            {
+                int minX = (int)Math.Min(SelectionStart.Value.X, positionX);
+                int minY = (int)Math.Min(SelectionStart.Value.Y, positionY);
+                int maxX = (int)Math.Max(SelectionStart.Value.X, positionX);
+                int maxY = (int)Math.Max(SelectionStart.Value.Y, positionY);
+                Selection = new System.Drawing.Rectangle(minX, minY, maxX - minX, maxY - minY);
+
+                SelectionRectangle.Visibility = Visibility.Visible;
+                SelectionRectangle.Width = Selection.Value.Width;
+                SelectionRectangle.Height = Selection.Value.Height;
+                SelectionRectangle.SetValue(Canvas.TopProperty, (double)minY);
+                SelectionRectangle.SetValue(Canvas.LeftProperty, (double)minX);
+
+                e.Handled = true;
+                return;
+            }
+
             int minSize = (int)Math.Min(ZoomControl.Viewport.Width, ZoomControl.Viewport.Height);
             if ((minSize > 50 && UseMapImageAsBackground)
                 || CurrentToolState == ToolState.None
@@ -557,14 +587,6 @@
                 return;
             }
 
-            Point point = Mouse.GetPosition(TileGrid);
-
-            double width = Math.Round(TileGrid.ActualWidth);
-            double height = Math.Round(TileGrid.ActualHeight);
-
-            int positionX = (int)(point.X / width * GetTileCountX());
-            int positionY = (int)(point.Y / height * GetTileCountY());
-
             e.Handled = true;
 
             ModifyTile(positionX, positionY, e.LeftButton == MouseButtonState.Pressed, e.RightButton == MouseButtonState.Pressed, true);
@@ -572,14 +594,6 @@
 
         private void TileGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            int minSize = (int)Math.Min(ZoomControl.Viewport.Width, ZoomControl.Viewport.Height);
-            if ((minSize > 50 && UseMapImageAsBackground)
-                    || CurrentToolState == ToolState.None
-                    || !(e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed))
-            {
-                return;
-            }
-
             Point point = Mouse.GetPosition(TileGrid);
 
             double width = Math.Round(TileGrid.ActualWidth);
@@ -587,6 +601,38 @@
 
             int positionX = (int)(point.X / width * GetTileCountX());
             int positionY = (int)(point.Y / height * GetTileCountY());
+
+            if (SelectAreaButton.IsChecked == true)
+            {
+                if (e.LeftButton == MouseButtonState.Pressed)
+                {
+                    Selection = new System.Drawing.Rectangle(positionX, positionY, 0, 0);
+                    SelectionRectangle.Visibility = Visibility.Visible;
+                    SelectionRectangle.Width = 0;
+                    SelectionRectangle.Height = 0;
+                    SelectionRectangle.SetValue(Canvas.TopProperty, (double)positionY);
+                    SelectionRectangle.SetValue(Canvas.LeftProperty, (double)positionX);
+
+                    SelectionStart = new Point(positionX, positionY);
+
+                    e.Handled = true;
+                    return;
+                }
+                else if (e.RightButton == MouseButtonState.Pressed)
+                {
+                    TileGrid.ContextMenu.IsOpen = true;
+                    e.Handled = true;
+                    return;
+                }
+            }
+
+            int minSize = (int)Math.Min(ZoomControl.Viewport.Width, ZoomControl.Viewport.Height);
+            if ((minSize > 50 && UseMapImageAsBackground)
+                    || CurrentToolState == ToolState.None
+                    || !(e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed))
+            {
+                return;
+            }
 
             e.Handled = true;
 
@@ -643,6 +689,29 @@
             CurrentToolState &= ~ToolState.SwitchInactive;
         }
 
+        private void SelectAreaButton_Checked(object sender, RoutedEventArgs e)
+        {
+            // 他のボタンを全てオフ
+            TileButton.IsChecked = false;
+            HammerButton.IsChecked = false;
+            EraserButton.IsChecked = false;
+            PaintButton.IsChecked = false;
+            InactiveButton.IsChecked = false;
+
+            // 範囲選択をクリア
+            Selection = null;
+            SelectionRectangle.Visibility = Visibility.Hidden;
+            SelectionStart = default;
+        }
+
+        private void SelectAreaButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            // 範囲選択をクリア
+            Selection = null;
+            SelectionRectangle.Visibility = Visibility.Hidden;
+            SelectionStart = default;
+        }
+
         private void HammerButton_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             var window = new SelectHammerWindow() { SelectedHammerType = CurrentHammerType };
@@ -667,6 +736,29 @@
             {
                 UpdateDetailImage();
             }
+        }
+
+        private void CreateBuildMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectAreaButton.IsChecked != true || !Selection.HasValue)
+            {
+                return;
+            }
+
+            Tile[,] tiles = new Tile[Selection.Value.Width, Selection.Value.Height];
+            for (int x = 0; x < tiles.GetLength(0); x++)
+            {
+                for (int y = 0; y < tiles.GetLength(1); y++)
+                {
+                    tiles[x, y] = new Tile();
+                    tiles[x, y].CopyFrom(GetTile(Selection.Value.X + x, Selection.Value.Y + y));
+                }
+            }
+
+            var window = new BuildingGeneratorWindow();
+            window.TileEditor.ViewTiles = tiles;
+            window.BuildingMetaData.Size = new TerraBuilder.BuildingGenerator.Size(tiles.GetLength(0), tiles.GetLength(1));
+            window.Show();
         }
     }
 }

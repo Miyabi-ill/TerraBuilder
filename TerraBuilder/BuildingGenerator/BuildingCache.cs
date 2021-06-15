@@ -153,7 +153,16 @@
                         var scheme = TEditScheme.Read(data);
                         if (!string.IsNullOrEmpty(scheme.name))
                         {
-                            BitmapImage image = TileToImage.CreateBitmap(scheme.tiles);
+                            BitmapImage image;
+                            if (scheme.tiles.GetLength(0) * scheme.tiles.GetLength(1) > 10000)
+                            {
+                                image = TerraBuilder.Utils.WorldToImage.CreateMapImage(scheme.tiles);
+                            }
+                            else
+                            {
+                                image = TileToImage.CreateBitmap(scheme.tiles);
+                            }
+
                             BuildingNameBitmapDictionary.Add(buildingFileName, image);
                             BuildingNameTilesDictionary.Add(buildingFileName, scheme.tiles);
 

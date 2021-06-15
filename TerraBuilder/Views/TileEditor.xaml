@@ -15,6 +15,7 @@
 				<ToggleButton Margin="5" x:Name="EraserButton" Checked="EraserButton_Checked" Unchecked="EraserButton_Unchecked">消しゴム</ToggleButton>
 				<ToggleButton Margin="5" x:Name="PaintButton" Checked="PaintButton_Checked" Unchecked="PaintButton_Unchecked" MouseRightButtonDown="PaintButton_MouseRightButtonDown">ペンキ</ToggleButton>
 				<ToggleButton Margin="5" x:Name="InactiveButton" Checked="InactiveButton_Checked" Unchecked="InactiveButton_Unchecked">背景化</ToggleButton>
+				<ToggleButton Margin="5" x:Name="SelectAreaButton" Checked="SelectAreaButton_Checked" Unchecked="SelectAreaButton_Unchecked">範囲選択</ToggleButton>
 			</DockPanel>
 			<xctk:Zoombox
 				x:Name="ZoomControl"
@@ -34,9 +35,16 @@
 						Width="{Binding ElementName=WorldMapImage, Path=ActualWidth}"
 						Height="{Binding ElementName=WorldMapImage, Path=ActualHeight}"
 						ShowGridLines="True"
-						Panel.ZIndex="100"></Grid>
+						Panel.ZIndex="100">
+						<Grid.ContextMenu>
+							<ContextMenu MenuItem.Click="CreateBuildMenuItem_Click">
+								<MenuItem Header="建材を作成"></MenuItem>
+							</ContextMenu>
+						</Grid.ContextMenu>
+					</Grid>
 					<Canvas Width="{Binding ActualWidth, ElementName=WorldMapImage}" Height="{Binding ActualHeight, ElementName=WorldMapImage}" Panel.ZIndex="1">
 						<Image x:Name="DetailImage"></Image>
+						<Rectangle x:Name="SelectionRectangle" Fill="#660033ff" Stroke="#a03f" StrokeThickness="0.1" Visibility="Hidden" IsHitTestVisible="False"></Rectangle>
 					</Canvas>
 				</Grid>
 			</xctk:Zoombox>

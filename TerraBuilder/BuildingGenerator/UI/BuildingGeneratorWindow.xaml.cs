@@ -369,8 +369,15 @@
                     BuildingMetaData.OriginalName = BuildingMetaData.OriginalName.Replace(BuildingGenerator.BuildingsRootPath, string.Empty).Trim('\\', '/');
                 }
 
-                TEditScheme.Write(Tiles, dialog.FileName, BuildingMetaData.Name);
-                BuildingFinder.BuildingCache.ReloadFile(dialog.FileName, true);
+                try
+                {
+                    TEditScheme.Write(Tiles == null ? TileEditor.ViewTiles : null, dialog.FileName, BuildingMetaData.Name);
+                    BuildingFinder.BuildingCache.ReloadFile(dialog.FileName, true);
+                }
+                catch
+                {
+                    MessageBox.Show("ファイルの書き込み時にエラーが発生しました。");
+                }
             }
         }
     }

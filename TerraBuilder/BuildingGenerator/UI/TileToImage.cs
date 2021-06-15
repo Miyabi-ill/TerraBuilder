@@ -239,6 +239,11 @@
 
         private static Bitmap DrawBasicTile(Tile[,] tiles, int tileX, int tileY)
         {
+            if (tileX < 0 || tileX >= tiles.GetLength(0) || tileY < 0 || tileY >= tiles.GetLength(1))
+            {
+                return new Bitmap(16, 16);
+            }
+
             Tile tile = tiles[tileX, tileY];
             int tileType = tile.type;
             Point frame = TileFrame(tiles, tileX, tileY);
@@ -459,7 +464,7 @@
                 && !tile.halfBrick()
                 && ((tileX - 1 >= 0 && tiles[tileX - 1, tileY].halfBrick()) || (tileX + 1 < tiles.GetLength(0) && tiles[tileX + 1, tileY].halfBrick())))
             {
-                if (tiles[tileX - 1, tileY].halfBrick() && tiles[tileX + 1, tileY].halfBrick())
+                if ((tileX - 1 >= 0 && tiles[tileX - 1, tileY].halfBrick()) && (tileX + 1 < tiles.GetLength(0) && tiles[tileX + 1, tileY].halfBrick()))
                 {
                     Bitmap result = new Bitmap(16, 16);
                     using (Graphics g = Graphics.FromImage(result))
@@ -486,7 +491,7 @@
 
                     return SimplePaintBitmap(result, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                 }
-                else if (tiles[tileX - 1, tileY].halfBrick())
+                else if (tileX - 1 >= 0 && tiles[tileX - 1, tileY].halfBrick())
                 {
                     int fixBorder = 4;
                     if (TileID.Sets.AllBlocksWithSmoothBordersToResolveHalfBlockIssue[tileType])
@@ -527,7 +532,7 @@
 
                     return SimplePaintBitmap(result, tiles[tileX, tileY].color(), inactive: tiles[tileX, tileY].inActive());
                 }
-                else if (tiles[tileX + 1, tileY].halfBrick())
+                else if (tileX + 1 < tiles.GetLength(0) && tiles[tileX + 1, tileY].halfBrick())
                 {
                     int fixBorder = 4;
                     if (TileID.Sets.AllBlocksWithSmoothBordersToResolveHalfBlockIssue[tileType])
