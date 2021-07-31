@@ -35,9 +35,6 @@
 
             this.Title = "TerraBuilder - v" + Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-            // グローバルコンテキストをプロパティグリッドに表示
-            GlobalContextProperty.SelectedObject = Runner.GlobalContext;
-
             ActionList.ItemsSource = Runner.WorldGenerationActions;
 
             TileEditor.Sandbox = Sandbox;
@@ -45,6 +42,9 @@
             Window = this;
 
             Configs.RecoverConfigsFromSaved();
+
+            // グローバルコンテキストをプロパティグリッドに表示
+            GlobalContextProperty.SelectedObject = Runner.GlobalContext;
 
             BuildingCache = new BuildingCache(new BuildingGenerator.BuildingGenerator() { BuildingsRootPath = Configs.LastBuildingsPath });
 
