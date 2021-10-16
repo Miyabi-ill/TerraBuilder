@@ -6,10 +6,11 @@
     using Terraria.ID;
     using TerraBuilder.WorldGeneration;
     using TerraBuilder.WorldGeneration.Chests;
+    using System.Collections.ObjectModel;
 
     public static class Configs
     {
-        public static Dictionary<string, Dictionary<string, ChestProbably>> ChestGroups { get; private set; } = new Dictionary<string, Dictionary<string, ChestProbably>>();
+        public static Dictionary<string, ObservableCollection<ChestProbably>> ChestGroups { get; private set; } = new Dictionary<string, ObservableCollection<ChestProbably>>();
 
         public static Dictionary<string, ChestContext> Chests { get; private set; } = new Dictionary<string, ChestContext>();
 
@@ -209,23 +210,16 @@
             {
                 using (var sr = new StreamReader(Path.Combine(dirName, "ChestGroups.json")))
                 {
-                    ChestGroups = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, ChestProbably>>>(sr.ReadToEnd());
-                    foreach (var chestGroup in ChestGroups)
-                    {
-                        foreach (var chestProb in chestGroup.Value)
-                        {
-                            chestProb.Value.Name = chestProb.Key;
-                        }
-                    }
+                    ChestGroups = JsonConvert.DeserializeObject<Dictionary<string, ObservableCollection<ChestProbably>>>(sr.ReadToEnd());
                 }
             }
             else
             {
                 using (var sw = new StreamWriter(Path.Combine(dirName, "ChestGroups.json")))
                 {
-                    var chests = new Dictionary<string, ChestProbably>();
+                    var chests = new ObservableCollection<ChestProbably>();
                     ChestProbably chestProbably = new ChestProbably() { Name = "ExampleChest" };
-                    chests.Add(chestProbably.Name, chestProbably);
+                    chests.Add(chestProbably);
                     ChestGroups.Add("ExampleGroup", chests);
                     sw.WriteLine(JsonConvert.SerializeObject(ChestGroups, Formatting.Indented));
                 }

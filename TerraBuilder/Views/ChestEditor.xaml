@@ -1,0 +1,70 @@
+﻿<Window x:Class="TerraBuilder.Views.ChestEditor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TerraBuilder.Views"
+		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="ChestEditor" Height="450" Width="1200">
+    <Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"></RowDefinition>
+			<RowDefinition></RowDefinition>
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition/>
+			<ColumnDefinition/>
+			<ColumnDefinition/>
+			<ColumnDefinition/>
+		</Grid.ColumnDefinitions>
+		<DockPanel Grid.ColumnSpan="4">
+			<Label Content="フォルダパス"></Label>
+			<Button DockPanel.Dock="Right" Margin="5">読み込み</Button>
+			<TextBox x:Name="FileNameTextBox" Margin="5"></TextBox>
+		</DockPanel>
+		<DockPanel Grid.Row="1" Margin="5">
+			<Label Content="チェストグループ" DockPanel.Dock="Top"></Label>
+			<ComboBox DockPanel.Dock="Top" Margin="0 5" x:Name="ChestGroupSelectionComboBox" SelectionChanged="ChestGroupSelectionComboBox_SelectionChanged"></ComboBox>
+			<DataGrid x:Name="ChestGroupDataGrid" AutoGenerateColumns="False">
+				<DataGrid.Columns>
+					<DataGridTextColumn Header="チェスト名" Binding="{Binding Name}"></DataGridTextColumn>
+					<DataGridTextColumn Header="重み" Binding="{Binding Probably}"></DataGridTextColumn>
+				</DataGrid.Columns>
+			</DataGrid>
+		</DockPanel>
+		<DockPanel Grid.Row="1" Grid.Column="1" Margin="5">
+			<Label Content="チェスト" DockPanel.Dock="Top"></Label>
+			<ComboBox DockPanel.Dock="Top" Margin="0 5" x:Name="ChestSelectionComboBox" SelectionChanged="ChestSelectionComboBox_SelectionChanged"></ComboBox>
+			<xctk:PropertyGrid
+				ShowTitle="False"
+				ShowDescriptionByTooltip="False"
+				ShowSearchBox="False"
+				ShowSortOptions="False"
+				ShowSummary="False"
+				x:Name="ChestPropertyGrid"></xctk:PropertyGrid>
+		</DockPanel>
+		<DockPanel Grid.Row="1" Grid.Column="2" Margin="5">
+			<Label Content="アイテムスロット" DockPanel.Dock="Top"></Label>
+			<ComboBox DockPanel.Dock="Top" Margin="0 5" x:Name="ItemSlotSelectionComboBox"></ComboBox>
+			<xctk:PropertyGrid
+				ShowTitle="False"
+				ShowDescriptionByTooltip="False"
+				ShowSearchBox="False"
+				ShowSortOptions="False"
+				ShowSummary="False"
+				x:Name="ItemSlotPropertyGrid"></xctk:PropertyGrid>
+		</DockPanel>
+		<DockPanel Grid.Row="1" Grid.Column="3" Margin="5">
+			<Label Content="アイテム" DockPanel.Dock="Top"></Label>
+			<ComboBox DockPanel.Dock="Top" Margin="0 5" x:Name="ItemSelectionComboBox"></ComboBox>
+			<xctk:PropertyGrid
+				ShowTitle="False"
+				ShowDescriptionByTooltip="False"
+				ShowSearchBox="False"
+				ShowSortOptions="False"
+				ShowSummary="False"
+				x:Name="ItemPropertyGrid"></xctk:PropertyGrid>
+		</DockPanel>
+    </Grid>
+</Window>

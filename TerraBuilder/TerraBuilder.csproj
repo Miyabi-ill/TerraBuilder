@@ -162,6 +162,9 @@
     <Compile Include="Views\BuildingSearchWindow.xaml.cs">
       <DependentUpon>BuildingSearchWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ChestEditor.xaml.cs">
+      <DependentUpon>ChestEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\PieChart.xaml.cs">
       <DependentUpon>PieChart.xaml</DependentUpon>
     </Compile>
@@ -232,6 +235,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\BuildingSearchWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ChestEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

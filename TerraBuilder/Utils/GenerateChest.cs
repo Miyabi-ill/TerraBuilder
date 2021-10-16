@@ -97,7 +97,7 @@
                 return null;
             }
 
-            var probablies = Configs.ChestGroups[chestGroupName].Values.ToArray();
+            var probablies = Configs.ChestGroups[chestGroupName];
             int selectedItemIndex = WeightedRandom.SelectIndex(random, probablies.Select(x => x.Probably));
             if (selectedItemIndex == -1)
             {

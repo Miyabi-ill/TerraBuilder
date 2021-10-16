@@ -283,5 +283,11 @@
                 }
             }
         }
+
+        private void ChestSettingMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new ChestEditor();
+            window.Show();
+        }
     }
 }
