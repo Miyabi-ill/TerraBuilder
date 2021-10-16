@@ -159,6 +159,9 @@
     <Compile Include="Views\AddActionWindow.xaml.cs">
       <DependentUpon>AddActionWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\AddTextItemWindow.xaml.cs">
+      <DependentUpon>AddTextItemWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\BuildingSearchWindow.xaml.cs">
       <DependentUpon>BuildingSearchWindow.xaml</DependentUpon>
     </Compile>
@@ -231,6 +234,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AddActionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AddTextItemWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

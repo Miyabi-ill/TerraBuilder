@@ -25,6 +25,8 @@
         /// </summary>
         public MainWindow()
         {
+            AppDomain.CurrentDomain.FirstChanceException += FirstChanceException;
+
             Terraria.Localization.LanguageManager.Instance.SetLanguage("en-US");
             Terraria.Main.Map = new Terraria.Map.WorldMap(1, 1);
             Terraria.Map.MapHelper.Initialize();
@@ -47,8 +49,6 @@
             GlobalContextProperty.SelectedObject = Runner.GlobalContext;
 
             BuildingCache = new BuildingCache(new BuildingGenerator.BuildingGenerator() { BuildingsRootPath = Configs.LastBuildingsPath });
-
-            AppDomain.CurrentDomain.FirstChanceException += FirstChanceException;
         }
 
         private void FirstChanceException(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)

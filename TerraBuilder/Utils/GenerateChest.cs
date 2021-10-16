@@ -79,7 +79,7 @@
         {
             foreach (ItemSlotOrItemProbablyAndStack itemSlot in chestContext.ItemSlots)
             {
-                if (random.NextDouble() < itemSlot.Probably)
+                if (random.NextDouble() < itemSlot.Probably / 100d)
                 {
                     int count = random.Next(itemSlot.Min, itemSlot.Max + 1);
                     for (int i = 0; i < count; i++)

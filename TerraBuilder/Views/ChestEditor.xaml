@@ -20,11 +20,16 @@
 		</Grid.ColumnDefinitions>
 		<DockPanel Grid.ColumnSpan="4">
 			<Label Content="フォルダパス"></Label>
-			<Button DockPanel.Dock="Right" Margin="5">読み込み</Button>
+			<Button DockPanel.Dock="Right" Margin="5" Width="60" Click="SaveButton_Click">保存</Button>
+			<Button DockPanel.Dock="Right" Margin="5" Width="60" Click="LoadButton_Click">読み込み</Button>
 			<TextBox x:Name="FileNameTextBox" Margin="5"></TextBox>
 		</DockPanel>
 		<DockPanel Grid.Row="1" Margin="5">
-			<Label Content="チェストグループ" DockPanel.Dock="Top"></Label>
+			<DockPanel DockPanel.Dock="Top" LastChildFill="False">
+				<Label Content="チェストグループ"></Label>
+				<Button DockPanel.Dock="Right" x:Name="DeleteChestGroupButton" Margin="5" Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}" Click="DeleteChestGroupButton_Click">-</Button>
+				<Button DockPanel.Dock="Right" x:Name="AddChestGroupButton" Margin="5" Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}" Click="AddChestGroupButton_Click">+</Button>
+			</DockPanel>
 			<ComboBox DockPanel.Dock="Top" Margin="0 5" x:Name="ChestGroupSelectionComboBox" SelectionChanged="ChestGroupSelectionComboBox_SelectionChanged"></ComboBox>
 			<DataGrid x:Name="ChestGroupDataGrid" AutoGenerateColumns="False">
 				<DataGrid.Columns>
@@ -34,37 +39,108 @@
 			</DataGrid>
 		</DockPanel>
 		<DockPanel Grid.Row="1" Grid.Column="1" Margin="5">
-			<Label Content="チェスト" DockPanel.Dock="Top"></Label>
+			<DockPanel DockPanel.Dock="Top" LastChildFill="False">
+				<Label Content="チェスト"></Label>
+				<Button DockPanel.Dock="Right" x:Name="DeleteChestButton" Margin="5" Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}" Click="DeleteChestButton_Click">-</Button>
+				<Button DockPanel.Dock="Right" x:Name="AddChestButton" Margin="5" Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}" Click="AddChestButton_Click">+</Button>
+			</DockPanel>
 			<ComboBox DockPanel.Dock="Top" Margin="0 5" x:Name="ChestSelectionComboBox" SelectionChanged="ChestSelectionComboBox_SelectionChanged"></ComboBox>
-			<xctk:PropertyGrid
-				ShowTitle="False"
-				ShowDescriptionByTooltip="False"
-				ShowSearchBox="False"
-				ShowSortOptions="False"
-				ShowSummary="False"
-				x:Name="ChestPropertyGrid"></xctk:PropertyGrid>
+			<Grid DockPanel.Dock="Top" Margin="5" Height="72">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition/>
+					<RowDefinition/>
+					<RowDefinition/>
+				</Grid.RowDefinitions>
+
+				<TextBlock VerticalAlignment="Center">タイルID</TextBlock>
+				<TextBlock VerticalAlignment="Center" Grid.Row="1">タイルスタイルID</TextBlock>
+				<TextBlock VerticalAlignment="Center" Grid.Row="2">ペンキID</TextBlock>
+				<xctk:IntegerUpDown x:Name="TileIDIntegerUpDown" Grid.Column="1" Margin="0 2" ValueChanged="TileID_IntegerUpDown_ValueChanged"></xctk:IntegerUpDown>
+				<xctk:IntegerUpDown x:Name="TileStyleIntegerUpDown" Grid.Column="1" Grid.Row="1" Margin="0 2" ValueChanged="TileStyle_IntegerUpDown_ValueChanged"></xctk:IntegerUpDown>
+				<xctk:IntegerUpDown x:Name="PaintIDIntegerUpDown" Grid.Column="1" Grid.Row="2" Margin="0 2" ValueChanged="PaintID_IntegerUpDown_ValueChanged"></xctk:IntegerUpDown>
+			</Grid>
+			<DataGrid x:Name="ChestDataGrid" AutoGenerateColumns="False">
+				<DataGrid.Columns>
+					<DataGridTextColumn Header="アイテムスロット/アイテム名" Binding="{Binding Name}"></DataGridTextColumn>
+					<DataGridTextColumn Header="確率(%)" Binding="{Binding Probably}"></DataGridTextColumn>
+					<DataGridTextColumn Header="最小スロット数/最小個数" Binding="{Binding Min}"></DataGridTextColumn>
+					<DataGridTextColumn Header="最大スロット数/最大個数" Binding="{Binding Max}"></DataGridTextColumn>
+				</DataGrid.Columns>
+
+				<DataGrid.RowStyle>
+					<Style TargetType="DataGridRow">
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding ItemSlotContext}" Value="{x:Null}">
+								<Setter Property="Background" Value="LightYellow"></Setter>
+							</DataTrigger>
+							<DataTrigger Binding="{Binding ItemContext}" Value="{x:Null}">
+								<Setter Property="Background" Value="LightGreen"></Setter>
+							</DataTrigger>
+							<MultiDataTrigger>
+								<MultiDataTrigger.Conditions>
+									<Condition Binding="{Binding ItemSlotContext}" Value="{x:Null}"></Condition>
+									<Condition Binding="{Binding ItemContext}" Value="{x:Null}"></Condition>
+								</MultiDataTrigger.Conditions>
+								<Setter Property="Background" Value="Red"></Setter>
+							</MultiDataTrigger>
+						</Style.Triggers>
+					</Style>
+				</DataGrid.RowStyle>
+			</DataGrid>
 		</DockPanel>
 		<DockPanel Grid.Row="1" Grid.Column="2" Margin="5">
-			<Label Content="アイテムスロット" DockPanel.Dock="Top"></Label>
-			<ComboBox DockPanel.Dock="Top" Margin="0 5" x:Name="ItemSlotSelectionComboBox"></ComboBox>
-			<xctk:PropertyGrid
-				ShowTitle="False"
-				ShowDescriptionByTooltip="False"
-				ShowSearchBox="False"
-				ShowSortOptions="False"
-				ShowSummary="False"
-				x:Name="ItemSlotPropertyGrid"></xctk:PropertyGrid>
+			<DockPanel DockPanel.Dock="Top" LastChildFill="False">
+				<Label Content="アイテムスロット"></Label>
+				<Button DockPanel.Dock="Right" x:Name="DeleteItemSlotButton" Margin="5" Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}" Click="DeleteItemSlotButton_Click">-</Button>
+				<Button DockPanel.Dock="Right" x:Name="AddItemSlotButton" Margin="5" Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}" Click="AddItemSlotButton_Click">+</Button>
+			</DockPanel>
+			<ComboBox DockPanel.Dock="Top" Margin="0 5" x:Name="ItemSlotSelectionComboBox" SelectionChanged="ItemSlotSelectionComboBox_SelectionChanged"></ComboBox>
+			<DataGrid x:Name="ItemSlotDataGrid" AutoGenerateColumns="False">
+				<DataGrid.Columns>
+					<DataGridTextColumn Header="アイテムスロット/アイテム名" Binding="{Binding Name}"></DataGridTextColumn>
+					<DataGridTextColumn Header="重み" Binding="{Binding Probably}"></DataGridTextColumn>
+					<DataGridTextColumn Header="最小スロット数/最小個数" Binding="{Binding Min}"></DataGridTextColumn>
+					<DataGridTextColumn Header="最大スロット数/最大個数" Binding="{Binding Max}"></DataGridTextColumn>
+				</DataGrid.Columns>
+
+				<DataGrid.RowStyle>
+					<Style TargetType="DataGridRow">
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding ItemSlotContext}" Value="{x:Null}">
+								<Setter Property="Background" Value="LightYellow"></Setter>
+							</DataTrigger>
+							<DataTrigger Binding="{Binding ItemContext}" Value="{x:Null}">
+								<Setter Property="Background" Value="LightGreen"></Setter>
+							</DataTrigger>
+							<MultiDataTrigger>
+								<MultiDataTrigger.Conditions>
+									<Condition Binding="{Binding ItemSlotContext}" Value="{x:Null}"></Condition>
+									<Condition Binding="{Binding ItemContext}" Value="{x:Null}"></Condition>
+								</MultiDataTrigger.Conditions>
+								<Setter Property="Background" Value="Red"></Setter>
+							</MultiDataTrigger>
+						</Style.Triggers>
+					</Style>
+				</DataGrid.RowStyle>
+			</DataGrid>
 		</DockPanel>
 		<DockPanel Grid.Row="1" Grid.Column="3" Margin="5">
-			<Label Content="アイテム" DockPanel.Dock="Top"></Label>
-			<ComboBox DockPanel.Dock="Top" Margin="0 5" x:Name="ItemSelectionComboBox"></ComboBox>
-			<xctk:PropertyGrid
-				ShowTitle="False"
-				ShowDescriptionByTooltip="False"
-				ShowSearchBox="False"
-				ShowSortOptions="False"
-				ShowSummary="False"
-				x:Name="ItemPropertyGrid"></xctk:PropertyGrid>
+			<DockPanel DockPanel.Dock="Top" LastChildFill="False">
+				<Label Content="アイテム"></Label>
+				<Button DockPanel.Dock="Right" x:Name="DeleteItemButton" Margin="5" Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}" Click="DeleteItemButton_Click">-</Button>
+				<Button DockPanel.Dock="Right" x:Name="AddItemButton" Margin="5" Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight}" Click="AddItemButton_Click">+</Button>
+			</DockPanel>
+			<DataGrid x:Name="ItemDataGrid" AutoGenerateColumns="False" CanUserAddRows="False">
+				<DataGrid.Columns>
+					<DataGridTextColumn Header="アイテム名" Binding="{Binding Name}"></DataGridTextColumn>
+					<DataGridTextColumn Header="アイテムID" Binding="{Binding ItemID}"></DataGridTextColumn>
+					<DataGridTextColumn Header="プレフィックスID" Binding="{Binding PrefixID}"></DataGridTextColumn>
+				</DataGrid.Columns>
+			</DataGrid>
 		</DockPanel>
     </Grid>
 </Window>

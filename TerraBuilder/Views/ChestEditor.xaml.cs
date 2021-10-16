@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TerraBuilder.WorldGeneration.Chests;
 
 namespace TerraBuilder.Views
 {
@@ -26,127 +28,9 @@ namespace TerraBuilder.Views
         {
             InitializeComponent();
             UpdateComboBox();
-        }
 
-        /// <summary>
-        /// チェストグループ名を更新する。
-        /// </summary>
-        /// <param name="oldName">旧チェストグループ名</param>
-        /// <param name="newName">新チェストグループ名</param>
-        private void UpdateChestGroupName(string oldName, string newName)
-        {
-            // TODO: 重複チェック
-            if (Configs.ChestGroups.ContainsKey(oldName))
-            {
-                var value = Configs.ChestGroups[oldName];
-                Configs.ChestGroups.Remove(oldName);
-                Configs.ChestGroups.Add(newName, value);
-            }
-        }
-
-        /// <summary>
-        /// チェスト名を更新する。
-        /// </summary>
-        /// <param name="oldName">旧チェスト名</param>
-        /// <param name="newName">新チェスト名</param>
-        private void UpdateChestName(string oldName, string newName)
-        {
-            // TODO: 重複チェック
-            if (Configs.Chests.ContainsKey(oldName))
-            {
-                var value = Configs.Chests[oldName];
-                Configs.Chests.Remove(oldName);
-                Configs.Chests.Add(newName, value);
-
-                // チェストグループはチェスト名を参照するので、全てのチェストグループを探索し、更新していく
-                foreach (var group in Configs.ChestGroups)
-                {
-                    var list = group.Value;
-                    foreach (var item in list)
-                    {
-                        if (item.Name == oldName)
-                        {
-                            item.Name = newName;
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// アイテムスロット名を変更する。
-        /// </summary>
-        /// <param name="oldName">旧アイテムスロット名</param>
-        /// <param name="newName">新アイテムスロット名</param>
-        private void UpdateItemSlotName(string oldName, string newName)
-        {
-            // TODO: 重複チェック
-            if (Configs.ItemSlots.ContainsKey(oldName))
-            {
-                var value = Configs.ItemSlots[oldName];
-                Configs.ItemSlots.Remove(oldName);
-                Configs.ItemSlots.Add(newName, value);
-
-                // チェストとアイテムスロットはアイテムスロット名を参照するので、全てのチェストとアイテムスロットを探索し、更新していく
-                // チェスト内アイテムスロット参照の変更
-                foreach (var chest in Configs.Chests)
-                {
-                    var context = chest.Value;
-                    foreach (var itemSlot in context.ItemSlots)
-                    {
-                        if (itemSlot.Name.Equals(oldName))
-                        {
-                            itemSlot.Name = newName;
-                        }
-                    }
-                }
-
-                // アイテムスロット内アイテムスロット参照の変更
-                foreach (var itemSlot in Configs.ItemSlots)
-                {
-                    foreach (var itemsProb in itemSlot.Value.Items)
-                    {
-                        if (itemsProb.Name.Equals(oldName))
-                        {
-                            itemsProb.Name = newName;
-                        }
-                    }
-                }
-
-                // アイテムスロット参照の変更
-                var tmp = Configs.ItemSlots[oldName];
-                Configs.ItemSlots.Remove(oldName);
-                Configs.ItemSlots.Add(newName, tmp);
-            }
-        }
-
-        /// <summary>
-        /// アイテム名を変更する。
-        /// </summary>
-        /// <param name="oldName">旧アイテム名</param>
-        /// <param name="newName">新アイテム名</param>
-        private void UpdateItemName(string oldName, string newName)
-        {
-            // TODO: 重複チェック
-            if (Configs.Items.ContainsKey(oldName))
-            {
-                // アイテムスロット内アイテム名の変更
-                foreach (var itemSlot in Configs.ItemSlots)
-                {
-                    foreach (var itemsProb in itemSlot.Value.Items)
-                    {
-                        if (itemsProb.Name.Equals(oldName))
-                        {
-                            itemsProb.Name = newName;
-                        }
-                    }
-                }
-
-                // アイテム名の変更
-                var tmp = Configs.Items[oldName];
-                Configs.Items.Remove(oldName);
-                Configs.Items.Add(newName, tmp);
-            }
+            ItemDataGrid.ItemsSource = Configs.ItemsCollection;
+            FileNameTextBox.Text = Configs.LastChestConfigsDir;
         }
 
         /// <summary>
@@ -157,7 +41,6 @@ namespace TerraBuilder.Views
             ChestGroupSelectionComboBox.ItemsSource = Configs.ChestGroups.Keys.ToList();
             ChestSelectionComboBox.ItemsSource = Configs.Chests.Keys.ToList();
             ItemSlotSelectionComboBox.ItemsSource = Configs.ItemSlots.Keys.ToList();
-            ItemSelectionComboBox.ItemsSource = Configs.Items.Keys.ToList();
         }
 
         /// <summary>
@@ -178,7 +61,154 @@ namespace TerraBuilder.Views
 
         private void ChestSelectionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (sender is ComboBox comboBox)
+            {
+                if (comboBox.SelectedItem is string chestName && Configs.Chests.ContainsKey(chestName))
+                {
+                    ChestDataGrid.ItemsSource = Configs.Chests[chestName].ItemSlots;
+                    TileIDIntegerUpDown.Value = Configs.Chests[chestName].TileType;
+                    TileStyleIntegerUpDown.Value = Configs.Chests[chestName].TileStyle;
+                    PaintIDIntegerUpDown.Value = Configs.Chests[chestName].Paint;
+                }
+            }
+        }
 
+        private void TileID_IntegerUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (ChestSelectionComboBox.SelectedItem is string chestName && Configs.Chests.ContainsKey(chestName))
+            {
+                // 21 = TileID.Containers
+                Configs.Chests[chestName].TileType = TileIDIntegerUpDown.Value.GetValueOrDefault(21);
+            }
+        }
+
+        private void TileStyle_IntegerUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (ChestSelectionComboBox.SelectedItem is string chestName && Configs.Chests.ContainsKey(chestName))
+            {
+                Configs.Chests[chestName].TileStyle = TileStyleIntegerUpDown.Value.GetValueOrDefault(0);
+            }
+        }
+
+        private void PaintID_IntegerUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (ChestSelectionComboBox.SelectedItem is string chestName && Configs.Chests.ContainsKey(chestName))
+            {
+                Configs.Chests[chestName].Paint = PaintIDIntegerUpDown.Value.GetValueOrDefault(0);
+            }
+        }
+
+        private void ItemSlotSelectionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ComboBox comboBox)
+            {
+                if (comboBox.SelectedItem is string itemSlotName && Configs.ItemSlots.ContainsKey(itemSlotName))
+                {
+                    ItemSlotDataGrid.ItemsSource = Configs.ItemSlots[itemSlotName].Items;
+                }
+            }
+        }
+
+        private void LoadButton_Click(object sender, RoutedEventArgs e)
+        {
+            Configs.LastChestConfigsDir = FileNameTextBox.Text;
+            Configs.LoadAllChestConfigs(FileNameTextBox.Text);
+            ItemDataGrid.ItemsSource = Configs.ItemsCollection;
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            Configs.SaveAllChestConfigs(FileNameTextBox.Text);
+        }
+
+        private void AddChestGroupButton_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new AddTextItemWindow
+            {
+                Description = "チェストグループ名を入力してください",
+                Title = "チェストグループを追加",
+            };
+            if (window.ShowDialog() == true && !string.IsNullOrWhiteSpace(window.Text) && !Configs.ChestGroups.ContainsKey(window.Text))
+            {
+                Configs.ChestGroups.Add(window.Text, new ObservableCollection<ChestProbably>());
+                UpdateComboBox();
+            }
+        }
+
+        private void DeleteChestGroupButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ChestGroupSelectionComboBox.SelectedItem is string chestGroupName && Configs.ChestGroups.ContainsKey(chestGroupName))
+            {
+                Configs.ChestGroups.Remove(chestGroupName);
+                UpdateComboBox();
+            }
+        }
+
+        private void AddChestButton_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new AddTextItemWindow
+            {
+                Description = "チェスト名を入力してください",
+                Title = "チェストを追加",
+            };
+            if (window.ShowDialog() == true && !string.IsNullOrWhiteSpace(window.Text) && !Configs.Chests.ContainsKey(window.Text))
+            {
+                Configs.Chests.Add(window.Text, new ChestContext() { Name = window.Text });
+                UpdateComboBox();
+            }
+        }
+
+        private void DeleteChestButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ChestSelectionComboBox.SelectedItem is string chestName && Configs.Chests.ContainsKey(chestName))
+            {
+                Configs.Chests.Remove(chestName);
+                UpdateComboBox();
+            }
+        }
+
+        private void AddItemSlotButton_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new AddTextItemWindow
+            {
+                Description = "アイテムスロット名を入力してください",
+                Title = "アイテムスロットを追加",
+            };
+            if (window.ShowDialog() == true && !string.IsNullOrWhiteSpace(window.Text) && !Configs.ItemSlots.ContainsKey(window.Text))
+            {
+                Configs.ItemSlots.Add(window.Text, new ItemSlotContext() { Name = window.Text });
+                UpdateComboBox();
+            }
+        }
+
+        private void DeleteItemSlotButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ItemSlotSelectionComboBox.SelectedItem is string itemSlots && Configs.ItemSlots.ContainsKey(itemSlots))
+            {
+                Configs.ItemSlots.Remove(itemSlots);
+                UpdateComboBox();
+            }
+        }
+
+        private void AddItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new AddTextItemWindow
+            {
+                Description = "アイテム名を入力してください",
+                Title = "アイテムを追加",
+            };
+            if (window.ShowDialog() == true && !string.IsNullOrWhiteSpace(window.Text) && !Configs.Items.ContainsKey(window.Text))
+            {
+                Configs.ItemsCollection.Add(new ItemContext() { Name = window.Text });
+            }
+        }
+
+        private void DeleteItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ItemDataGrid.SelectedItem is ItemContext context)
+            {
+                Configs.ItemsCollection.Remove(context);
+            }
         }
     }
 }

@@ -10,6 +10,8 @@
 
     public static class Configs
     {
+        private static ObservableCollection<ItemContext> itemsCollection;
+
         public static Dictionary<string, ObservableCollection<ChestProbably>> ChestGroups { get; private set; } = new Dictionary<string, ObservableCollection<ChestProbably>>();
 
         public static Dictionary<string, ChestContext> Chests { get; private set; } = new Dictionary<string, ChestContext>();
@@ -17,6 +19,87 @@
         public static Dictionary<string, ItemSlotContext> ItemSlots { get; private set; } = new Dictionary<string, ItemSlotContext>();
 
         public static Dictionary<string, ItemContext> Items { get; private set; } = new Dictionary<string, ItemContext>();
+
+        public static ObservableCollection<ItemContext> ItemsCollection
+        {
+            get => itemsCollection;
+            set
+            {
+                itemsCollection = value;
+                itemsCollection.CollectionChanged += ItemsCollection_CollectionChanged;
+            }
+        }
+
+        /// <summary>
+        /// ItemsCollectionとItemsを連携する。
+        /// ItemsCollection -> Itemsの１方向のみ。
+        /// </summary>
+        /// <param name="sender">コレクション</param>
+        /// <param name="e">イベント</param>
+        private static void ItemsCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                    {
+                        foreach (ItemContext item in e.NewItems)
+                        {
+                            if (string.IsNullOrWhiteSpace(item?.Name))
+                            {
+                                continue;
+                            }
+
+                            if (!Items.ContainsKey(item.Name))
+                            {
+                                Items.Add(item.Name, item);
+                            }
+                        }
+
+                        break;
+                    }
+
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                    {
+                        foreach (ItemContext item in e.OldItems)
+                        {
+                            if (Items.ContainsKey(item.Name))
+                            {
+                                Items.Remove(item.Name);
+                            }
+                        }
+
+                        break;
+                    }
+
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                    {
+                        foreach (ItemContext item in e.OldItems)
+                        {
+                            if (Items.ContainsKey(item.Name))
+                            {
+                                Items.Remove(item.Name);
+                            }
+                        }
+
+                        foreach (ItemContext item in e.NewItems)
+                        {
+                            if (!Items.ContainsKey(item.Name))
+                            {
+                                Items.Add(item.Name, item);
+                            }
+                        }
+
+                        break;
+                    }
+
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                    {
+                        Items.Clear();
+
+                        break;
+                    }
+            }
+        }
 
         // TODO: クラス全体をリファクタ
         // このクラスはコンフィグをまとめて読み込む用(パスを保存して読み込む用)のクラスにする
@@ -119,6 +202,34 @@
             }
         }
 
+        public static void SaveAllChestConfigs(string dirName)
+        {
+            if (!Directory.Exists(dirName))
+            {
+                Directory.CreateDirectory(dirName);
+            }
+
+            using (var sw = new StreamWriter(Path.Combine(dirName, "Items.json")))
+            {
+                sw.WriteLine(JsonConvert.SerializeObject(Items));
+            }
+
+            using (var sw = new StreamWriter(Path.Combine(dirName, "ItemSlots.json")))
+            {
+                sw.WriteLine(JsonConvert.SerializeObject(ItemSlots));
+            }
+
+            using (var sw = new StreamWriter(Path.Combine(dirName, "Chests.json")))
+            {
+                sw.WriteLine(JsonConvert.SerializeObject(Chests));
+            }
+
+            using (var sw = new StreamWriter(Path.Combine(dirName, "ChestGroups.json")))
+            {
+                sw.WriteLine(JsonConvert.SerializeObject(ChestGroups));
+            }
+        }
+
         public static void LoadAllChestConfigs(string dirName)
         {
             if (!Directory.Exists(dirName))
@@ -135,6 +246,8 @@
                     {
                         item.Value.Name = item.Key;
                     }
+
+                    ItemsCollection = new ObservableCollection<ItemContext>(Items.Values);
                 }
             }
             else
