@@ -22,7 +22,10 @@
 					<RowDefinition/>
 				</Grid.RowDefinitions>
 				<TextBlock Margin="5" VerticalAlignment="Center">チェストグループ名</TextBlock>
-				<TextBox Margin="5" Grid.Column="1" x:Name="ChestGroupNameBox"></TextBox>
+				<DockPanel Margin="5" Grid.Column="1">
+					<Button DockPanel.Dock="Right" x:Name="ChestGroupUpdateButton" Width="60" Click="ChestGroupUpdateButton_Click">更新</Button>
+					<ComboBox x:Name="ChestGroupComboBox" Margin="0 0 5 0"></ComboBox>
+				</DockPanel>
 				<TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="1">チェストシミュレート生成数</TextBlock>
 				<TextBox Margin="5" Grid.Row="1" Grid.Column="1" x:Name="ChestSimulateCountBox">10000</TextBox>
 				<TextBlock Margin="5" Grid.Row="2">表示モード</TextBlock>

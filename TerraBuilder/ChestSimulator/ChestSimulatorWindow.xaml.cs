@@ -18,6 +18,7 @@
         {
             InitializeComponent();
             Sandbox = sandbox;
+            UpdateComboBox();
         }
 
         private WorldSandbox Sandbox { get; }
@@ -158,9 +159,9 @@
             {
                 try
                 {
-                    Configs.LoadAllChestConfigs(Configs.LastChestConfigsDir);
+                    //Configs.LoadAllChestConfigs(Configs.LastChestConfigsDir);
 
-                    var results = ChestAccumulateResult.CreateResultFromChestGroupWithStep(ChestGroupNameBox.Text, chestCount);
+                    var results = ChestAccumulateResult.CreateResultFromChestGroupWithStep(ChestGroupComboBox.Text, chestCount);
                     var accResult = ChestAccumulateResult.CreateOverrollResult(results.chestAccResults.Values);
                     var allResults = new List<ChestAccumulateResult>();
                     allResults.Add(accResult);
@@ -215,6 +216,16 @@
                     CircleGraphViewModeGrid.Visibility = Visibility.Visible;
                     break;
             }
+        }
+
+        private void ChestGroupUpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateComboBox();
+        }
+
+        private void UpdateComboBox()
+        {
+            ChestGroupComboBox.ItemsSource = Configs.ChestGroups.Keys;
         }
     }
 }
