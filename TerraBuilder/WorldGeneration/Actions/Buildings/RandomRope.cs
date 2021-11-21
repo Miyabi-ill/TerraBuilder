@@ -8,6 +8,10 @@
     using System.Threading.Tasks;
     using Terraria.ID;
 
+    /// <summary>
+    /// ロープをランダムに配置する
+    /// </summary>
+    [Action]
     public class RandomRope : IWorldGenerationAction<RandomRope.RandomRopeContext>
     {
         public string Name => nameof(RandomRope);

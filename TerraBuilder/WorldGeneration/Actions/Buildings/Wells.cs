@@ -9,6 +9,10 @@
     using Terraria;
     using Terraria.ID;
 
+    /// <summary>
+    /// 井戸を設置する
+    /// </summary>
+    [Action]
     public class Wells : IWorldGenerationAction<Wells.WellContext>
     {
         public string Name => nameof(Wells);

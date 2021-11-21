@@ -8,6 +8,7 @@
     /// <summary>
     /// 地表の生成を行う。
     /// </summary>
+    [Action]
     public class Surface : IWorldGenerationAction<Surface.SurfaceContext>
     {
         /// <summary>

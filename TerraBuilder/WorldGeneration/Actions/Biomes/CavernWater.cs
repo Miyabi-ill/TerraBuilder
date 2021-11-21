@@ -4,6 +4,10 @@
     using System.Linq;
     using TerraBuilder.Utils;
 
+    /// <summary>
+    /// 地下に水を生成する生成アクション。
+    /// </summary>
+    [Action]
     public class CavernWater : IWorldGenerationAction<CavernWater.CavernWaterContext>
     {
         public string Name => nameof(CavernWater);

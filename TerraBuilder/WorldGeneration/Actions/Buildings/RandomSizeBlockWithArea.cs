@@ -10,8 +10,9 @@
     using static TerraBuilder.WorldGeneration.Actions.Buildings.RandomSizeBlocks;
 
     /// <summary>
-    /// ランダムなサイズのブロックをワールド地表に設置するクラス
+    /// ランダムなサイズのブロックをある程度まとまった量ワールド地表に設置するクラス
     /// </summary>
+    [Action]
     public class RandomSizeBlockWithArea : IWorldGenerationAction<RandomSizeBlockWithArea.RandomSizeBlockWithAreaContext>
     {
         private enum ActiveWallDirection : int
@@ -26,7 +27,7 @@
         public string Name => nameof(RandomSizeBlockWithArea);
 
         /// <inheritdoc/>
-        public string Description => "ランダムな大きさ、形のブロックをワールド地表に配置する";
+        public string Description => "ランダムな大きさ、形のブロックをワールド地表の一定のエリア内に配置する";
 
         /// <inheritdoc/>
         public RandomSizeBlockWithAreaContext Context { get; } = new RandomSizeBlockWithAreaContext();

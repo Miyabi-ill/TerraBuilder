@@ -11,6 +11,7 @@
     /// <summary>
     /// 第二層にランダムにチェストを置くためのクラス
     /// </summary>
+    [Action]
     public class RandomCavernChests : IWorldGenerationAction<RandomCavernChests.RandomCavernChestContext>
     {
         /// <inheritdoc/>

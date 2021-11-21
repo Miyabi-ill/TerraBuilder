@@ -13,17 +13,13 @@
     {
         static WorldGenerationRunner()
         {
-            AvailableActions.Add(nameof(Actions.Biomes.Caverns), () => new Actions.Biomes.Caverns());
-            AvailableActions.Add(nameof(Actions.Biomes.Surface), () => new Actions.Biomes.Surface());
-            AvailableActions.Add(nameof(Actions.Biomes.Tunnel), () => new Actions.Biomes.Tunnel());
-            AvailableActions.Add(nameof(Actions.Biomes.SpawnArea), () => new Actions.Biomes.SpawnArea());
-            AvailableActions.Add(nameof(Actions.Biomes.CavernWater), () => new Actions.Biomes.CavernWater());
-            AvailableActions.Add(nameof(Actions.Buildings.RandomSizeBlocks), () => new Actions.Buildings.RandomSizeBlocks());
-            AvailableActions.Add(nameof(Actions.Buildings.RandomSizeBlockWithArea), () => new Actions.Buildings.RandomSizeBlockWithArea());
-            AvailableActions.Add(nameof(Actions.Buildings.RandomCavernChests), () => new Actions.Buildings.RandomCavernChests());
-            AvailableActions.Add(nameof(Actions.Buildings.RandomRope), () => new Actions.Buildings.RandomRope());
-            AvailableActions.Add(nameof(Actions.Buildings.Wells), () => new Actions.Buildings.Wells());
-            AvailableActions.Add(nameof(Actions.Buildings.LiquidsInAir), () => new Actions.Buildings.LiquidsInAir());
+            foreach (Type type in typeof(WorldGenerationRunner).Assembly.GetTypes())
+            {
+                if (type.GetCustomAttributes(typeof(ActionAttribute), false).Length > 0)
+                {
+                    AvailableActions.Add(type.Name, () => type.GetConstructor(Type.EmptyTypes).Invoke(null) as IWorldGenerationAction<ActionContext>);
+                }
+            }
         }
 
         /// <summary>
@@ -34,17 +30,17 @@
         {
             CurrentRunner = this;
 
-            WorldGenerationActions.Add(new Actions.Biomes.Caverns());
-            WorldGenerationActions.Add(new Actions.Biomes.Surface());
-            WorldGenerationActions.Add(new Actions.Buildings.Wells());
-            WorldGenerationActions.Add(new Actions.Biomes.Tunnel());
-            WorldGenerationActions.Add(new Actions.Buildings.RandomSizeBlocks());
-            WorldGenerationActions.Add(new Actions.Buildings.RandomSizeBlockWithArea());
-            WorldGenerationActions.Add(new Actions.Buildings.RandomCavernChests());
-            WorldGenerationActions.Add(new Actions.Biomes.CavernWater());
-            WorldGenerationActions.Add(new Actions.Buildings.RandomRope());
-            WorldGenerationActions.Add(new Actions.Buildings.LiquidsInAir());
-            WorldGenerationActions.Add(new Actions.Biomes.SpawnArea());
+            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.Caverns)].Invoke());
+            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.Surface)].Invoke());
+            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.Wells)].Invoke());
+            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.Tunnel)].Invoke());
+            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomSizeBlocks)].Invoke());
+            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomSizeBlockWithArea)].Invoke());
+            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomCavernChests)].Invoke());
+            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.CavernWater)].Invoke());
+            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomRope)].Invoke());
+            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.LiquidsInAir)].Invoke());
+            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.SpawnArea)].Invoke());
 
             // TODO: Load from json
             GlobalContext = new GlobalContext();
@@ -103,6 +99,10 @@
             return true;
         }
 
+        /// <summary>
+        /// 現在のワールド生成アクションを保存する
+        /// </summary>
+        /// <param name="path">保存先のパス</param>
         public void Save(string path)
         {
             using (var sw = new StreamWriter(path))
@@ -117,6 +117,10 @@
             }
         }
 
+        /// <summary>
+        /// ワールド生成アクションを読み込む
+        /// </summary>
+        /// <param name="path">読み込むパス</param>
         public void Load(string path)
         {
             if (File.Exists(path))

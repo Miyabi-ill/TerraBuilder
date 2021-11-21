@@ -9,6 +9,7 @@
     /// <summary>
     /// ランダムなサイズのブロックをワールド地表に設置するクラス
     /// </summary>
+    [Action]
     public class RandomSizeBlocks : IWorldGenerationAction<RandomSizeBlocks.RandomSizeBlockContext>
     {
         public enum PlaceBiome

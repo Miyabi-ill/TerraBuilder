@@ -147,6 +147,7 @@
       <DependentUpon>ChestSimulatorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Configs.cs" />
+    <Compile Include="WorldGeneration\ActionAttribute.cs" />
     <Compile Include="Utils\Colors.cs" />
     <Compile Include="Utils\ErrorLogger.cs" />
     <Compile Include="Utils\GenerateChest.cs" />
@@ -287,7 +288,9 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="WorldGeneration\Actions\Vanilla\" />
+  </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
       <Visible>False</Visible>

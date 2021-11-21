@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Windows;
     using TerraBuilder.WorldGeneration;
 
@@ -16,7 +17,7 @@
         public AddActionWindow()
         {
             InitializeComponent();
-            ActionsComboBox.ItemsSource = WorldGenerationRunner.AvailableActions;
+            ActionsComboBox.ItemsSource = WorldGenerationRunner.AvailableActions.OrderBy(x => x.Key);
         }
 
         /// <summary>

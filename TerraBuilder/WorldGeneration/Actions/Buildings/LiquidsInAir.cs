@@ -5,6 +5,10 @@
     using Terraria.ID;
     using TerraBuilder.Utils;
 
+    /// <summary>
+    /// 空中に水を生成する
+    /// </summary>
+    [Action]
     class LiquidsInAir : IWorldGenerationAction<LiquidsInAir.LiquidsInAirContext>
     {
         public string Name => nameof(LiquidsInAir);

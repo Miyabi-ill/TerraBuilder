@@ -11,6 +11,7 @@
     /// <summary>
     /// 洞窟(第二層)の生成を行う。
     /// </summary>
+    [Action]
     public class Caverns : IWorldGenerationAction<Caverns.CavernContext>
     {
         /// <inheritdoc/>

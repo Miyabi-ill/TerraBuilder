@@ -6,6 +6,7 @@
     /// <summary>
     /// スポーン地点を作成する。
     /// </summary>
+    [Action]
     public class SpawnArea : IWorldGenerationAction<SpawnArea.SpawnAreaContext>
     {
         /// <inheritdoc/>

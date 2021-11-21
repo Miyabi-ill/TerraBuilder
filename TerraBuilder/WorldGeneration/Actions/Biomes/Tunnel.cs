@@ -8,6 +8,7 @@
     /// <summary>
     /// トンネルを生成するクラス。
     /// </summary>
+    [Action]
     public class Tunnel : IWorldGenerationAction<Tunnel.TunnelContext>
     {
         /// <inheritdoc/>
