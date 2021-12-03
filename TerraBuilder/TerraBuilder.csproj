@@ -188,6 +188,7 @@
     <Compile Include="WorldGeneration\Actions\Buildings\RandomSizeBlocks.cs" />
     <Compile Include="WorldGeneration\Actions\Buildings\RandomSizeBlockWithArea.cs" />
     <Compile Include="WorldGeneration\Actions\Buildings\Wells.cs" />
+    <Compile Include="WorldGeneration\Actions\Vanilla\Marble.cs" />
     <Compile Include="WorldGeneration\Chests\ChestContext.cs" />
     <Compile Include="WorldGeneration\Chests\ChestProbably.cs" />
     <Compile Include="WorldGeneration\Chests\ItemContext.cs" />
@@ -288,9 +289,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="WorldGeneration\Actions\Vanilla\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
       <Visible>False</Visible>
