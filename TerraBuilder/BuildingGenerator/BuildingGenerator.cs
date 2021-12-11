@@ -48,7 +48,8 @@
         /// </summary>
         public void Build()
         {
-            Tile[,] tiles = Root?.Build();
+            Random rand = WorldGeneration.WorldGenerationRunner.CurrentRunner.GlobalContext.Random;
+            Tile[,] tiles = Root?.Build(rand);
             if (tiles == null || tiles.GetLength(0) == 0 || tiles.GetLength(1) == 0)
             {
                 Result = null;
@@ -181,9 +182,9 @@
                     Rectangle rectangle = new Rectangle()
                     {
                         FillWall = TerrariaNameDict.TileNameToID.First(p => p.Value == wallId).Key,
-                        Size = new Size() { Width = wallWidth, Height = wallHeight },
-                        X = x + 1,
-                        Y = y + 1,
+                        Size = new Size() { Width = new ConstantValue<int> { Value = wallWidth }, Height = new ConstantValue<int> { Value = wallHeight } },
+                        X = new ConstantValue<int> { Value = x + 1 },
+                        Y = new ConstantValue<int> { Value = y + 1 },
                     };
 
                     root.Childs.Add(rectangle);

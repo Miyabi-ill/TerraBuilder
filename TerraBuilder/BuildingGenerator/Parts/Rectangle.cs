@@ -1,5 +1,6 @@
 ﻿namespace TerraBuilder.BuildingGenerator.Parts
 {
+    using System;
     using System.Linq;
     using Newtonsoft.Json;
     using Terraria;
@@ -21,11 +22,11 @@
 
         /// <inheritdoc/>
         [JsonProperty]
-        public override int X { get; set; }
+        public override RandomValue<int> X { get; set; }
 
         /// <inheritdoc/>
         [JsonProperty]
-        public override int Y { get; set; }
+        public override RandomValue<int> Y { get; set; }
 
         [JsonProperty]
         public Size Size { get; set; }
@@ -160,13 +161,15 @@
         }
 
         /// <inheritdoc/>
-        public override Tile[,] Build()
+        public override Tile[,] Build(Random rand)
         {
-            Tile[,] tiles = new Tile[Size.Width, Size.Height];
+            int width = Size.Width.GetValue(rand);
+            int height = Size.Height.GetValue(rand);
+            Tile[,] tiles = new Tile[width, height];
 
-            for (int i = 0; i < Size.Width; i++)
+            for (int i = 0; i < width; i++)
             {
-                for (int j = 0; j < Size.Height; j++)
+                for (int j = 0; j < height; j++)
                 {
                     tiles[i, j] = new Tile();
 

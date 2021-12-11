@@ -8,17 +8,17 @@
         /// <summary>
         /// 幅
         /// </summary>
-        public int Width { get; set; }
+        public RandomValue<int> Width { get; set; }
 
         /// <summary>
         /// 高さ
         /// </summary>
-        public int Height { get; set; }
+        public RandomValue<int> Height { get; set; }
 
         public Size(int width, int height)
         {
-            Width = width;
-            Height = height;
+            Width = new ConstantValue<int> { Value = width };
+            Height = new ConstantValue<int> { Value = height };
         }
 
         /// <inheritdoc/>

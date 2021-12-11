@@ -15,16 +15,15 @@
     /// </summary>
     public class BuildParent : BuildBase
     {
-        private int x = 1;
-        private int y = 1;
+        private RandomValue<int> x = new ConstantValue<int> { Value = 1 };
+        private RandomValue<int> y = new ConstantValue<int> { Value = 1 };
         private string name;
         private Size size;
         private ObservableCollection<BuildBase> childs = new ObservableCollection<BuildBase>();
 
         /// <inheritdoc/>
         [JsonProperty]
-        [DefaultValue(1)]
-        public override int X
+        public override RandomValue<int> X
         {
             get => x;
             set
@@ -36,8 +35,7 @@
 
         /// <inheritdoc/>
         [JsonProperty]
-        [DefaultValue(1)]
-        public override int Y
+        public override RandomValue<int> Y
         {
             get => y;
             set
@@ -88,12 +86,14 @@
         }
 
         /// <inheritdoc/>
-        public override Tile[,] Build()
+        public override Tile[,] Build(Random rand)
         {
-            Tile[,] tiles = new Tile[Size.Width, Size.Height];
-            for (int i = 0; i < Size.Width; i++)
+            int width = Size.Width.GetValue(rand);
+            int height = Size.Height.GetValue(rand);
+            Tile[,] tiles = new Tile[width, height];
+            for (int i = 0; i < width; i++)
             {
-                for (int j = 0; j < Size.Height; j++)
+                for (int j = 0; j < height; j++)
                 {
                     tiles[i, j] = new Tile();
                 }
@@ -101,27 +101,29 @@
 
             foreach (BuildBase child in Childs)
             {
-                Tile[,] builds = child.Build();
+                Tile[,] builds = child.Build(rand);
                 int h = builds.GetLength(1);
-                int startY = Size.Height - (h + child.Y - 1);
+                int childX = child.X.GetValue(rand);
+                int childY = child.Y.GetValue(rand);
+                int startY = height - (h + childY - 1);
                 for (int i = 0; i < builds.GetLength(0); i++)
                 {
                     for (int j = 0; j < h; j++)
                     {
-                        if (i + child.X - 1 < 0
-                            || i + child.X - 1 >= tiles.GetLength(0)
+                        if (i + childX - 1 < 0
+                            || i + childX - 1 >= tiles.GetLength(0)
                             || startY + j < 0
                             || startY + j >= tiles.GetLength(1))
                         {
                             continue;
                         }
 
-                        if (tiles[i + child.X - 1, startY + j] == null)
+                        if (tiles[i + childX - 1, startY + j] == null)
                         {
-                            tiles[i + child.X - 1, startY + j] = new Tile();
+                            tiles[i + childX - 1, startY + j] = new Tile();
                         }
 
-                        MergeTileNotOverwrite(tiles[i + child.X - 1, startY + j], builds[i, j]);
+                        MergeTileNotOverwrite(tiles[i + childX - 1, startY + j], builds[i, j]);
                     }
                 }
             }

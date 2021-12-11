@@ -119,7 +119,7 @@
     <Compile Include="BuildingGenerator\Parts\BuildRoot.cs" />
     <Compile Include="BuildingGenerator\Parts\Import.cs" />
     <Compile Include="BuildingGenerator\Parts\Line.cs" />
-    <Compile Include="BuildingGenerator\Parts\RandomValue.cs" />
+    <Compile Include="BuildingGenerator\RandomValue.cs" />
     <Compile Include="BuildingGenerator\Parts\Rectangle.cs" />
     <Compile Include="BuildingGenerator\Parts\Repeat.cs" />
     <Compile Include="BuildingGenerator\SearchResult.cs" />

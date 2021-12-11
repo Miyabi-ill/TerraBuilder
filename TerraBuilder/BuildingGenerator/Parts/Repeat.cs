@@ -9,13 +9,13 @@
 
     public class Repeat : BuildBase
     {
-        private int repeatX = 1;
-        private int repeatY = 1;
+        private RandomValue<int> repeatX = new ConstantValue<int> { Value = 1 };
+        private RandomValue<int> repeatY = new ConstantValue<int> { Value = 1 };
 
-        private int? spaceX;
-        private int? spaceY;
+        private RandomValue<int> spaceX;
+        private RandomValue<int> spaceY;
 
-        public int RepeatX
+        public RandomValue<int> RepeatX
         {
             get => repeatX;
             set
@@ -25,7 +25,7 @@
             }
         }
 
-        public int RepeatY
+        public RandomValue<int> RepeatY
         {
             get => repeatY;
             set
@@ -35,7 +35,7 @@
             }
         }
 
-        public int? SpaceX
+        public RandomValue<int> SpaceX
         {
             get => spaceX;
             set
@@ -45,7 +45,7 @@
             }
         }
 
-        public int? SpaceY
+        public RandomValue<int> SpaceY
         {
             get => spaceY;
             set
@@ -58,35 +58,37 @@
         public BuildBase Building { get; set; }
 
         /// <inheritdoc/>
-        public override Tile[,] Build()
+        public override Tile[,] Build(Random rand)
         {
-            Tile[,] build = Building?.Build();
+            Tile[,] build = Building?.Build(rand);
+            int repeatX = RepeatX.GetValue(rand);
+            int repeatY = RepeatY.GetValue(rand);
             if (build == null
                 || build.GetLength(0) == 0
                 || build.GetLength(1) == 0
-                || RepeatX == 0
-                || RepeatY == 0)
+                || repeatX == 0
+                || repeatY == 0)
             {
                 return new Tile[0, 0];
             }
 
-            int width = SpaceX.HasValue ? SpaceX.Value : build.GetLength(0);
-            int height = SpaceY.HasValue ? SpaceY.Value : build.GetLength(1);
-            Tile[,] tiles = new Tile[(width * (RepeatX - 1)) + build.GetLength(0), (height * (RepeatY - 1)) + build.GetLength(1)];
-            for (int i = 0; i < RepeatX; i++)
+            int width = SpaceX != null ? SpaceX.GetValue(rand) : build.GetLength(0);
+            int height = SpaceY != null ? SpaceY.GetValue(rand) : build.GetLength(1);
+            Tile[,] tiles = new Tile[(width * (repeatX - 1)) + build.GetLength(0), (height * (repeatY - 1)) + build.GetLength(1)];
+            for (int i = 0; i < repeatX; i++)
             {
-                for (int j = 0; j < RepeatY; j++)
+                for (int j = 0; j < repeatY; j++)
                 {
                     for (int x = 0; x < build.GetLength(0); x++)
                     {
-                        if (i != RepeatX - 1 && x >= width)
+                        if (i != repeatX - 1 && x >= width)
                         {
                             break;
                         }
 
                         for (int y = 0; y < build.GetLength(1); y++)
                         {
-                            if (j != RepeatY - 1 && y >= height)
+                            if (j != repeatY - 1 && y >= height)
                             {
                                 break;
                             }

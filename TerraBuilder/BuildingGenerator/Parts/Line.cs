@@ -10,17 +10,17 @@
     public class Line : BuildBase
     {
         /// <inheritdoc/>
-        public override int X { get; set; }
+        public override RandomValue<int> X { get; set; }
 
         /// <inheritdoc/>
-        public override int Y { get; set; }
+        public override RandomValue<int> Y { get; set; }
 
-        public int EndX { get; set; }
+        public RandomValue<int> EndX { get; set; }
 
-        public int EndY { get; set; }
+        public RandomValue<int> EndY { get; set; }
 
         /// <inheritdoc/>
-        public override Tile[,] Build()
+        public override Tile[,] Build(Random rand)
         {
             throw new NotImplementedException();
         }

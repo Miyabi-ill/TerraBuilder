@@ -1,5 +1,6 @@
 ﻿namespace TerraBuilder.BuildingGenerator.Parts
 {
+    using System;
     using Terraria;
 
     /// <summary>
@@ -23,7 +24,7 @@
         }
 
         /// <inheritdoc/>
-        public override Tile[,] Build()
+        public override Tile[,] Build(Random rand)
         {
             try
             {
@@ -34,7 +35,7 @@
                 }
                 else
                 {
-                    return build.Build();
+                    return build.Build(rand);
                 }
             }
             catch

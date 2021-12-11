@@ -1,5 +1,6 @@
 ﻿namespace TerraBuilder.BuildingGenerator.Parts
 {
+    using System;
     using System.ComponentModel;
     using Newtonsoft.Json;
     using Terraria;
@@ -9,8 +10,8 @@
     /// </summary>
     public class BuildBase : INotifyPropertyChanged
     {
-        private int x = 1;
-        private int y = 1;
+        private RandomValue<int> x = new ConstantValue<int>() { Value = 1 };
+        private RandomValue<int> y = new ConstantValue<int>() { Value = 1 };
         private string name;
 
         /// <inheritdoc/>
@@ -20,8 +21,7 @@
         /// 建築の基準点X。左下を0とする。
         /// </summary>
         [JsonProperty]
-        [DefaultValue(1)]
-        public virtual int X
+        public virtual RandomValue<int> X
         {
             get => x;
             set
@@ -35,8 +35,7 @@
         /// 建築の基準点Y。左下を0とする。
         /// </summary>
         [JsonProperty]
-        [DefaultValue(1)]
-        public virtual int Y
+        public virtual RandomValue<int> Y
         {
             get => y;
             set
@@ -73,7 +72,7 @@
         /// タイル配列を生成する
         /// </summary>
         /// <returns>生成したタイル配列</returns>
-        public virtual Tile[,] Build()
+        public virtual Tile[,] Build(Random rand)
         {
             return new Tile[0, 0];
         }
