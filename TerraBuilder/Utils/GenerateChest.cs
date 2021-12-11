@@ -122,7 +122,7 @@
                 Item item = new Item();
                 ItemContext itemContext = probablyAndStack.ItemContext;
                 item.SetDefaults(itemContext.ItemID);
-                item.stack = random.Next(probablyAndStack.Min, probablyAndStack.Max);
+                item.stack = random.Next(probablyAndStack.Min, probablyAndStack.Max + 1);
                 item.prefix = (byte)itemContext.PrefixID;
                 items.Add(item);
                 return items;
@@ -130,7 +130,7 @@
 
             if (probablyAndStack.ItemSlotContext != null)
             {
-                int slotCount = random.Next(probablyAndStack.Min, probablyAndStack.Max);
+                int slotCount = random.Next(probablyAndStack.Min, probablyAndStack.Max + 1);
                 for (int i = 0; i < slotCount; i++)
                 {
                     items.AddRange(GenerateFromItemSlot(random, probablyAndStack.ItemSlotContext));

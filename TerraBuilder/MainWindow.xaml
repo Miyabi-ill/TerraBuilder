@@ -61,7 +61,7 @@
 						<xctk:PropertyGrid
 							x:Name="GlobalContextProperty"
 							ShowTitle="False"
-							ShowDescriptionByTooltip="False"
+							ShowDescriptionByTooltip="True"
 							ShowSearchBox="False"
 							ShowSortOptions="False"
 							ShowSummary="False"
@@ -73,7 +73,7 @@
 					<xctk:PropertyGrid
 						x:Name="LocalContextProperty"
 						ShowTitle="False"
-						ShowDescriptionByTooltip="False"
+						ShowDescriptionByTooltip="True"
 						ShowSearchBox="False"
 						ShowSortOptions="False"
 						ShowSummary="False"

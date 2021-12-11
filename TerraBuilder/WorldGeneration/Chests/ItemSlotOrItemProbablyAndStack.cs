@@ -42,6 +42,6 @@
 
         public int Max { get; set; } = 1;
 
-        public double Probably { get; set; } = 1.0;
+        public double Probably { get; set; } = 100.0;
     }
 }

@@ -31,6 +31,12 @@
             for (int i = 0; i < simulateChestCount; i++)
             {
                 var chestContext = GenerateChest.GetChestContextByRandom(random, chestGroupName);
+                if (chestContext == null)
+                {
+                    i -= 1;
+                    continue;
+                }
+
                 Dictionary<string, (int count, double probably)> itemSlotDict;
                 ChestAccumulateResult chestAccumulateResult;
 

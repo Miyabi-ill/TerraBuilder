@@ -10,6 +10,6 @@
 
         public string Name { get; set; }
 
-        public double Probably { get; set; } = 1.0;
+        public double Probably { get; set; } = 100.0;
     }
 }

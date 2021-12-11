@@ -105,7 +105,7 @@
                 {
                     if (sandbox.Tiles[cx, y]?.active() == true)
                     {
-                        isStacked = sandbox.Tiles[cx, y].type == TileID.WoodBlock || sandbox.Tiles[cx, y].type == TileID.Platforms;
+                        isStacked = sandbox.Tiles[cx, y].type == context.SolidTileID || sandbox.Tiles[cx, y].type == context.PlatformTileID;
                         foundActiveTile = true;
                         break;
                     }
@@ -152,7 +152,7 @@
                     bool foundBuildingBlock = false;
                     for (int cx = x; cx < x + sizeX; cx++)
                     {
-                        if (sandbox.Tiles[cx, cy] != null && (sandbox.Tiles[cx, cy].type == TileID.WoodBlock || sandbox.Tiles[cx, cy].type == TileID.Platforms))
+                        if (sandbox.Tiles[cx, cy] != null && (sandbox.Tiles[cx, cy].type == context.SolidTileID || sandbox.Tiles[cx, cy].type == context.PlatformTileID))
                         {
                             foundBuildingBlock = true;
                             break;
@@ -174,7 +174,7 @@
                     bool foundBuildingBlock = false;
                     for (int cx = x; cx < x + sizeX; cx++)
                     {
-                        if (sandbox.Tiles[cx, cy] != null && (sandbox.Tiles[cx, cy].type == TileID.WoodBlock || sandbox.Tiles[cx, cy].type == TileID.Platforms))
+                        if (sandbox.Tiles[cx, cy] != null && (sandbox.Tiles[cx, cy].type == context.SolidTileID || sandbox.Tiles[cx, cy].type == context.PlatformTileID))
                         {
                             foundBuildingBlock = true;
                             break;
@@ -205,47 +205,67 @@
                 {
                     if (px == 0)
                     {
-                        ushort tileType = randomWallDir == ActiveWallDirection.Left ? TileID.WoodBlock : TileID.Platforms;
+                        ushort tileType = randomWallDir == ActiveWallDirection.Left ? context.SolidTileID : context.PlatformTileID;
                         tiles[px, py] = new Tile()
                         {
                             type = tileType,
                         };
+                        if (randomWallDir != ActiveWallDirection.Left)
+                        {
+                            tiles[px, py].color(context.PlatformPaintID);
+                        }
+
                         tiles[px, py].active(true);
                         tileProtectionTypes[px, py] = TileProtectionMap.TileProtectionType.TopSolid;
                     }
                     else if (px == sizeX - 1)
                     {
-                        ushort tileType = randomWallDir == ActiveWallDirection.Right ? TileID.WoodBlock : TileID.Platforms;
+                        ushort tileType = randomWallDir == ActiveWallDirection.Right ? context.SolidTileID : context.PlatformTileID;
                         tiles[px, py] = new Tile()
                         {
                             type = tileType,
                         };
+                        if (randomWallDir != ActiveWallDirection.Right)
+                        {
+                            tiles[px, py].color(context.PlatformPaintID);
+                        }
+
                         tiles[px, py].active(true);
                         tileProtectionTypes[px, py] = TileProtectionMap.TileProtectionType.TopSolid;
                     }
                     else if (py == 0)
                     {
-                        ushort tileType = randomWallDir == ActiveWallDirection.Top ? TileID.WoodBlock : TileID.Platforms;
+                        ushort tileType = randomWallDir == ActiveWallDirection.Top ? context.SolidTileID : context.PlatformTileID;
                         tiles[px, py] = new Tile()
                         {
                             type = tileType,
                         };
+                        if (randomWallDir != ActiveWallDirection.Top)
+                        {
+                            tiles[px, py].color(context.PlatformPaintID);
+                        }
+
                         tiles[px, py].active(true);
                         tileProtectionTypes[px, py] = TileProtectionMap.TileProtectionType.TopSolid;
                     }
                     else if (py == sizeY - 1)
                     {
-                        ushort tileType = randomWallDir == ActiveWallDirection.Bottom ? TileID.WoodBlock : TileID.Platforms;
+                        ushort tileType = randomWallDir == ActiveWallDirection.Bottom ? context.SolidTileID : context.PlatformTileID;
                         tiles[px, py] = new Tile()
                         {
                             type = tileType,
                         };
+                        if (randomWallDir != ActiveWallDirection.Bottom)
+                        {
+                            tiles[px, py].color(context.PlatformPaintID);
+                        }
+
                         tiles[px, py].active(true);
                         tileProtectionTypes[px, py] = TileProtectionMap.TileProtectionType.TopSolid;
                     }
                     else
                     {
-                        tiles[px, py] = new Tile() { wall = WallID.Wood };
+                        tiles[px, py] = new Tile() { wall = context.RoomWallID };
                         tileProtectionTypes[px, py] = TileProtectionMap.TileProtectionType.None;
                     }
                 }
@@ -340,6 +360,26 @@
             [DisplayName("松明設置確率")]
             [Description("部屋の中に松明を設置する確率。")]
             public double TorchProbably { get; set; } = 0.08;
+
+            [Category("部屋設置")]
+            [DisplayName("タイルID（壁）")]
+            [Description("部屋の壁のタイルID")]
+            public ushort SolidTileID { get; set; } = TileID.WoodBlock;
+
+            [Category("部屋設置")]
+            [DisplayName("背景壁ID")]
+            [Description("部屋の背景壁の壁ID")]
+            public ushort RoomWallID { get; set; } = WallID.Wood;
+
+            [Category("部屋設置")]
+            [DisplayName("タイルID（プラットフォーム）")]
+            [Description("部屋のプラットフォーム部分のタイルID")]
+            public ushort PlatformTileID { get; set; } = TileID.Platforms;
+
+            [Category("部屋設置")]
+            [DisplayName("タイルペンキID（プラットフォーム）")]
+            [Description("部屋のプラットフォーム部分のペンキID")]
+            public byte PlatformPaintID { get; set; } = 0;
         }
     }
 }
