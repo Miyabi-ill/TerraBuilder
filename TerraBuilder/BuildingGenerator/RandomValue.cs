@@ -86,7 +86,7 @@
 
     public class SelectValue<T> : RandomValue<T>
     {
-        public IList<T> SelectValues { get; private set; } = new List<T>();
+        public List<(double, T)> SelectValues { get; private set; } = new List<(double, T)>();
 
         public override T GetValue(Random rand)
         {
@@ -97,8 +97,19 @@
 
             if (SelectValues.Count > 0)
             {
-                int index = rand.Next(SelectValues.Count);
-                return SelectValues[index];
+                double sum = SelectValues.AsQueryable().Select(((double, T) value) => value.Item1).Sum();
+                double select = rand.NextDouble() * sum;
+                foreach (var value in SelectValues)
+                {
+                    if (select - value.Item1 < 0)
+                    {
+                        return value.Item2;
+                    }
+
+                    select -= value.Item1;
+                }
+
+                return SelectValues.Last().Item2;
             }
             else
             {

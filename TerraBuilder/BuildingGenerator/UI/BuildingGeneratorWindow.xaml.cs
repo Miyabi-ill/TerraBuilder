@@ -170,40 +170,40 @@
         {
             Box root = new Box()
             {
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = 6, Width = 8 },
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue<int> { Value = 6 }, Width = new ConstantValue<int> { Value = 8 } },
                 Name = "Basic-House",
             };
 
             Rectangle leftWall = new Rectangle()
             {
-                X = 1,
-                Y = 5,
+                X = new ConstantValue<int> { Value = 1 },
+                Y = new ConstantValue<int> { Value = 5 },
                 FillTile = nameof(Terraria.ID.TileID.WoodBlock),
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = 2, Width = 1 },
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue<int> { Value = 2 }, Width = new ConstantValue<int> { Value = 1 } },
             };
 
             Rectangle topWall = new Rectangle()
             {
-                X = 1,
-                Y = 6,
+                X = new ConstantValue<int> { Value = 1 },
+                Y = new ConstantValue<int> { Value = 6 },
                 FillTile = nameof(Terraria.ID.TileID.WoodBlock),
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = 1, Width = 8 },
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue<int> { Value = 1 }, Width = new ConstantValue<int> { Value = 8 } },
             };
 
             Rectangle rightWall = new Rectangle()
             {
-                X = 8,
-                Y = 5,
+                X = new ConstantValue<int> { Value = 8 },
+                Y = new ConstantValue<int> { Value = 5 },
                 FillTile = nameof(Terraria.ID.TileID.WoodBlock),
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = 2, Width = 1 },
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue<int> { Value = 2 }, Width = new ConstantValue<int> { Value = 1 } },
             };
 
             Rectangle bottomWall = new Rectangle()
             {
-                X = 1,
-                Y = 1,
+                X = new ConstantValue<int> { Value = 1 },
+                Y = new ConstantValue<int> { Value = 1 },
                 FillTile = nameof(Terraria.ID.TileID.WoodBlock),
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = 1, Width = 8 },
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue<int> { Value = 1 }, Width = new ConstantValue<int> { Value = 8 } },
             };
 
             root.Childs.Add(leftWall);
@@ -213,40 +213,40 @@
 
             Rectangle inner = new Rectangle()
             {
-                X = 2,
-                Y = 2,
+                X = new ConstantValue<int> { Value = 2 },
+                Y = new ConstantValue<int> { Value = 2 },
                 FillWall = nameof(Terraria.ID.WallID.Wood),
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = 4, Width = 6 },
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue<int> { Value = 4 }, Width = new ConstantValue<int> { Value = 6 } },
             };
 
             root.Childs.Add(inner);
 
             Parts.TileObject leftDoor = new Parts.TileObject()
             {
-                ItemName = "WoodenDoor",
-                X = 1,
-                Y = 2,
+                ItemName = new ConstantValue<string> { Value = "WoodenDoor" },
+                X = new ConstantValue<int> { Value = 1 },
+                Y = new ConstantValue<int> { Value = 2 },
             };
 
             Parts.TileObject rightDoor = new Parts.TileObject()
             {
-                ItemName = "WoodenDoor",
-                X = 8,
-                Y = 2,
+                ItemName = new ConstantValue<string> { Value = "WoodenDoor" },
+                X = new ConstantValue<int> { Value = 8 },
+                Y = new ConstantValue<int> { Value = 2 },
             };
 
             Parts.TileObject table = new Parts.TileObject()
             {
-                ItemName = "WoodenTable",
-                X = 3,
-                Y = 2,
+                ItemName = new ConstantValue<string> { Value = "WoodenTable" },
+                X = new ConstantValue<int> { Value = 3 },
+                Y = new ConstantValue<int> { Value = 2 },
             };
 
             Parts.TileObject chair = new Parts.TileObject()
             {
-                ItemName = "WoodenChair",
-                X = 6,
-                Y = 2,
+                ItemName = new ConstantValue<string> { Value = "WoodenChair" },
+                X = new ConstantValue<int> { Value = 6 },
+                Y = new ConstantValue<int> { Value = 2 },
             };
 
             root.Childs.Add(leftDoor);
@@ -281,8 +281,9 @@
 
         private void RegenerateFromMetaDataButton_Click(object sender, RoutedEventArgs e)
         {
-            int width = BuildingMetaData.Size.Width;
-            int height = BuildingMetaData.Size.Height;
+            Random rand = WorldGeneration.WorldGenerationRunner.CurrentRunner.GlobalContext.Random;
+            int width = BuildingMetaData.Size.Width.GetValue(rand);
+            int height = BuildingMetaData.Size.Height.GetValue(rand);
 
             int oldWidth = 0;
             int oldHeight = 0;

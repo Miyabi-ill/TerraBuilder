@@ -14,7 +14,7 @@
         private string name;
         private string originalName;
         private ObservableCollection<string> tags = new ObservableCollection<string>();
-        private Size size = new Size() { Width = 1, Height = 1 };
+        private Size size = new Size() { Width = new ConstantValue<int> { Value = 1 }, Height = new ConstantValue<int> { Value = 1 } };
 
         /// <inheritdoc/>
         public event PropertyChangedEventHandler PropertyChanged;
