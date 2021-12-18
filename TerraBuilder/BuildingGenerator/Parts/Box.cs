@@ -6,6 +6,7 @@
     using Newtonsoft.Json;
     using Terraria;
 
+    [JsonConverter(typeof(PartsConverter))]
     public class Box : BuildParent
     {
     }

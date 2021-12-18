@@ -39,6 +39,9 @@
             };
 
             BuildingFinder.BuildingCache = MainWindow.Window.BuildingCache;
+
+            OverwriteWithTemplateButton_Click(null, null);
+            WriteButton_Click(null, null);
         }
 
         /// <inheritdoc/>
@@ -170,40 +173,40 @@
         {
             Box root = new Box()
             {
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue<int> { Value = 6 }, Width = new ConstantValue<int> { Value = 8 } },
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(6), Width = new ConstantValue(8) },
                 Name = "Basic-House",
             };
 
             Rectangle leftWall = new Rectangle()
             {
-                X = new ConstantValue<int> { Value = 1 },
-                Y = new ConstantValue<int> { Value = 5 },
+                X = new ConstantValue(1),
+                Y = new ConstantValue(5),
                 FillTile = nameof(Terraria.ID.TileID.WoodBlock),
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue<int> { Value = 2 }, Width = new ConstantValue<int> { Value = 1 } },
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(2), Width = new ConstantValue(1) },
             };
 
             Rectangle topWall = new Rectangle()
             {
-                X = new ConstantValue<int> { Value = 1 },
-                Y = new ConstantValue<int> { Value = 6 },
+                X = new ConstantValue(1),
+                Y = new ConstantValue(6),
                 FillTile = nameof(Terraria.ID.TileID.WoodBlock),
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue<int> { Value = 1 }, Width = new ConstantValue<int> { Value = 8 } },
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(1), Width = new ConstantValue(8) },
             };
 
             Rectangle rightWall = new Rectangle()
             {
-                X = new ConstantValue<int> { Value = 8 },
-                Y = new ConstantValue<int> { Value = 5 },
+                X = new ConstantValue(8),
+                Y = new ConstantValue(5),
                 FillTile = nameof(Terraria.ID.TileID.WoodBlock),
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue<int> { Value = 2 }, Width = new ConstantValue<int> { Value = 1 } },
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(2), Width = new ConstantValue(1) },
             };
 
             Rectangle bottomWall = new Rectangle()
             {
-                X = new ConstantValue<int> { Value = 1 },
-                Y = new ConstantValue<int> { Value = 1 },
+                X = new ConstantValue(1),
+                Y = new ConstantValue(1),
                 FillTile = nameof(Terraria.ID.TileID.WoodBlock),
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue<int> { Value = 1 }, Width = new ConstantValue<int> { Value = 8 } },
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(1), Width = new ConstantValue(8) },
             };
 
             root.Childs.Add(leftWall);
@@ -213,40 +216,40 @@
 
             Rectangle inner = new Rectangle()
             {
-                X = new ConstantValue<int> { Value = 2 },
-                Y = new ConstantValue<int> { Value = 2 },
+                X = new ConstantValue(2),
+                Y = new ConstantValue(2),
                 FillWall = nameof(Terraria.ID.WallID.Wood),
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue<int> { Value = 4 }, Width = new ConstantValue<int> { Value = 6 } },
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(4), Width = new ConstantValue(6) },
             };
 
             root.Childs.Add(inner);
 
             Parts.TileObject leftDoor = new Parts.TileObject()
             {
-                ItemName = new ConstantValue<string> { Value = "WoodenDoor" },
-                X = new ConstantValue<int> { Value = 1 },
-                Y = new ConstantValue<int> { Value = 2 },
+                ItemName = new ConstantValue("WoodenDoor"),
+                X = new ConstantValue(1),
+                Y = new ConstantValue(2),
             };
 
             Parts.TileObject rightDoor = new Parts.TileObject()
             {
-                ItemName = new ConstantValue<string> { Value = "WoodenDoor" },
-                X = new ConstantValue<int> { Value = 8 },
-                Y = new ConstantValue<int> { Value = 2 },
+                ItemName = new ConstantValue("WoodenDoor"),
+                X = new ConstantValue(8),
+                Y = new ConstantValue(2),
             };
 
             Parts.TileObject table = new Parts.TileObject()
             {
-                ItemName = new ConstantValue<string> { Value = "WoodenTable" },
-                X = new ConstantValue<int> { Value = 3 },
-                Y = new ConstantValue<int> { Value = 2 },
+                ItemName = new ConstantValue("WoodenTable"),
+                X = new ConstantValue(3),
+                Y = new ConstantValue(2),
             };
 
             Parts.TileObject chair = new Parts.TileObject()
             {
-                ItemName = new ConstantValue<string> { Value = "WoodenChair" },
-                X = new ConstantValue<int> { Value = 6 },
-                Y = new ConstantValue<int> { Value = 2 },
+                ItemName = new ConstantValue("WoodenChair"),
+                X = new ConstantValue(6),
+                Y = new ConstantValue(2),
             };
 
             root.Childs.Add(leftDoor);
@@ -256,7 +259,7 @@
 
             jsonText = JsonConvert.SerializeObject(root, new JsonSerializerSettings()
             {
-                TypeNameHandling = TypeNameHandling.Auto,
+                TypeNameHandling = TypeNameHandling.None,
                 NullValueHandling = NullValueHandling.Ignore,
                 Formatting = Formatting.Indented,
             });
@@ -282,8 +285,8 @@
         private void RegenerateFromMetaDataButton_Click(object sender, RoutedEventArgs e)
         {
             Random rand = WorldGeneration.WorldGenerationRunner.CurrentRunner.GlobalContext.Random;
-            int width = BuildingMetaData.Size.Width.GetValue(rand);
-            int height = BuildingMetaData.Size.Height.GetValue(rand);
+            int width = (int)BuildingMetaData.Size.Width.GetValue(rand);
+            int height = (int)BuildingMetaData.Size.Height.GetValue(rand);
 
             int oldWidth = 0;
             int oldHeight = 0;

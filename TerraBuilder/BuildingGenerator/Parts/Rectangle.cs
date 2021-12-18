@@ -5,6 +5,7 @@
     using Newtonsoft.Json;
     using Terraria;
 
+    [JsonConverter(typeof(PartsConverter))]
     public class Rectangle : BuildBase
     {
         private string fillTile;
@@ -22,11 +23,11 @@
 
         /// <inheritdoc/>
         [JsonProperty]
-        public override RandomValue<int> X { get; set; }
+        public override RandomValue X { get; set; }
 
         /// <inheritdoc/>
         [JsonProperty]
-        public override RandomValue<int> Y { get; set; }
+        public override RandomValue Y { get; set; }
 
         [JsonProperty]
         public Size Size { get; set; }
@@ -163,8 +164,8 @@
         /// <inheritdoc/>
         public override Tile[,] Build(Random rand)
         {
-            int width = Size.Width.GetValue(rand);
-            int height = Size.Height.GetValue(rand);
+            int width = (int)Size.Width.GetValue(rand);
+            int height = (int)Size.Height.GetValue(rand);
             Tile[,] tiles = new Tile[width, height];
 
             for (int i = 0; i < width; i++)

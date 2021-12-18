@@ -1,11 +1,13 @@
 ﻿namespace TerraBuilder.BuildingGenerator.Parts
 {
     using System;
+    using Newtonsoft.Json;
     using Terraria;
 
     /// <summary>
     /// 既存の建築をインポートする。
     /// </summary>
+    [JsonConverter(typeof(PartsConverter))]
     public class Import : BuildBase
     {
         private string buildingName;

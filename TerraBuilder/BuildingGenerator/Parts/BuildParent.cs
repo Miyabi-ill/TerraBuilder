@@ -13,17 +13,18 @@
     /// <summary>
     /// 子を持つ建築の基底クラス。
     /// </summary>
+    [JsonConverter(typeof(PartsConverter))]
     public class BuildParent : BuildBase
     {
-        private RandomValue<int> x = new ConstantValue<int> { Value = 1 };
-        private RandomValue<int> y = new ConstantValue<int> { Value = 1 };
+        private RandomValue x = new ConstantValue(1);
+        private RandomValue y = new ConstantValue(1);
         private string name;
         private Size size;
         private ObservableCollection<BuildBase> childs = new ObservableCollection<BuildBase>();
 
         /// <inheritdoc/>
         [JsonProperty]
-        public override RandomValue<int> X
+        public override RandomValue X
         {
             get => x;
             set
@@ -35,7 +36,7 @@
 
         /// <inheritdoc/>
         [JsonProperty]
-        public override RandomValue<int> Y
+        public override RandomValue Y
         {
             get => y;
             set
@@ -88,8 +89,8 @@
         /// <inheritdoc/>
         public override Tile[,] Build(Random rand)
         {
-            int width = Size.Width.GetValue(rand);
-            int height = Size.Height.GetValue(rand);
+            int width = (int)Size.Width.GetValue(rand);
+            int height = (int)Size.Height.GetValue(rand);
             Tile[,] tiles = new Tile[width, height];
             for (int i = 0; i < width; i++)
             {
@@ -103,8 +104,8 @@
             {
                 Tile[,] builds = child.Build(rand);
                 int h = builds.GetLength(1);
-                int childX = child.X.GetValue(rand);
-                int childY = child.Y.GetValue(rand);
+                int childX = (int)child.X.GetValue(rand);
+                int childY = (int)child.Y.GetValue(rand);
                 int startY = height - (h + childY - 1);
                 for (int i = 0; i < builds.GetLength(0); i++)
                 {

@@ -6,7 +6,9 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using Newtonsoft.Json;
 
+    [JsonConverter(typeof(PartsConverter))]
     public class BuildRoot : BuildParent
     {
         public ObservableCollection<string> Tags { get; } = new ObservableCollection<string>();

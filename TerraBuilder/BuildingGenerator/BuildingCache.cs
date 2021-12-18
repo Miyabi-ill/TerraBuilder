@@ -344,7 +344,7 @@
             else if (TileTags.ContainsKey(name))
             {
                 Random rand = WorldGeneration.WorldGenerationRunner.CurrentRunner.GlobalContext.Random;
-                Tile[,] tiles = new Parts.TileObject() { ItemName = new ConstantValue<string> { Value = name.Substring(5) } }.Build(rand);
+                Tile[,] tiles = new Parts.TileObject() { ItemName = new ConstantValue(name.Substring(5)) }.Build(rand);
                 if (tiles.GetLength(0) > 0)
                 {
                     return tiles;
@@ -355,13 +355,13 @@
                     {
                         int tileId = TerrariaNameDict.ItemNameToItem[name.Substring(5)].createTile;
                         string tileTypeName = TerrariaNameDict.TileNameToID.First(p => p.Value == tileId).Key;
-                        return new Parts.Rectangle() { FillTile = tileTypeName, Size = new Size() { Width = new ConstantValue<int> { Value = 1 }, Height = new ConstantValue<int> { Value = 1 } } }.Build(rand);
+                        return new Parts.Rectangle() { FillTile = tileTypeName, Size = new Size() { Width = new ConstantValue(1), Height = new ConstantValue(1) } }.Build(rand);
                     }
                     else if (name.StartsWith("Wall:"))
                     {
                         int wallId = TerrariaNameDict.ItemNameToItem[name.Substring(5)].createWall;
                         string wallTypeName = TerrariaNameDict.WallNameToID.First(p => p.Value == wallId).Key;
-                        return new Parts.Rectangle() { FillWall = wallTypeName, Size = new Size() { Width = new ConstantValue<int> { Value = 1 }, Height = new ConstantValue<int> { Value = 1 } } }.Build(rand);
+                        return new Parts.Rectangle() { FillWall = wallTypeName, Size = new Size() { Width = new ConstantValue(1), Height = new ConstantValue(1) } }.Build(rand);
                     }
 
                     throw new ArgumentException("This could never happen.");

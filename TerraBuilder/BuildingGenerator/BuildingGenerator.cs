@@ -182,9 +182,9 @@
                     Rectangle rectangle = new Rectangle()
                     {
                         FillWall = TerrariaNameDict.TileNameToID.First(p => p.Value == wallId).Key,
-                        Size = new Size() { Width = new ConstantValue<int> { Value = wallWidth }, Height = new ConstantValue<int> { Value = wallHeight } },
-                        X = new ConstantValue<int> { Value = x + 1 },
-                        Y = new ConstantValue<int> { Value = y + 1 },
+                        Size = new Size() { Width = new ConstantValue(wallWidth), Height = new ConstantValue(wallHeight) },
+                        X = new ConstantValue(x + 1),
+                        Y = new ConstantValue(y + 1),
                     };
 
                     root.Childs.Add(rectangle);

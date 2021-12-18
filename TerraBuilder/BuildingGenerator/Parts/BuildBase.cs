@@ -8,10 +8,11 @@
     /// <summary>
     /// 建築生成の基底クラス
     /// </summary>
+    [JsonConverter(typeof(PartsConverter))]
     public class BuildBase : INotifyPropertyChanged
     {
-        private RandomValue<int> x = new ConstantValue<int>() { Value = 1 };
-        private RandomValue<int> y = new ConstantValue<int>() { Value = 1 };
+        private RandomValue x = new ConstantValue() { Value = 1 };
+        private RandomValue y = new ConstantValue() { Value = 1 };
         private string name;
 
         /// <inheritdoc/>
@@ -21,7 +22,7 @@
         /// 建築の基準点X。左下を0とする。
         /// </summary>
         [JsonProperty]
-        public virtual RandomValue<int> X
+        public virtual RandomValue X
         {
             get => x;
             set
@@ -35,7 +36,7 @@
         /// 建築の基準点Y。左下を0とする。
         /// </summary>
         [JsonProperty]
-        public virtual RandomValue<int> Y
+        public virtual RandomValue Y
         {
             get => y;
             set
@@ -57,6 +58,15 @@
                 name = value;
                 RaisePropertyChanged(nameof(Name));
             }
+        }
+
+        /// <summary>
+        /// 型名。Jsonからのデシリアライズに使われる。
+        /// </summary>
+        [JsonProperty]
+        public virtual string TypeName
+        {
+            get => this.GetType().Name;
         }
 
         /// <summary>

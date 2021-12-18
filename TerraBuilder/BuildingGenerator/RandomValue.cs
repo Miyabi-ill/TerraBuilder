@@ -6,76 +6,153 @@
     using System.Text;
     using System.Threading.Tasks;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
-    public abstract class RandomValue<T>
+    [JsonConverter(typeof(RandomValueConverter))]
+    public abstract class RandomValue
     {
+        /// <summary>
+        /// 値選択タイプ名
+        /// </summary>
+        [JsonProperty]
+        public abstract string TypeName { get; }
+
         /// <summary>
         /// 値を取得する
         /// </summary>
         /// <param name="rand">乱数生成インスタンス</param>
         /// <returns>生成された値</returns>
-        public abstract T GetValue(Random rand);
+        public abstract object GetValue(Random rand);
     }
 
-    public class ConstantValue<T> : RandomValue<T>
+    [JsonConverter(typeof(RandomValueConverter))]
+    public class ConstantValue : RandomValue
     {
         /// <summary>
-        /// 帰す固定値
+        /// 固定値を返すクラスのコンストラクタ。
+        /// </summary>
+        public ConstantValue()
+        {
+        }
+
+        /// <summary>
+        /// 固定値を返すクラスのコンストラクタ。
+        /// </summary>
+        /// <param name="value">返す固定値</param>
+        public ConstantValue(object value)
+        {
+            Value = value;
+        }
+
+        /// <summary>
+        /// 返す固定値
         /// </summary>
         [JsonProperty]
-        public T Value { get; set; }
+        public object Value { get; set; }
+
+        /// <inheritdoc/>
+        [JsonProperty]
+        public override string TypeName => "Constant";
 
         /// <summary>
         /// 固定値を取得する
         /// </summary>
         /// <param name="rand">乱数生成インスタンス。使わない</param>
         /// <returns>Valueを帰す</returns>
-        public override T GetValue(Random rand)
+        public override object GetValue(Random rand)
         {
             return Value;
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
-            return Value.ToString();
+            return Value?.ToString();
         }
     }
 
     /// <summary>
     /// 範囲内の値を生成する。intかdouble以外が必要な場合、SelectValueを使う。
     /// </summary>
-    /// <typeparam name="T">intかdouble</typeparam>
-    public class RangeValue<T> : RandomValue<T>
+    [JsonConverter(typeof(RandomValueConverter))]
+    public class RangeValue : RandomValue
     {
+        private Type dataType;
+
+        /// <summary>
+        /// 範囲内の値を生成するクラスのコンストラクタ。
+        /// このコンストラクタを使用する場合、DataTypeを自分で指定する必要がある。
+        /// </summary>
         public RangeValue()
         {
-            if (typeof(T) != typeof(int) && typeof(T) != typeof(double))
+        }
+
+        /// <summary>
+        /// 範囲内の値を生成するクラスのコンストラクタ。
+        /// </summary>
+        /// <param name="minValue">最小値</param>
+        /// <param name="maxValue">最大値</param>
+        /// <exception cref="TypeInitializationException">minValueかmaxValueがintかdoubleでなければエラー</exception>
+        public RangeValue(object minValue, object maxValue)
+        {
+            if ((minValue.GetType() != typeof(int) && minValue.GetType() != typeof(double))
+                || (maxValue.GetType() != typeof(int) && maxValue.GetType() != typeof(double)))
             {
-                throw new TypeInitializationException(nameof(RangeValue<T>), new ArgumentException($"RangeValue generics type must be `int` or `double` but it is `{typeof(T).Name}`"));
+                throw new TypeInitializationException(nameof(RangeValue), new ArgumentException("RangeValue value type must be `int` or `double`."));
+            }
+
+            if (minValue is double || maxValue is double)
+            {
+                MinValue = (double)minValue;
+                MaxValue = (double)maxValue;
+                dataType = typeof(double);
+            }
+            else
+            {
+                MinValue = minValue;
+                MaxValue = maxValue;
+                dataType = typeof(int);
             }
         }
 
-        public T MinValue { get; set; }
+        [JsonProperty]
+        public override string TypeName => "Range";
 
-        public T MaxValue { get; set; }
+        [JsonProperty]
+        public object MinValue { get; set; }
 
-        public override T GetValue(Random rand)
+        [JsonProperty]
+        public object MaxValue { get; set; }
+
+        public override object GetValue(Random rand)
         {
             if (rand == null)
             {
                 rand = new Random();
             }
 
-            if (MinValue is int)
+            if (dataType == null)
             {
-                return (T)(object)rand.Next(Convert.ToInt32(MinValue), Convert.ToInt32(MaxValue) + 1);
-            }
-            else if (MinValue is double minValue && MaxValue is double maxValue)
-            {
-                return (T)(object)((rand.NextDouble() * (maxValue - minValue)) + minValue);
+                if (MinValue is int && MaxValue is int)
+                {
+                    dataType = typeof(int);
+                }
+                else
+                {
+                    dataType = typeof(double);
+                }
             }
 
-            throw new ArgumentException($"RangeValue generics type must be `int` or `double` but it is `{typeof(T).Name}`");
+            if (dataType == typeof(int))
+            {
+                return rand.Next((int)MinValue, (int)MaxValue + 1);
+            }
+            else if (dataType == typeof(double))
+            {
+                return (rand.NextDouble() * ((double)MaxValue - (double)MinValue)) + (double)MinValue;
+            }
+
+            throw new ArgumentException($"RangeValue DataType must be `int` or `double`");
         }
 
         public override string ToString()
@@ -84,11 +161,16 @@
         }
     }
 
-    public class SelectValue<T> : RandomValue<T>
+    [JsonConverter(typeof(RandomValueConverter))]
+    public class SelectValue : RandomValue
     {
-        public List<(double, T)> SelectValues { get; private set; } = new List<(double, T)>();
+        [JsonProperty]
+        public override string TypeName => "Select";
 
-        public override T GetValue(Random rand)
+        [JsonProperty]
+        public List<(double, object)> SelectValues { get; protected set; } = new List<(double, object)>();
+
+        public override object GetValue(Random rand)
         {
             if (rand == null)
             {
@@ -97,7 +179,7 @@
 
             if (SelectValues.Count > 0)
             {
-                double sum = SelectValues.AsQueryable().Select(((double, T) value) => value.Item1).Sum();
+                double sum = SelectValues.AsQueryable().Select(((double, object) value) => value.Item1).Sum();
                 double select = rand.NextDouble() * sum;
                 foreach (var value in SelectValues)
                 {
@@ -120,6 +202,56 @@
         public override string ToString()
         {
             return $"[{string.Join(", ", SelectValues)}]";
+        }
+    }
+
+    public class RandomValueConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return typeof(RandomValue).IsAssignableFrom(objectType);
+        }
+
+        public override bool CanWrite
+        {
+            get { return false; }
+        }
+
+        public override object ReadJson(
+            JsonReader reader,
+            Type objectType,
+            object existingValue,
+            JsonSerializer serializer)
+        {
+            // JObjectをJsonからロード
+            JObject jObject = JObject.Load(reader);
+
+            string typeName = (string)jObject["TypeName"];
+            RandomValue target;
+            switch (typeName)
+            {
+                case "Constant":
+                    target = new ConstantValue();
+                    break;
+                case "Range":
+                    target = new RangeValue();
+                    break;
+                case "Select":
+                    target = new SelectValue();
+                    break;
+                default:
+                    throw new JsonReaderException($"TypeName `{typeName}` does not implemented.");
+            }
+
+            // Populate the object properties
+            serializer.Populate(jObject.CreateReader(), target);
+
+            return target;
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            throw new NotImplementedException();
         }
     }
 }

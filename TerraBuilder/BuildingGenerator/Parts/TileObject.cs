@@ -5,21 +5,22 @@
     using Terraria;
     using Terraria.ObjectData;
 
+    [JsonConverter(typeof(PartsConverter))]
     public class TileObject : BuildBase
     {
-        private RandomValue<string> itemName;
-        private RandomValue<int> tileId;
-        private RandomValue<int> style;
-        private RandomValue<int> alternate;
+        private RandomValue itemName;
+        private RandomValue tileId;
+        private RandomValue style;
+        private RandomValue alternate;
 
-        private RandomValue<string> paintName;
-        private RandomValue<byte> paintType;
+        private RandomValue paintName;
+        private RandomValue paintType;
 
         /// <summary>
         /// アイテム名。設定すると<see cref="TileID"/>と<see cref="Style"/>が自動的に設定される。
         /// </summary>
         [JsonProperty]
-        public RandomValue<string> ItemName
+        public RandomValue ItemName
         {
             get => itemName;
             set
@@ -34,7 +35,7 @@
         /// 設置するタイルID。基本的に<see cref="ItemName"/>を使い、それで設定できないものに使う。
         /// </summary>
         [JsonProperty]
-        public RandomValue<int> TileID
+        public RandomValue TileID
         {
             get => tileId;
             set
@@ -48,7 +49,7 @@
         /// 設置するスタイル。基本的に<see cref="ItemName"/>を使い、それで設定できないものに使う。
         /// </summary>
         [JsonProperty]
-        public RandomValue<int> Style
+        public RandomValue Style
         {
             get => style;
             set
@@ -62,7 +63,7 @@
         /// 同じタイル、スタイルの中で違うテクスチャを選択する。ex.本、カボチャランタン、プレゼントなど
         /// </summary>
         [JsonProperty]
-        public RandomValue<int> Alternate
+        public RandomValue Alternate
         {
             get => alternate;
             set
@@ -75,7 +76,7 @@
         /// ペンキの名前
         /// </summary>
         [JsonProperty]
-        public RandomValue<string> Paint
+        public RandomValue Paint
         {
             get => paintName;
             set
@@ -89,7 +90,7 @@
         /// ペンキID
         /// </summary>
         [JsonIgnore]
-        public RandomValue<byte> PaintType
+        public RandomValue PaintType
         {
             get => paintType;
             set
@@ -102,11 +103,11 @@
         /// <inheritdoc/>
         public override Tile[,] Build(Random rand)
         {
-            string itemName = this.itemName?.GetValue(rand);
-            string paintName = this.paintName?.GetValue(rand);
+            string itemName = (string)this.itemName?.GetValue(rand);
+            string paintName = (string)this.paintName?.GetValue(rand);
             int tileId = 0;
             int style = 0;
-            int alternate = Alternate?.GetValue(rand) ?? 0;
+            int alternate = (int?)Alternate?.GetValue(rand) ?? 0;
             byte paintType = 0;
 
             if (!string.IsNullOrEmpty(itemName) && TerrariaNameDict.ItemNameToItem.ContainsKey(itemName))
@@ -117,8 +118,8 @@
             }
             else
             {
-                tileId = TileID?.GetValue(rand) ?? 0;
-                style = Style?.GetValue(rand) ?? 0;
+                tileId = (int?)TileID?.GetValue(rand) ?? 0;
+                style = (int?)Style?.GetValue(rand) ?? 0;
             }
 
             if (!string.IsNullOrEmpty(paintName) && TerrariaNameDict.PaintNameToID.ContainsKey(paintName))
@@ -127,7 +128,7 @@
             }
             else
             {
-                paintType = PaintType?.GetValue(rand) ?? 0;
+                paintType = (byte?)PaintType?.GetValue(rand) ?? 0;
             }
 
             if (tileId < 0)
