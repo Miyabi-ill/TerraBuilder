@@ -23,7 +23,7 @@
             {
                 if (field.FieldType == typeof(ushort))
                 {
-                    WallNameToID.Add(field.Name, (ushort)field.GetValue(null));
+                    WallNameToID.Add(field.Name.ToLower(), (ushort)field.GetValue(null));
                 }
             }
 
@@ -36,7 +36,7 @@
                     item.SetDefaults(id);
                     if (item.type == id)
                     {
-                        ItemNameToItem.Add(field.Name, item);
+                        ItemNameToItem.Add(field.Name.ToLower(), item);
                     }
                 }
             }
@@ -46,7 +46,7 @@
                 if (field.FieldType == typeof(byte))
                 {
                     byte id = (byte)field.GetValue(null);
-                    PaintNameToID.Add(field.Name, id);
+                    PaintNameToID.Add(field.Name.ToLower(), id);
                 }
             }
         }

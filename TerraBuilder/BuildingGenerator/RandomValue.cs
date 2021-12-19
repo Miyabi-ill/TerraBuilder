@@ -28,6 +28,8 @@
     [JsonConverter(typeof(RandomValueConverter))]
     public class ConstantValue : RandomValue
     {
+        private object value;
+
         /// <summary>
         /// 固定値を返すクラスのコンストラクタ。
         /// </summary>
@@ -48,7 +50,21 @@
         /// 返す固定値
         /// </summary>
         [JsonProperty]
-        public object Value { get; set; }
+        public object Value
+        {
+            get => value;
+            set
+            {
+                if (value is long val)
+                {
+                    this.value = (int)val;
+                }
+                else
+                {
+                    this.value = value;
+                }
+            }
+        }
 
         /// <inheritdoc/>
         [JsonProperty]
@@ -78,6 +94,8 @@
     public class RangeValue : RandomValue
     {
         private Type dataType;
+        private object minValue;
+        private object maxValue;
 
         /// <summary>
         /// 範囲内の値を生成するクラスのコンストラクタ。
@@ -95,6 +113,16 @@
         /// <exception cref="TypeInitializationException">minValueかmaxValueがintかdoubleでなければエラー</exception>
         public RangeValue(object minValue, object maxValue)
         {
+            if (minValue is long)
+            {
+                minValue = (int)(long)minValue;
+            }
+
+            if (maxValue is long)
+            {
+                maxValue = (int)(long)maxValue;
+            }
+
             if ((minValue.GetType() != typeof(int) && minValue.GetType() != typeof(double))
                 || (maxValue.GetType() != typeof(int) && maxValue.GetType() != typeof(double)))
             {
@@ -103,14 +131,14 @@
 
             if (minValue is double || maxValue is double)
             {
-                MinValue = (double)minValue;
-                MaxValue = (double)maxValue;
+                this.minValue = (double)minValue;
+                this.maxValue = (double)maxValue;
                 dataType = typeof(double);
             }
             else
             {
-                MinValue = minValue;
-                MaxValue = maxValue;
+                this.minValue = minValue;
+                this.maxValue = maxValue;
                 dataType = typeof(int);
             }
         }
@@ -119,10 +147,38 @@
         public override string TypeName => "Range";
 
         [JsonProperty]
-        public object MinValue { get; set; }
+        public object MinValue
+        {
+            get => minValue;
+            set
+            {
+                if (value is long)
+                {
+                    minValue = (int)(long)value;
+                }
+                else
+                {
+                    minValue = value;
+                }
+            }
+        }
 
         [JsonProperty]
-        public object MaxValue { get; set; }
+        public object MaxValue
+        {
+            get => maxValue;
+            set
+            {
+                if (value is long)
+                {
+                    maxValue = (int)(long)value;
+                }
+                else
+                {
+                    maxValue = value;
+                }
+            }
+        }
 
         public override object GetValue(Random rand)
         {
@@ -152,7 +208,7 @@
                 return (rand.NextDouble() * ((double)MaxValue - (double)MinValue)) + (double)MinValue;
             }
 
-            throw new ArgumentException($"RangeValue DataType must be `int` or `double`");
+            throw new ArgumentException("RangeValue DataType must be `int` or `double`");
         }
 
         public override string ToString()
@@ -191,7 +247,13 @@
                     select -= value.Item1;
                 }
 
-                return SelectValues.Last().Item2;
+                object val = SelectValues.Last().Item2;
+                if (val is long)
+                {
+                    val = (int)(long)val;
+                }
+
+                return val;
             }
             else
             {

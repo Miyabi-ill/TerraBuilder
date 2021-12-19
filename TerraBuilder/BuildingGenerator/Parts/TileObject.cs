@@ -110,9 +110,9 @@
             int alternate = (int?)Alternate?.GetValue(rand) ?? 0;
             byte paintType = 0;
 
-            if (!string.IsNullOrEmpty(itemName) && TerrariaNameDict.ItemNameToItem.ContainsKey(itemName))
+            if (!string.IsNullOrEmpty(itemName) && TerrariaNameDict.ItemNameToItem.ContainsKey(itemName.ToLower()))
             {
-                Item item = TerrariaNameDict.ItemNameToItem[itemName];
+                Item item = TerrariaNameDict.ItemNameToItem[itemName.ToLower()];
                 tileId = item.createTile;
                 style = item.placeStyle;
             }
@@ -122,13 +122,13 @@
                 style = (int?)Style?.GetValue(rand) ?? 0;
             }
 
-            if (!string.IsNullOrEmpty(paintName) && TerrariaNameDict.PaintNameToID.ContainsKey(paintName))
+            if (!string.IsNullOrEmpty(paintName) && TerrariaNameDict.PaintNameToID.ContainsKey(paintName.ToLower()))
             {
-                paintType = TerrariaNameDict.PaintNameToID[paintName];
+                paintType = TerrariaNameDict.PaintNameToID[paintName.ToLower()];
             }
             else
             {
-                paintType = (byte?)PaintType?.GetValue(rand) ?? 0;
+                paintType = Convert.ToByte(PaintType?.GetValue(rand));
             }
 
             if (tileId < 0)

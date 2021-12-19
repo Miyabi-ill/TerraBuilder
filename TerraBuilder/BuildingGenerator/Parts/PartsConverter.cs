@@ -63,7 +63,6 @@
 
             // Populate the object properties
             serializer.Populate(jObject.CreateReader(), target);
-
             return target;
         }
 

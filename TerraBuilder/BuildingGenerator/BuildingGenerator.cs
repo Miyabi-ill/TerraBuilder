@@ -181,7 +181,8 @@
 
                     Rectangle rectangle = new Rectangle()
                     {
-                        FillWall = TerrariaNameDict.TileNameToID.First(p => p.Value == wallId).Key,
+                        // TODO
+                        //FillWall = TerrariaNameDict.TileNameToID.First(p => p.Value == wallId).Key,
                         Size = new Size() { Width = new ConstantValue(wallWidth), Height = new ConstantValue(wallHeight) },
                         X = new ConstantValue(x + 1),
                         Y = new ConstantValue(y + 1),

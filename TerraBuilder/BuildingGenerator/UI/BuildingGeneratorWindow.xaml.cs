@@ -171,42 +171,46 @@
 
         private void OverwriteWithTemplateButton_Click(object sender, RoutedEventArgs e)
         {
-            Box root = new Box()
+            BuildRoot root = new BuildRoot()
             {
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(6), Width = new ConstantValue(8) },
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(8), Width = new ConstantValue(10) },
                 Name = "Basic-House",
             };
+
+            SelectValue fillTiles = new SelectValue();
+            fillTiles.SelectValues.Add((0.6, nameof(Terraria.ID.TileID.GrayBrick)));
+            fillTiles.SelectValues.Add((0.4, nameof(Terraria.ID.TileID.StoneSlab)));
 
             Rectangle leftWall = new Rectangle()
             {
                 X = new ConstantValue(1),
-                Y = new ConstantValue(5),
-                FillTile = nameof(Terraria.ID.TileID.WoodBlock),
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(2), Width = new ConstantValue(1) },
+                Y = new ConstantValue(6),
+                FillTile = fillTiles,
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(2), Width = new ConstantValue(2) },
             };
 
             Rectangle topWall = new Rectangle()
             {
                 X = new ConstantValue(1),
-                Y = new ConstantValue(6),
-                FillTile = nameof(Terraria.ID.TileID.WoodBlock),
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(1), Width = new ConstantValue(8) },
+                Y = new ConstantValue(7),
+                FillTile = fillTiles,
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(2), Width = new ConstantValue(10) },
             };
 
             Rectangle rightWall = new Rectangle()
             {
-                X = new ConstantValue(8),
-                Y = new ConstantValue(5),
-                FillTile = nameof(Terraria.ID.TileID.WoodBlock),
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(2), Width = new ConstantValue(1) },
+                X = new ConstantValue(9),
+                Y = new ConstantValue(6),
+                FillTile = fillTiles,
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(2), Width = new ConstantValue(2) },
             };
 
             Rectangle bottomWall = new Rectangle()
             {
                 X = new ConstantValue(1),
                 Y = new ConstantValue(1),
-                FillTile = nameof(Terraria.ID.TileID.WoodBlock),
-                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(1), Width = new ConstantValue(8) },
+                FillTile = fillTiles,
+                Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(2), Width = new ConstantValue(10) },
             };
 
             root.Childs.Add(leftWall);
@@ -216,9 +220,9 @@
 
             Rectangle inner = new Rectangle()
             {
-                X = new ConstantValue(2),
-                Y = new ConstantValue(2),
-                FillWall = nameof(Terraria.ID.WallID.Wood),
+                X = new ConstantValue(3),
+                Y = new ConstantValue(3),
+                FillWall = new ConstantValue(nameof(Terraria.ID.WallID.Wood)),
                 Size = new TerraBuilder.BuildingGenerator.Size() { Height = new ConstantValue(4), Width = new ConstantValue(6) },
             };
 
@@ -227,29 +231,29 @@
             Parts.TileObject leftDoor = new Parts.TileObject()
             {
                 ItemName = new ConstantValue("WoodenDoor"),
-                X = new ConstantValue(1),
-                Y = new ConstantValue(2),
+                X = new ConstantValue(2),
+                Y = new ConstantValue(3),
             };
 
             Parts.TileObject rightDoor = new Parts.TileObject()
             {
                 ItemName = new ConstantValue("WoodenDoor"),
-                X = new ConstantValue(8),
-                Y = new ConstantValue(2),
+                X = new ConstantValue(9),
+                Y = new ConstantValue(3),
             };
 
             Parts.TileObject table = new Parts.TileObject()
             {
                 ItemName = new ConstantValue("WoodenTable"),
-                X = new ConstantValue(3),
-                Y = new ConstantValue(2),
+                X = new ConstantValue(4),
+                Y = new ConstantValue(3),
             };
 
             Parts.TileObject chair = new Parts.TileObject()
             {
                 ItemName = new ConstantValue("WoodenChair"),
-                X = new ConstantValue(6),
-                Y = new ConstantValue(2),
+                X = new ConstantValue(7),
+                Y = new ConstantValue(3),
             };
 
             root.Childs.Add(leftDoor);

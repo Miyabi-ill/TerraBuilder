@@ -8,27 +8,6 @@
     [JsonConverter(typeof(PartsConverter))]
     public class Rectangle : BuildBase
     {
-        private string fillTile;
-        private string fillWall;
-
-        private int fillTileType = -1;
-        private ushort fillWallType;
-
-        private string paintName;
-        private byte paintType;
-
-        private string tileShape;
-        private bool halfBlock;
-        private byte slopeType;
-
-        /// <inheritdoc/>
-        [JsonProperty]
-        public override RandomValue X { get; set; }
-
-        /// <inheritdoc/>
-        [JsonProperty]
-        public override RandomValue Y { get; set; }
-
         [JsonProperty]
         public Size Size { get; set; }
 
@@ -36,130 +15,22 @@
         /// 範囲内をタイルで埋めるときのタイル内部名。
         /// </summary>
         [JsonProperty]
-        public string FillTile
-        {
-            get => fillTile;
-            set
-            {
-                fillTile = value;
-                fillTileType = TerrariaNameDict.TileNameToID[fillTile.ToLower()];
-            }
-        }
-
-        /// <summary>
-        /// 範囲内をタイルで埋めるときのタイルID。
-        /// </summary>
-        [JsonIgnore]
-        public int FillTileType
-        {
-            get => fillTileType;
-            set
-            {
-                fillTileType = value;
-            }
-        }
+        public RandomValue FillTile { get; set; }
 
         /// <summary>
         /// 範囲内を壁で埋めるときの壁内部名。
         /// </summary>
         [JsonProperty]
-        public string FillWall
-        {
-            get => fillWall;
-            set
-            {
-                fillWall = value;
-                fillWallType = TerrariaNameDict.WallNameToID[fillWall];
-            }
-        }
-
-        /// <summary>
-        /// 範囲内を壁で埋めるときの壁ID。
-        /// </summary>
-        [JsonIgnore]
-        public ushort FillWallType
-        {
-            get => fillWallType;
-            set
-            {
-                fillWallType = value;
-            }
-        }
+        public RandomValue FillWall { get; set; }
 
         /// <summary>
         /// ペンキの名前
         /// </summary>
         [JsonProperty]
-        public string Paint
-        {
-            get => paintName;
-            set
-            {
-                paintName = value;
-                paintType = TerrariaNameDict.PaintNameToID[paintName];
-            }
-        }
-
-        /// <summary>
-        /// ペンキID
-        /// </summary>
-        [JsonIgnore]
-        public byte PaintType
-        {
-            get => paintType;
-            set => paintType = value;
-        }
+        public RandomValue Paint { get; set; }
 
         [JsonProperty]
-        public string TileShape
-        {
-            get => tileShape;
-            set
-            {
-                tileShape = value;
-                switch (tileShape.ToLowerInvariant())
-                {
-                    case "half":
-                        HalfBlock = true;
-                        SlopeType = 0;
-                        break;
-                    case "leftbottom":
-                        SlopeType = 1;
-                        HalfBlock = false;
-                        break;
-                    case "lefttop":
-                        SlopeType = 3;
-                        HalfBlock = false;
-                        break;
-                    case "rightbottom":
-                        SlopeType = 2;
-                        HalfBlock = false;
-                        break;
-                    case "righttop":
-                        SlopeType = 4;
-                        HalfBlock = false;
-                        break;
-                    default:
-                        HalfBlock = false;
-                        SlopeType = 0;
-                        break;
-                }
-            }
-        }
-
-        [JsonIgnore]
-        public bool HalfBlock
-        {
-            get => halfBlock;
-            set => halfBlock = value;
-        }
-
-        [JsonIgnore]
-        public byte SlopeType
-        {
-            get => slopeType;
-            set => slopeType = value;
-        }
+        public RandomValue TileShape { get; set; }
 
         /// <inheritdoc/>
         public override Tile[,] Build(Random rand)
@@ -172,27 +43,82 @@
             {
                 for (int j = 0; j < height; j++)
                 {
-                    tiles[i, j] = new Tile();
-
-                    if (FillWallType != 0)
+                    int fillTileType = -1;
+                    if (FillTile != null)
                     {
-                        tiles[i, j].wall = FillWallType;
-                        tiles[i, j].wallColor(PaintType);
+                        string fillTile = (string)FillTile.GetValue(rand);
+                        fillTileType = TerrariaNameDict.TileNameToID[fillTile.ToLower()];
                     }
 
-                    if (FillTileType != -1)
+                    ushort fillWallType = 0;
+                    if (FillWall != null)
                     {
-                        tiles[i, j].type = (ushort)FillTileType;
-                        tiles[i, j].active(true);
-                        tiles[i, j].color(PaintType);
+                        string fillWall = (string)FillWall.GetValue(rand);
+                        fillWallType = TerrariaNameDict.WallNameToID[fillWall.ToLower()];
+                    }
 
-                        if (HalfBlock)
+                    byte paintType = 0;
+                    if (Paint != null)
+                    {
+                        string paintName = (string)Paint.GetValue(rand);
+                        paintType = TerrariaNameDict.PaintNameToID[paintName.ToLower()];
+                    }
+
+                    bool halfBlock = false;
+                    byte slopeType = 0;
+                    if (TileShape != null)
+                    {
+                        string tileShape = (string)TileShape.GetValue(rand);
+                        switch (tileShape?.ToLowerInvariant())
+                        {
+                            case "half":
+                                halfBlock = true;
+                                slopeType = 0;
+                                break;
+                            case "leftbottom":
+                                slopeType = 1;
+                                halfBlock = false;
+                                break;
+                            case "lefttop":
+                                slopeType = 3;
+                                halfBlock = false;
+                                break;
+                            case "rightbottom":
+                                slopeType = 2;
+                                halfBlock = false;
+                                break;
+                            case "righttop":
+                                slopeType = 4;
+                                halfBlock = false;
+                                break;
+                            default:
+                                halfBlock = false;
+                                slopeType = 0;
+                                break;
+                        }
+                    }
+
+                    tiles[i, j] = new Tile();
+
+                    if (fillWallType != 0)
+                    {
+                        tiles[i, j].wall = fillWallType;
+                        tiles[i, j].wallColor(paintType);
+                    }
+
+                    if (fillTileType != -1)
+                    {
+                        tiles[i, j].type = (ushort)fillTileType;
+                        tiles[i, j].active(true);
+                        tiles[i, j].color(paintType);
+
+                        if (halfBlock)
                         {
                             tiles[i, j].halfBrick(true);
                         }
-                        else if (SlopeType != 0)
+                        else if (slopeType != 0)
                         {
-                            tiles[i, j].slope(SlopeType);
+                            tiles[i, j].slope(slopeType);
                         }
                     }
                 }
