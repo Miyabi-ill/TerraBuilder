@@ -12,7 +12,7 @@
     using Microsoft.WindowsAPICodePack.Dialogs;
     using TerraBuilder.BuildingGenerator;
     using TerraBuilder.ChestSimulator;
-    using TerraBuilder.Views;
+    using TerraBuilder.UI;
     using TerraBuilder.WorldGeneration;
 
     /// <summary>

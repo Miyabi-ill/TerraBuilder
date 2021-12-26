@@ -1,9 +1,9 @@
-﻿<Window x:Class="TerraBuilder.Views.ChestEditor"
+﻿<Window x:Class="TerraBuilder.UI.ChestEditor"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TerraBuilder.Views"
+        xmlns:local="clr-namespace:TerraBuilder.UI"
 		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="ChestEditor" Height="450" Width="1200">

@@ -1,7 +1,7 @@
 ﻿namespace TerraBuilder.BuildingGenerator.UI
 {
     using System.Windows;
-    using static TerraBuilder.Views.TileEditor;
+    using static TerraBuilder.UI.TileEditor;
 
     /// <summary>
     /// Interaction logic for SelectHammerWindow.xaml

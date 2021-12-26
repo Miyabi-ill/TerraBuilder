@@ -6,7 +6,7 @@
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media;
-    using TerraBuilder.Views;
+    using TerraBuilder.UI;
     using TerraBuilder.WorldGeneration;
 
     /// <summary>

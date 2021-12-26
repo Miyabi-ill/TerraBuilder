@@ -1,4 +1,4 @@
-﻿namespace TerraBuilder.Views
+﻿namespace TerraBuilder.UI
 {
     using System;
     using System.Collections.Generic;

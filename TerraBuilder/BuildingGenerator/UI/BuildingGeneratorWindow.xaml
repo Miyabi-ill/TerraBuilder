@@ -4,7 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TerraBuilder.BuildingGenerator.UI"
-		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:views="clr-namespace:TerraBuilder.Views"
+		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+		xmlns:ui="clr-namespace:TerraBuilder.UI"
 		mc:Ignorable="d"
         Title="建築ジェネレータ" Height="450" Width="800"
 		DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
@@ -21,7 +22,7 @@
 				<RowDefinition/>
 				<RowDefinition Height="Auto"/>
 			</Grid.RowDefinitions>
-			<views:TileEditor x:Name="TileEditor"></views:TileEditor>
+			<ui:TileEditor x:Name="TileEditor"></ui:TileEditor>
 			<Grid Background="#33ffff00" Name="GenerateFailedOverlay" Visibility="Hidden">
 				<TextBlock Background="White" HorizontalAlignment="Center" VerticalAlignment="Center">テキストからの生成に失敗しました</TextBlock>
 			</Grid>

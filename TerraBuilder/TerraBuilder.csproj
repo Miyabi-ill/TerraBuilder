@@ -158,22 +158,22 @@
     <Compile Include="Utils\TileFraming.cs" />
     <Compile Include="Utils\WeightedRandom.cs" />
     <Compile Include="Utils\WorldToImage.cs" />
-    <Compile Include="Views\AddActionWindow.xaml.cs">
+    <Compile Include="UI\AddActionWindow.xaml.cs">
       <DependentUpon>AddActionWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\AddTextItemWindow.xaml.cs">
+    <Compile Include="UI\AddTextItemWindow.xaml.cs">
       <DependentUpon>AddTextItemWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\BuildingSearchWindow.xaml.cs">
+    <Compile Include="UI\BuildingSearchWindow.xaml.cs">
       <DependentUpon>BuildingSearchWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ChestEditor.xaml.cs">
+    <Compile Include="UI\ChestEditor.xaml.cs">
       <DependentUpon>ChestEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\PieChart.xaml.cs">
+    <Compile Include="UI\PieChart.xaml.cs">
       <DependentUpon>PieChart.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\TileEditor.xaml.cs">
+    <Compile Include="UI\TileEditor.xaml.cs">
       <DependentUpon>TileEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="WorldGeneration\ActionContext.cs" />
@@ -236,27 +236,27 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\AddActionWindow.xaml">
+    <Page Include="UI\AddActionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\AddTextItemWindow.xaml">
+    <Page Include="UI\AddTextItemWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\BuildingSearchWindow.xaml">
+    <Page Include="UI\BuildingSearchWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ChestEditor.xaml">
+    <Page Include="UI\ChestEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\PieChart.xaml">
+    <Page Include="UI\PieChart.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\TileEditor.xaml">
+    <Page Include="UI\TileEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

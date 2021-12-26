@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TerraBuilder"
-		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:views="clr-namespace:TerraBuilder.Views"
+		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:views="clr-namespace:TerraBuilder.UI"
 		mc:Ignorable="d"
 		DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="TerraBuilder" Height="720" Width="1280">

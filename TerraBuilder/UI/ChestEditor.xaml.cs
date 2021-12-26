@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TerraBuilder.WorldGeneration.Chests;
 
-namespace TerraBuilder.Views
+namespace TerraBuilder.UI
 {
     /// <summary>
     /// Interaction logic for ChestEditor.xaml
