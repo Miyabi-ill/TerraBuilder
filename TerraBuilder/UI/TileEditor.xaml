@@ -9,7 +9,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
 		<DockPanel>
-			<DockPanel DockPanel.Dock="Top" LastChildFill="False">
+			<DockPanel DockPanel.Dock="Top" LastChildFill="False" Visibility="Collapsed">
 				<ToggleButton Margin="5" x:Name="TileButton" Checked="TileButton_Checked" Unchecked="TileButton_Unchecked">タイル</ToggleButton>
 				<ToggleButton Margin="5" x:Name="HammerButton" Checked="HammerButton_Checked" Unchecked="HammerButton_Unchecked" MouseRightButtonDown="HammerButton_MouseRightButtonDown">ハンマー</ToggleButton>
 				<ToggleButton Margin="5" x:Name="EraserButton" Checked="EraserButton_Checked" Unchecked="EraserButton_Unchecked">消しゴム</ToggleButton>

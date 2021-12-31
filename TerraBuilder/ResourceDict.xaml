@@ -7,4 +7,7 @@
 	<Geometry x:Key="RunIcon">
 		M73,44.14c1.35-.78,1.35-2.06,0-2.84L3,.83C1.6.06.5.69.5,2.25V83.19C.5,84.74,1.6,85.38,3,84.6Z
 	</Geometry>
+	<Style TargetType="{x:Type Window}">
+		<Setter Property="FontFamily" Value="Segoe UI" />
+	</Style>
 </ResourceDictionary>

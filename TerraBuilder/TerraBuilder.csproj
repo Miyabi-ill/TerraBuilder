@@ -148,6 +148,9 @@
       <DependentUpon>ChestSimulatorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Configs.cs" />
+    <Compile Include="UI\WorldGenerationWindow.xaml.cs">
+      <DependentUpon>WorldGenerationWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WorldGeneration\ActionAttribute.cs" />
     <Compile Include="Utils\Colors.cs" />
     <Compile Include="Utils\ErrorLogger.cs" />
@@ -256,7 +259,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\SVGIcons.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\TileEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\UIResources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\WorldGenerationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

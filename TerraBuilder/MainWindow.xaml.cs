@@ -35,6 +35,9 @@
             Runner = new WorldGenerationRunner();
             InitializeComponent();
 
+            var window = new WorldGenerationWindow();
+            window.Show();
+
             this.Title = "TerraBuilder - v" + Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             ActionList.ItemsSource = Runner.WorldGenerationActions;

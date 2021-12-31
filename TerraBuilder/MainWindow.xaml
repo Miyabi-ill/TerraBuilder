@@ -11,7 +11,7 @@
 	<Window.Resources>
 		<ResourceDictionary Source="ResourceDict.xaml"/>
 	</Window.Resources>
-    <Grid>
+	<Grid>
 		<Grid x:Name="MainGrid">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition/>
