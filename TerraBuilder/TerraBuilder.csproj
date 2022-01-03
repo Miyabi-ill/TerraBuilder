@@ -143,8 +143,8 @@
     </Compile>
     <Compile Include="BuildingGenerator\UI\TextureLoader.cs" />
     <Compile Include="BuildingGenerator\UI\TileToImage.cs" />
-    <Compile Include="ChestSimulator\ChestAccumulateResult.cs" />
-    <Compile Include="ChestSimulator\ChestSimulatorWindow.xaml.cs">
+    <Compile Include="Chests\Simulator\ChestAccumulateResult.cs" />
+    <Compile Include="Chests\Simulator\ChestSimulatorWindow.xaml.cs">
       <DependentUpon>ChestSimulatorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Configs.cs" />
@@ -195,11 +195,11 @@
     <Compile Include="WorldGeneration\Actions\Buildings\RandomSizeBlockWithArea.cs" />
     <Compile Include="WorldGeneration\Actions\Buildings\Wells.cs" />
     <Compile Include="WorldGeneration\Actions\Vanilla\Marble.cs" />
-    <Compile Include="WorldGeneration\Chests\ChestContext.cs" />
-    <Compile Include="WorldGeneration\Chests\ChestProbably.cs" />
-    <Compile Include="WorldGeneration\Chests\ItemContext.cs" />
-    <Compile Include="WorldGeneration\Chests\ItemSlotContext.cs" />
-    <Compile Include="WorldGeneration\Chests\ItemSlotOrItemProbablyAndStack.cs" />
+    <Compile Include="Chests\ChestContext.cs" />
+    <Compile Include="Chests\ChestProbably.cs" />
+    <Compile Include="Chests\ItemContext.cs" />
+    <Compile Include="Chests\ItemSlotContext.cs" />
+    <Compile Include="Chests\ItemSlotOrItemProbablyAndStack.cs" />
     <Compile Include="WorldGeneration\GlobalContext.cs" />
     <Compile Include="WorldGeneration\IWorldGenerationAction.cs" />
     <Compile Include="WorldEdit\TileProtectionMap.cs" />
@@ -221,7 +221,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ChestSimulator\ChestSimulatorWindow.xaml">
+    <Page Include="Chests\Simulator\ChestSimulatorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

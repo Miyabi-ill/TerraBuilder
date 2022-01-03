@@ -1,4 +1,4 @@
-﻿namespace TerraBuilder.ChestSimulator
+﻿namespace TerraBuilder.Chests.Simulator
 {
     using System;
     using System.Collections.Generic;

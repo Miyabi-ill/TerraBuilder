@@ -1,9 +1,9 @@
-﻿<Window x:Class="TerraBuilder.ChestSimulator.ChestSimulatorWindow"
+﻿<Window x:Class="TerraBuilder.Chests.Simulator.ChestSimulatorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TerraBuilder.ChestSimulator"
+        xmlns:local="clr-namespace:TerraBuilder.Chests.Simulator"
 		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="チェストシミュレータ" Height="450" Width="800">

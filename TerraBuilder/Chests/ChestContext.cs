@@ -1,4 +1,4 @@
-﻿namespace TerraBuilder.WorldGeneration.Chests
+﻿namespace TerraBuilder.Chests
 {
     using System.Collections.ObjectModel;
     using Newtonsoft.Json;
