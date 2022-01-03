@@ -6,13 +6,13 @@
     using Terraria.ID;
 
     /// <summary>
-    /// 地表の生成を行う。
+    /// 地表の生成を行う.
     /// </summary>
     [Action]
     public class Surface : IWorldGenerationAction<Surface.SurfaceContext>
     {
         /// <summary>
-        /// 地表生成のパターン。ランダムな区間ごとに選ばれ、変更される
+        /// 地表生成のパターン.ランダムな区間ごとに選ばれ、変更される
         /// </summary>
         private enum SurfaceType : int
         {
@@ -35,7 +35,7 @@
         /// <inheritdoc/>
         public bool Run(WorldSandbox sandbox)
         {
-            // Terraria.GameContent.Biomes.TerrainPassに近い生成を行う。
+            // Terraria.GameContent.Biomes.TerrainPassに近い生成を行う.
             GlobalContext globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
             Random rand = globalContext.Random;
 
@@ -211,23 +211,23 @@
         }
 
         /// <summary>
-        /// 地表生成に使われるコンテキスト。
+        /// 地表生成に使われるコンテキスト.
         /// </summary>
         public class SurfaceContext : ActionContext
         {
             /// <summary>
-            /// 地表の高さ。この高さ以上(数値的には以下)が地表。
+            /// 地表の高さ.この高さ以上(数値的には以下)が地表.
             /// </summary>
             [Browsable(false)]
             public int SurfaceLevel => WorldGenerationRunner.CurrentRunner.GlobalContext.SurfaceLevel;
 
             /// <summary>
-            /// 地表生成を行う最大の高さ。
+            /// 地表生成を行う最大の高さ.
             /// <see cref="SurfaceLevel"/>からこの値を減算した高さが実際に地表生成を行う最大の高さになる
             /// </summary>
             [Category("地表生成")]
             [DisplayName("地表最大高さ")]
-            [Description("地表生成を行う最大の高さ。地表レベルからのブロック数。")]
+            [Description("地表生成を行う最大の高さ.地表レベルからのブロック数.")]
             public int SurfaceMaxHeight { get; set; } = 50;
         }
     }

@@ -5,7 +5,7 @@
     using Terraria;
 
     /// <summary>
-    /// 既存の建築をインポートする。
+    /// 既存の建築をインポートする.
     /// </summary>
     [JsonConverter(typeof(PartsConverter))]
     public class Import : BuildBase

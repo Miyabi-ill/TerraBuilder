@@ -5,6 +5,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1623:Property summary documentation should match accessors", Justification = "日本語でコメントを書くため無効化。", Scope = "namespaceanddescendants", Target = "~N:TerraBuilder")]
-[assembly: SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1642:Constructor summary documentation should begin with standard text", Justification = "日本語でコメントを書くため無効化。", Scope = "namespaceanddescendants", Target = "~N:TerraBuilder")]
-[assembly: SuppressMessage("Style", "IDE0003:Remove qualification", Justification = "SA1623を優先。https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1623.md", Scope = "namespaceanddescendants", Target = "~N:TerraBuilder")]
+[assembly: SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1623:Property summary documentation should match accessors", Justification = "日本語でコメントを書くため無効化.", Scope = "namespaceanddescendants", Target = "~N:TerraBuilder")]
+[assembly: SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1642:Constructor summary documentation should begin with standard text", Justification = "日本語でコメントを書くため無効化.", Scope = "namespaceanddescendants", Target = "~N:TerraBuilder")]
+[assembly: SuppressMessage("Style", "IDE0003:Remove qualification", Justification = "SA1623を優先.https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1623.md", Scope = "namespaceanddescendants", Target = "~N:TerraBuilder")]

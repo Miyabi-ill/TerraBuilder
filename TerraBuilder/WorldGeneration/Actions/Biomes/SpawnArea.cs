@@ -4,7 +4,7 @@
     using Terraria.ID;
 
     /// <summary>
-    /// スポーン地点を作成する。
+    /// スポーン地点を作成する.
     /// </summary>
     [Action]
     public class SpawnArea : IWorldGenerationAction<SpawnArea.SpawnAreaContext>
@@ -60,7 +60,7 @@
         }
 
         /// <summary>
-        /// スポーン地点の生成に使われるコンテキスト。
+        /// スポーン地点の生成に使われるコンテキスト.
         /// </summary>
         public class SpawnAreaContext : ActionContext
         {

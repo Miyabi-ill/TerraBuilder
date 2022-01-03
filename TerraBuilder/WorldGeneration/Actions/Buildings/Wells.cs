@@ -3,9 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using Terraria;
     using Terraria.ID;
 
@@ -17,7 +14,7 @@
     {
         public string Name => nameof(Wells);
 
-        public string Description => "井戸を生成する。";
+        public string Description => "井戸を生成する.";
 
         public WellContext Context { get; private set; } = new WellContext();
 
@@ -136,12 +133,12 @@
 
             [Category("井戸設置")]
             [DisplayName("井戸設置リトライ数")]
-            [Description("井戸を設置する際にリトライする回数。設置に失敗するケース=近くの井戸からの最小距離が大きすぎるなど")]
+            [Description("井戸を設置する際にリトライする回数.設置に失敗するケース=近くの井戸からの最小距離が大きすぎるなど")]
             public int MaxRetryPerWell { get; set; } = 100;
 
             [Category("井戸設置")]
             [DisplayName("近くの井戸からの最小距離")]
-            [Description("近くの井戸から最小でも離れている距離。この距離以内には井戸は生成されない。")]
+            [Description("近くの井戸から最小でも離れている距離.この距離以内には井戸は生成されない.")]
             public int MinDistanceFromNearbyWells { get; set; } = 30;
         }
     }

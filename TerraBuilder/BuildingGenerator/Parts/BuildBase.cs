@@ -19,7 +19,7 @@
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
-        /// 建築の基準点X。左下を0とする。
+        /// 建築の基準点X.左下を0とする.
         /// </summary>
         [JsonProperty]
         public virtual RandomValue X
@@ -33,7 +33,7 @@
         }
 
         /// <summary>
-        /// 建築の基準点Y。左下を0とする。
+        /// 建築の基準点Y.左下を0とする.
         /// </summary>
         [JsonProperty]
         public virtual RandomValue Y
@@ -47,7 +47,7 @@
         }
 
         /// <summary>
-        /// 建築名。<see cref="Import"/>に使われる。
+        /// 建築名.<see cref="Import"/>に使われる.
         /// </summary>
         [JsonProperty]
         public virtual string Name
@@ -61,7 +61,7 @@
         }
 
         /// <summary>
-        /// 型名。Jsonからのデシリアライズに使われる。
+        /// 型名.Jsonからのデシリアライズに使われる.
         /// </summary>
         [JsonProperty]
         public virtual string TypeName

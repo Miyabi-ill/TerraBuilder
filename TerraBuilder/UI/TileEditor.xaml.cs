@@ -1,24 +1,14 @@
 ﻿namespace TerraBuilder.UI
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
-    using System.Windows.Data;
-    using System.Windows.Documents;
     using System.Windows.Input;
-    using System.Windows.Media;
     using System.Windows.Media.Imaging;
-    using System.Windows.Navigation;
-    using System.Windows.Shapes;
-    using Terraria;
     using TerraBuilder.BuildingGenerator;
     using TerraBuilder.BuildingGenerator.UI;
     using TerraBuilder.Utils;
-    using TerraBuilder.WorldGeneration;
+    using Terraria;
 
     /// <summary>
     /// Interaction logic for WorldViewer.xaml
@@ -97,7 +87,7 @@
         }
 
         /// <summary>
-        /// ハンマー形状。
+        /// ハンマー形状.
         /// </summary>
         public enum HammerType
         {
@@ -121,7 +111,7 @@
         }
 
         /// <summary>
-        /// マップ画像をアップデートする。タイルに変更を加えた時に呼ぶ。
+        /// マップ画像をアップデートする.タイルに変更を加えた時に呼ぶ.
         /// </summary>
         public void UpdateMap()
         {

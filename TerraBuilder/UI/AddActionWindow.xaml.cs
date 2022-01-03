@@ -12,7 +12,7 @@
     public partial class AddActionWindow : Window
     {
         /// <summary>
-        /// コンストラクタ。
+        /// コンストラクタ.
         /// </summary>
         public AddActionWindow()
         {
@@ -21,7 +21,7 @@
         }
 
         /// <summary>
-        /// 生成したアクション。
+        /// 生成したアクション.
         /// </summary>
         public IWorldGenerationAction<ActionContext> Action { get; private set; }
 

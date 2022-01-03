@@ -5,14 +5,14 @@
     using TerraBuilder.Utils;
 
     /// <summary>
-    /// 地下に水を生成する生成アクション。
+    /// 地下に水を生成する生成アクション.
     /// </summary>
     [Action]
     public class CavernWater : IWorldGenerationAction<CavernWater.CavernWaterContext>
     {
         public string Name => nameof(CavernWater);
 
-        public string Description => "地下に水を生成する。洞窟の生成が必須。";
+        public string Description => "地下に水を生成する.洞窟の生成が必須.";
 
         public CavernWaterContext Context { get; set; } = new CavernWaterContext();
 

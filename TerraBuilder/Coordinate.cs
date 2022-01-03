@@ -6,18 +6,18 @@ namespace TerraBuilder
     using System;
 
     /// <summary>
-    /// テラリアワールドの座標用クラス。
+    /// テラリアワールドの座標用クラス.
     /// ワールドの左上をx, y = 0, 0とし、xは横方向、yは縦方向の軸を表す.
     /// </summary>
     public struct Coordinate
     {
         /// <summary>
-        /// ワールドの横方向の座標。右に行くほど大.
+        /// ワールドの横方向の座標.右に行くほど大.
         /// </summary>
         public int X;
 
         /// <summary>
-        /// ワールドの縦方向の座標。下に行くほど大.
+        /// ワールドの縦方向の座標.下に行くほど大.
         /// </summary>
         public int Y;
 
@@ -48,12 +48,12 @@ namespace TerraBuilder
         {
             if (x < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(x), nameof(x) + "は負の値になることはできません。");
+                throw new ArgumentOutOfRangeException(nameof(x), nameof(x) + "は負の値になることはできません.");
             }
 
             if (y < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(y), nameof(y) + "は負の値になることはできません。");
+                throw new ArgumentOutOfRangeException(nameof(y), nameof(y) + "は負の値になることはできません.");
             }
 
             this.X = x;

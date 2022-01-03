@@ -3,9 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Terraria;
-    using TerraBuilder.WorldGeneration;
     using TerraBuilder.WorldGeneration.Chests;
+    using Terraria;
 
     public static class GenerateChest
     {

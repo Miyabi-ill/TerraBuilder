@@ -7,14 +7,14 @@ namespace TerraBuilder.WorldEdit
     using Terraria;
 
     /// <summary>
-    /// タイルを保護するマップ。このマップを参照して、タイルの設置可否が決まる。
+    /// タイルを保護するマップ.このマップを参照して、タイルの設置可否が決まる.
     /// </summary>
     public class TileProtectionMap
     {
         /// <summary>
-        /// タイル保護マップのコンストラクタ。
+        /// タイル保護マップのコンストラクタ.
         /// </summary>
-        /// <param name="sandbox">ワールドサンドボックス</param>
+        /// <param name="sandbox">ワールドサンドボックス.</param>
         public TileProtectionMap(WorldSandbox sandbox)
         {
             this.MapSizeX = sandbox.TileCountX;
@@ -24,7 +24,7 @@ namespace TerraBuilder.WorldEdit
         }
 
         /// <summary>
-        /// タイル保護の種類
+        /// タイル保護の種類.
         /// </summary>
         [Flags]
         public enum TileProtectionType
@@ -112,10 +112,10 @@ namespace TerraBuilder.WorldEdit
         private TileProtectionType[,] TileProtectionTypes { get; }
 
         /// <summary>
-        /// 指定した座標のタイル保護タイプを取得する。
+        /// 指定した座標のタイル保護タイプを取得する.
         /// </summary>
-        /// <param name="coordinate">タイル座標。</param>
-        /// <returns>指定した座標のタイル保護タイプ。</returns>
+        /// <param name="coordinate">タイル座標.</param>
+        /// <returns>指定した座標のタイル保護タイプ.</returns>
         public TileProtectionType this[Coordinate coordinate]
         {
             get => this.TileProtectionTypes[coordinate.X, coordinate.Y];
@@ -124,7 +124,7 @@ namespace TerraBuilder.WorldEdit
         }
 
         /// <summary>
-        /// タイル保護マップを全てクリアする（全てのタイルを保護されていない状態にする）。
+        /// タイル保護マップを全てクリアする（全てのタイルを保護されていない状態にする）.
         /// </summary>
         public void Clear()
         {
@@ -137,21 +137,29 @@ namespace TerraBuilder.WorldEdit
             }
         }
 
-        public Tile PlaceTile(WorldSandbox sandbox, Tile tile, int x, int y)
+        /// <summary>
+        /// タイルをサンドボックスに設置する.
+        /// タイルが保護されていた場合、保護部分以外が設置できるなら設置する.
+        /// </summary>
+        /// <param name="sandbox">設置先サンドボックス.</param>
+        /// <param name="coordinate">設置先座標.</param>
+        /// <param name="tile">設置するタイル.</param>
+        /// <returns>設置できたタイル（`sandbox.Tiles[coordinate.X, coordinate.Y]`と同一）.</returns>
+        public Tile PlaceTile(WorldSandbox sandbox, Coordinate coordinate, Tile tile)
         {
-            TileProtectionType type = this.TileProtectionTypes[x, y];
+            TileProtectionType type = this.TileProtectionTypes[coordinate.X, coordinate.Y];
             if (type == TileProtectionType.None)
             {
-                sandbox.Tiles[x, y] = tile;
+                sandbox.Tiles[coordinate.X, coordinate.Y] = tile;
                 return tile;
             }
 
-            if (sandbox.Tiles[x, y] == null)
+            if (sandbox.Tiles[coordinate.X, coordinate.Y] == null)
             {
-                sandbox.Tiles[x, y] = new Tile();
+                sandbox.Tiles[coordinate.X, coordinate.Y] = new Tile();
             }
 
-            Tile sandboxTile = (Tile)sandbox.Tiles[x, y];
+            Tile sandboxTile = (Tile)sandbox.Tiles[coordinate.X, coordinate.Y];
 
             bool rejectTilePlace = false;
             bool rejectWallPlace = false;

@@ -7,12 +7,11 @@
     using System.Text.RegularExpressions;
     using System.Windows;
     using System.Windows.Controls;
-    using System.Windows.Input;
     using Microsoft.Win32;
     using Microsoft.WindowsAPICodePack.Dialogs;
     using Newtonsoft.Json;
-    using Terraria;
     using TerraBuilder.BuildingGenerator.Parts;
+    using Terraria;
 
     /// <summary>
     /// Interaction logic for BuildingGeneratorWindow.xaml
@@ -344,7 +343,7 @@
 
             if (string.IsNullOrEmpty(buildingGenerator.BuildingsRootPath))
             {
-                var result = MessageBox.Show("建材の保存に使うフォルダが指定されていません。指定しますか？", "ディレクトリを選択", MessageBoxButton.YesNo);
+                var result = MessageBox.Show("建材の保存に使うフォルダが指定されていません.指定しますか？", "ディレクトリを選択", MessageBoxButton.YesNo);
                 if (result == MessageBoxResult.Yes)
                 {
                     var dirDialog = new CommonOpenFileDialog()
@@ -384,7 +383,7 @@
                 }
                 catch
                 {
-                    MessageBox.Show("ファイルの書き込み時にエラーが発生しました。");
+                    MessageBox.Show("ファイルの書き込み時にエラーが発生しました.");
                 }
             }
         }

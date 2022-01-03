@@ -1,12 +1,12 @@
 ﻿namespace TerraBuilder
 {
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.IO;
     using Newtonsoft.Json;
-    using Terraria.ID;
     using TerraBuilder.WorldGeneration;
     using TerraBuilder.WorldGeneration.Chests;
-    using System.Collections.ObjectModel;
+    using Terraria.ID;
 
     public static class Configs
     {
@@ -31,8 +31,8 @@
         }
 
         /// <summary>
-        /// ItemsCollectionとItemsを連携する。
-        /// ItemsCollection -> Itemsの１方向のみ。
+        /// ItemsCollectionとItemsを連携する.
+        /// ItemsCollection -> Itemsの１方向のみ.
         /// </summary>
         /// <param name="sender">コレクション</param>
         /// <param name="e">イベント</param>

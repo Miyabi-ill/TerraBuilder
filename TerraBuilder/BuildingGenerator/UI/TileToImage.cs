@@ -4,15 +4,13 @@
     using System.Collections.Generic;
     using System.Drawing;
     using System.Drawing.Imaging;
-    using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Windows.Media.Imaging;
-    using Microsoft.Win32;
+    using TerraBuilder.Utils;
     using Terraria;
     using Terraria.ID;
     using Terraria.Map;
-    using TerraBuilder.Utils;
 
     public static class TileToImage
     {
@@ -590,7 +588,7 @@
                 && tileType != 160
                 && tileType != 138)
             {
-                // タイルを9つに分割し、それぞれにライティングを適応して描画。今回は不要(通常の描画)
+                // タイルを9つに分割し、それぞれにライティングを適応して描画.今回は不要(通常の描画)
                 Bitmap image;
                 try
                 {

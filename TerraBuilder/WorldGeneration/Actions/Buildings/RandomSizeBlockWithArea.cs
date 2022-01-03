@@ -2,11 +2,9 @@
 {
     using System.Collections.Generic;
     using System.ComponentModel;
+    using TerraBuilder.WorldGeneration;
     using Terraria;
     using Terraria.DataStructures;
-    using Terraria.ID;
-    using TerraBuilder.Utils;
-    using TerraBuilder.WorldGeneration;
     using static TerraBuilder.WorldGeneration.Actions.Buildings.RandomSizeBlocks;
 
     /// <summary>
@@ -127,7 +125,7 @@
         public class RandomSizeBlockWithAreaContext : RandomSizeBlocks.RandomSizeBlockContext
         {
             /// <summary>
-            /// コンストラクタ。
+            /// コンストラクタ.
             /// </summary>
             public RandomSizeBlockWithAreaContext()
             {
@@ -147,7 +145,7 @@
 
             [Category("部屋エリア設置")]
             [DisplayName("近くのエリアからの最小距離")]
-            [Description("近くのエリアから最小でも離れている距離。この距離以内にはエリアは生成されない。")]
+            [Description("近くのエリアから最小でも離れている距離.この距離以内にはエリアは生成されない.")]
             public int MinDistanceFromNearbyArea { get; set; } = 200;
 
             [Category("部屋エリア設置")]
@@ -162,7 +160,7 @@
 
             [Category("部屋エリア設置")]
             [DisplayName("エリア選択リトライ数")]
-            [Description("エリア選択をやり直す回数。選択に失敗した場合生成されない。失敗する原因=近くのエリアからの最小距離が大きすぎるなど")]
+            [Description("エリア選択をやり直す回数.選択に失敗した場合生成されない.失敗する原因=近くのエリアからの最小距離が大きすぎるなど")]
             public int MaxAreaSelectRetry { get; set; } = 10;
         }
     }

@@ -9,7 +9,7 @@
     public static class PerlinNoise
     {
         /// <summary>
-        /// 1次パーリンノイズを生成する。
+        /// 1次パーリンノイズを生成する.
         /// </summary>
         /// <param name="waveLength">波長</param>
         /// <param name="width">全体の波の長さ</param>
@@ -27,7 +27,7 @@
         }
 
         /// <summary>
-        /// 1次パーリンノイズを生成する。
+        /// 1次パーリンノイズを生成する.
         /// </summary>
         /// <param name="waveLength">波長</param>
         /// <param name="width">全体の波の長さ</param>
@@ -61,12 +61,12 @@
         }
 
         /// <summary>
-        /// 異なるオクターブ(粒度)の1次パーリンノイズを合成したパーリンノイズを生成する。
+        /// 異なるオクターブ(粒度)の1次パーリンノイズを合成したパーリンノイズを生成する.
         /// </summary>
         /// <param name="waveLength">波長</param>
         /// <param name="width">全体の波の長さ</param>
         /// <param name="amplifier">波の増幅量</param>
-        /// <param name="octaves">オクターブ。重ねる波の数</param>
+        /// <param name="octaves">オクターブ.重ねる波の数</param>
         /// <param name="diviser">波の増幅量と波長を割り算する値</param>
         /// <param name="seed">シード値</param>
         /// <returns>1次パーリンノイズの配列</returns>
@@ -83,12 +83,12 @@
         }
 
         /// <summary>
-        /// 異なるオクターブ(粒度)の1次パーリンノイズを合成したパーリンノイズを生成する。
+        /// 異なるオクターブ(粒度)の1次パーリンノイズを合成したパーリンノイズを生成する.
         /// </summary>
         /// <param name="waveLength">波長</param>
         /// <param name="width">全体の波の長さ</param>
         /// <param name="amplifier">波の増幅量</param>
-        /// <param name="octaves">オクターブ。重ねる波の数</param>
+        /// <param name="octaves">オクターブ.重ねる波の数</param>
         /// <param name="diviser">波の増幅量と波長を割り算する値</param>
         /// <param name="random">ランダムインスタンス</param>
         /// <returns>1次パーリンノイズの配列</returns>
@@ -117,11 +117,11 @@
         }
 
         /// <summary>
-        /// オクターブの異なるパーリンノイズを合成した後、正規化したパーリンノイズを生成する。
+        /// オクターブの異なるパーリンノイズを合成した後、正規化したパーリンノイズを生成する.
         /// </summary>
         /// <param name="waveLength">波長</param>
         /// <param name="width">全体の波の長さ</param>
-        /// <param name="octaves">オクターブ。重ねる波の数</param>
+        /// <param name="octaves">オクターブ.重ねる波の数</param>
         /// <param name="diviser">波の増幅量と波長を割り算する値</param>
         /// <param name="random">ランダムインスタンス</param>
         /// <returns>0から1に正規化された1次パーリンノイズ</returns>

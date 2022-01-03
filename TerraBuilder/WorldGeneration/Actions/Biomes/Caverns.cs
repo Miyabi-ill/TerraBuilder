@@ -2,14 +2,13 @@
 {
     using System;
     using System.ComponentModel;
-    using System.Linq;
     using Microsoft.Xna.Framework;
+    using TerraBuilder.Utils;
     using Terraria;
     using Terraria.ID;
-    using TerraBuilder.Utils;
 
     /// <summary>
-    /// 洞窟(第二層)の生成を行う。
+    /// 洞窟(第二層)の生成を行う.
     /// </summary>
     [Action]
     public class Caverns : IWorldGenerationAction<Caverns.CavernContext>
@@ -18,7 +17,7 @@
         public string Name => nameof(Caverns);
 
         /// <inheritdoc/>
-        public string Description => "地下に洞窟を生成する。";
+        public string Description => "地下に洞窟を生成する.";
 
         /// <inheritdoc/>
         public CavernContext Context { get; } = new CavernContext();
@@ -55,7 +54,7 @@
                 }
             }
 
-            // 空間のminとmaxから波の増幅量を決定、適用。タイルで使うために四捨五入しておく。
+            // 空間のminとmaxから波の増幅量を決定、適用.タイルで使うために四捨五入しておく.
             double bottomAmplifier = Context.CavernMaxHeight - diffSurface - Context.CavernMinHeight;
             if (bottomAmplifier < 0)
             {
@@ -215,12 +214,12 @@
         }
 
         /// <summary>
-        /// 洞窟の生成に使われるコンテキスト。
+        /// 洞窟の生成に使われるコンテキスト.
         /// </summary>
         public class CavernContext : ActionContext
         {
             /// <summary>
-            /// 洞窟の最小の高さ。
+            /// 洞窟の最小の高さ.
             /// </summary>
             [Category("洞窟生成")]
             [DisplayName("最小高さ")]
@@ -228,7 +227,7 @@
             public int CavernMinHeight { get; set; } = 5;
 
             /// <summary>
-            /// 洞窟の最大の高さ。
+            /// 洞窟の最大の高さ.
             /// </summary>
             [Category("洞窟生成")]
             [DisplayName("最大高さ")]
@@ -236,7 +235,7 @@
             public int CavernMaxHeight { get; set; } = 200;
 
             /// <summary>
-            /// 地表からの最小距離。
+            /// 地表からの最小距離.
             /// </summary>
             [Category("洞窟生成")]
             [DisplayName("最小地表距離")]
@@ -244,7 +243,7 @@
             public int CavernMinDistanceFromSurface { get; set; } = 0;
 
             /// <summary>
-            /// 地表からの最大距離。
+            /// 地表からの最大距離.
             /// </summary>
             [Category("洞窟生成")]
             [DisplayName("最大地表距離")]
@@ -300,7 +299,7 @@
             public int MaxRepeatForStroke { get; set; } = 4;
 
             /// <summary>
-            /// 洞窟の上下のタイルから、ブロック塊のブラシ開始地点までの最小距離。
+            /// 洞窟の上下のタイルから、ブロック塊のブラシ開始地点までの最小距離.
             /// </summary>
             [Category("洞窟内空中ブロック")]
             [DisplayName("洞窟の上下からの最小距離")]

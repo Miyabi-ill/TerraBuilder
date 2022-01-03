@@ -1,7 +1,6 @@
 ﻿namespace TerraBuilder.BuildingGenerator.Parts
 {
     using System;
-    using System.Linq;
     using Newtonsoft.Json;
     using Terraria;
 
@@ -12,13 +11,13 @@
         public Size Size { get; set; }
 
         /// <summary>
-        /// 範囲内をタイルで埋めるときのタイル内部名。
+        /// 範囲内をタイルで埋めるときのタイル内部名.
         /// </summary>
         [JsonProperty]
         public RandomValue FillTile { get; set; }
 
         /// <summary>
-        /// 範囲内を壁で埋めるときの壁内部名。
+        /// 範囲内を壁で埋めるときの壁内部名.
         /// </summary>
         [JsonProperty]
         public RandomValue FillWall { get; set; }

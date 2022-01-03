@@ -6,7 +6,7 @@
     using Microsoft.Xna.Framework;
 
     /// <summary>
-    /// トンネルを生成するクラス。
+    /// トンネルを生成するクラス.
     /// </summary>
     [Action]
     public class Tunnel : IWorldGenerationAction<Tunnel.TunnelContext>
@@ -190,7 +190,7 @@
             /// </summary>
             [Category("トンネル生成")]
             [DisplayName("近くのトンネルからの最小距離")]
-            [Description("近くのトンネルからどれだけ離れているかを設定する。この距離以内には追加のトンネルの入口は生成されない。")]
+            [Description("近くのトンネルからどれだけ離れているかを設定する.この距離以内には追加のトンネルの入口は生成されない.")]
             public int MinDistanceFromNearbyTunnel { get; set; } = 100;
         }
     }

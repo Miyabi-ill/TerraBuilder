@@ -1,13 +1,11 @@
 ﻿namespace TerraBuilder.WorldGeneration.Chests
 {
-    using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using Newtonsoft.Json;
     using Terraria.ID;
 
     /// <summary>
-    /// 設置するチェストの設定を行うクラス。
+    /// 設置するチェストの設定を行うクラス.
     /// </summary>
     public class ChestContext : ActionContext
     {
@@ -33,7 +31,7 @@
         public int Paint { get; set; }
 
         /// <summary>
-        /// チェストに入れるアイテムのスロット。
+        /// チェストに入れるアイテムのスロット.
         /// </summary>
         public ObservableCollection<ItemSlotOrItemProbablyAndStack> ItemSlots { get; private set; } = new ObservableCollection<ItemSlotOrItemProbablyAndStack>();
     }

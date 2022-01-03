@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using TerraBuilder.Utils;
-    using TerraBuilder.WorldGeneration;
 
     public class ChestAccumulateResult
     {
@@ -149,7 +148,7 @@
             // アイテムスロット
             foreach (string key in itemSlotProbably.Keys.ToArray())
             {
-                // keyはチェスト名。
+                // keyはチェスト名.
                 int itemSlotSum = itemSlotProbably[key].Sum(x => x.Value.count);
 
                 // アイテムスロットごとに確率を設定
@@ -213,7 +212,7 @@
 
                 chestAccumulateResult.Count++;
 
-                // アイテムのカウントを追加していく。確率は最後に計算する。
+                // アイテムのカウントを追加していく.確率は最後に計算する.
                 var chestItemProbablys = new Dictionary<string, int>();
                 foreach (var item in chest.item)
                 {
@@ -300,7 +299,7 @@
 
                 chestAccumulateResult.Count++;
 
-                // アイテムのカウントを追加していく。確率は最後に計算する。
+                // アイテムのカウントを追加していく.確率は最後に計算する.
                 var chestItemProbablys = new Dictionary<string, int>();
                 foreach (var item in chest.item)
                 {
@@ -372,7 +371,7 @@
             {
                 chestCount += result.Count;
 
-                // アイテムのカウントを追加していく。確率は最後に計算する。
+                // アイテムのカウントを追加していく.確率は最後に計算する.
                 foreach (var item in result.ItemsProbablys)
                 {
                     if (chestAccumulateResult.ItemsProbablys.ContainsKey(item.Key))

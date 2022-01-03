@@ -4,7 +4,7 @@
     using System.Reflection;
 
     /// <summary>
-    /// 各アクション毎の設定項目の基底クラス。
+    /// 各アクション毎の設定項目の基底クラス.
     /// </summary>
     public abstract class ActionContext
     {
@@ -13,8 +13,8 @@
         private readonly Dictionary<string, object> outerPropertyDictionary = new Dictionary<string, object>();
 
         /// <summary>
-        /// コンストラクタ。
-        /// プロパティを全て辞書に追加する。
+        /// コンストラクタ.
+        /// プロパティを全て辞書に追加する.
         /// </summary>
         public ActionContext()
         {
@@ -25,8 +25,8 @@
         }
 
         /// <summary>
-        /// プロパティの値を名前から取得する。
-        /// 必要性は不明。
+        /// プロパティの値を名前から取得する.
+        /// 必要性は不明.
         /// </summary>
         /// <param name="name">プロパティ名</param>
         /// <returns>プロパティの値</returns>
@@ -68,7 +68,7 @@
                 }
                 else
                 {
-                    // キーがない場合、辞書に追加する。Pythonの辞書の挙動の模倣
+                    // キーがない場合、辞書に追加する.Pythonの辞書の挙動の模倣
                     outerPropertyDictionary.Add(name, value);
                 }
             }

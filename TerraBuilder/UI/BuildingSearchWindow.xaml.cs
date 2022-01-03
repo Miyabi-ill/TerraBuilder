@@ -2,8 +2,8 @@
 {
     using System.ComponentModel;
     using System.Windows;
-    using Terraria;
     using TerraBuilder.BuildingGenerator;
+    using Terraria;
 
     /// <summary>
     /// Interaction logic for BuildingSearchWindow.xaml

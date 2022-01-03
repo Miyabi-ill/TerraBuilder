@@ -1,13 +1,11 @@
 ﻿namespace TerraBuilder
 {
     using System;
-    using System.Collections.Generic;
     using System.Reflection;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media;
-    using System.Windows.Media.Imaging;
     using Microsoft.Win32;
     using Microsoft.WindowsAPICodePack.Dialogs;
     using TerraBuilder.BuildingGenerator;
@@ -21,7 +19,7 @@
     public partial class MainWindow : Window
     {
         /// <summary>
-        /// コンストラクタ。
+        /// コンストラクタ.
         /// </summary>
         public MainWindow()
         {
@@ -68,7 +66,7 @@
         internal BuildingCache BuildingCache { get; private set; }
 
         /// <summary>
-        /// ユーザーにメッセージを表示する。
+        /// ユーザーにメッセージを表示する.
         /// </summary>
         /// <param name="text">表示するメッセージ</param>
         public void ShowMessage(string text)
@@ -81,7 +79,7 @@
         }
 
         /// <summary>
-        /// ユーザーにエラーメッセージを表示する。
+        /// ユーザーにエラーメッセージを表示する.
         /// </summary>
         /// <param name="text">表示するエラーメッセージ</param>
         public void ShowErrorMessage(string text)
@@ -99,7 +97,7 @@
             bool success = await Task.Run(() => Runner.Run(Sandbox)).ConfigureAwait(true);
             if (success)
             {
-                ShowMessage("生成が正常に終了しました。");
+                ShowMessage("生成が正常に終了しました.");
             }
 
             TileEditor.UpdateMap();
@@ -140,7 +138,7 @@
             lock (Sandbox)
             {
                 string path = Sandbox.Save(null);
-                ShowMessage(string.Format("{0}に保存しました。", path));
+                ShowMessage(string.Format("{0}に保存しました.", path));
                 TileEditor.UpdateMap();
             }
         }

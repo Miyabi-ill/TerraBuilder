@@ -4,7 +4,7 @@
     using Newtonsoft.Json;
 
     /// <summary>
-    /// アイテムのスロットの設定。
+    /// アイテムのスロットの設定.
     /// </summary>
     public class ItemSlotContext : ActionContext
     {

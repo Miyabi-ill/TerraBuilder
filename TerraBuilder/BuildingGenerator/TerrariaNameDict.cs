@@ -5,7 +5,7 @@
     using Terraria.ID;
 
     /// <summary>
-    /// 文字列からテラリアIDを取得するクラス。
+    /// 文字列からテラリアIDを取得するクラス.
     /// </summary>
     public static class TerrariaNameDict
     {

@@ -17,7 +17,7 @@
         private RandomValue paintType;
 
         /// <summary>
-        /// アイテム名。設定すると<see cref="TileID"/>と<see cref="Style"/>が自動的に設定される。
+        /// アイテム名.設定すると<see cref="TileID"/>と<see cref="Style"/>が自動的に設定される.
         /// </summary>
         [JsonProperty]
         public RandomValue ItemName
@@ -32,7 +32,7 @@
         }
 
         /// <summary>
-        /// 設置するタイルID。基本的に<see cref="ItemName"/>を使い、それで設定できないものに使う。
+        /// 設置するタイルID.基本的に<see cref="ItemName"/>を使い、それで設定できないものに使う.
         /// </summary>
         [JsonProperty]
         public RandomValue TileID
@@ -46,7 +46,7 @@
         }
 
         /// <summary>
-        /// 設置するスタイル。基本的に<see cref="ItemName"/>を使い、それで設定できないものに使う。
+        /// 設置するスタイル.基本的に<see cref="ItemName"/>を使い、それで設定できないものに使う.
         /// </summary>
         [JsonProperty]
         public RandomValue Style
@@ -60,7 +60,7 @@
         }
 
         /// <summary>
-        /// 同じタイル、スタイルの中で違うテクスチャを選択する。ex.本、カボチャランタン、プレゼントなど
+        /// 同じタイル、スタイルの中で違うテクスチャを選択する.ex.本、カボチャランタン、プレゼントなど
         /// </summary>
         [JsonProperty]
         public RandomValue Alternate

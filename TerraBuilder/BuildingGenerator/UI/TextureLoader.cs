@@ -4,12 +4,7 @@
     using System.Collections.Generic;
     using System.Drawing;
     using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using Microsoft.Win32;
-    using Microsoft.Xna.Framework;
-    using Microsoft.Xna.Framework.Graphics;
     using Terraria.ID;
 
     public class TextureLoader

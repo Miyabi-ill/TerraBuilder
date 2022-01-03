@@ -12,7 +12,7 @@ namespace TerraBuilder.WorldEdit
     using Terraria.Map;
 
     /// <summary>
-    /// テラリアのワールドの干渉に必要な情報をまとめたクラス。
+    /// テラリアのワールドの干渉に必要な情報をまとめたクラス.
     /// </summary>
     public class WorldSandbox
     {
@@ -21,9 +21,9 @@ namespace TerraBuilder.WorldEdit
         private readonly string locker = string.Empty;
 
         /// <summary>
-        /// コンストラクタ。
+        /// コンストラクタ.
         /// もしテラリアのクラスが初期化されていなければ初期化し、
-        /// プロパティを設定する。
+        /// プロパティを設定する.
         /// </summary>
         public WorldSandbox()
         {
@@ -40,13 +40,8 @@ namespace TerraBuilder.WorldEdit
                 isInitializedTerrariaInstance = true;
             }
 
-            Reset();
+            this.Sync();
         }
-
-        /// <summary>
-        /// ワールドに存在するタイル.
-        /// </summary>
-        public ITileCollection Tiles { get; private set; }
 
         /// <summary>
         /// タイル保護マップ.
@@ -77,7 +72,7 @@ namespace TerraBuilder.WorldEdit
         }
 
         /// <summary>
-        /// リスポーン地点X
+        /// リスポーン地点X.
         /// </summary>
         public int SpawnTileX
         {
@@ -86,7 +81,7 @@ namespace TerraBuilder.WorldEdit
         }
 
         /// <summary>
-        /// リスポーン地点Y
+        /// リスポーン地点Y.
         /// </summary>
         public int SpawnTileY
         {
@@ -95,32 +90,37 @@ namespace TerraBuilder.WorldEdit
         }
 
         /// <summary>
-        /// ワールドのシード値
+        /// ワールドのシード値.
         /// </summary>
         public int Seed { get; set; } = 42;
 
         /// <summary>
-        /// プロパティをリセットして読み込みなおす
+        /// ワールドに存在するタイル.
         /// </summary>
-        /// <returns>リセットに成功したらtrue</returns>
-        public bool Reset()
-        {
-            lock (locker)
-            {
-                TileCountX = 4200;
-                TileCountY = 1200;
+        private ITileCollection Tiles { get; set; }
 
-                Tiles = Main.tile;
-                Chests = Main.chest;
+        /// <summary>
+        /// テラリアと同期を取る.
+        /// </summary>
+        /// <returns>同期に成功したらtrue.失敗したらfalse.</returns>
+        public bool Sync()
+        {
+            lock (this.locker)
+            {
+                this.TileCountX = 4200;
+                this.TileCountY = 1200;
+
+                this.Tiles = Main.tile;
+                this.Chests = Main.chest;
 
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     Main.npc[i] = new NPC();
                 }
 
-                for (int x = 0; x < TileCountX; x++)
+                for (int x = 0; x < this.TileCountX; x++)
                 {
-                    for (int y = 0; y < TileCountY; y++)
+                    for (int y = 0; y < this.TileCountY; y++)
                     {
                         Main.tile[x, y] = new Tile();
                     }
@@ -131,17 +131,17 @@ namespace TerraBuilder.WorldEdit
                     Main.chest[i] = null;
                 }
 
-                TileProtectionMap = new TileProtectionMap(this);
+                this.TileProtectionMap = new TileProtectionMap(this);
 
                 return true;
             }
         }
 
         /// <summary>
-        /// ワールドを保存する。
+        /// ワールドを保存する.
         /// </summary>
-        /// <param name="path">保存先のパス。指定しない場合はテラリアのワールドフォルダに保存される</param>
-        /// <returns>保存したパス</returns>
+        /// <param name="path">保存先のパス.指定しない場合はテラリアのワールドフォルダに保存される.</param>
+        /// <returns>保存したパス.</returns>
         public string Save(string path)
         {
             lock (locker)
@@ -220,7 +220,7 @@ namespace TerraBuilder.WorldEdit
                     Tiles = Main.tile;
                     Chests = Main.chest;
 
-                    // Seedの再設定により、Randomインスタンスを生成しなおす。
+                    // Seedの再設定により、Randomインスタンスを生成しなおす.
                     // 追加のコンテキストもクリアしておく
                     if (WorldGenerationRunner.CurrentRunner != null)
                     {

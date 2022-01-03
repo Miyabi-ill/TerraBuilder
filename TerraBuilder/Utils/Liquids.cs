@@ -1,7 +1,6 @@
 ﻿namespace TerraBuilder.Utils
 {
     using Terraria;
-    using TerraBuilder.WorldGeneration;
 
     public class Liquids
     {

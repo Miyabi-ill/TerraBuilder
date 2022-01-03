@@ -3,9 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using Terraria;
     using Terraria.DataStructures;
     using Terraria.GameContent.Tile_Entities;
@@ -46,10 +43,8 @@
                         {
                             Tile tile = tiles[x, y];
 
-                            int dataIndex;
-                            int headerIndex;
 
-                            byte[] tileData = SerializeTileData(tile, out dataIndex, out headerIndex);
+                            byte[] tileData = SerializeTileData(tile, out int dataIndex, out int headerIndex);
 
                             // rle compression
                             byte header1 = tileData[headerIndex];

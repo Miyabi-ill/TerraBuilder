@@ -8,15 +8,14 @@
     using System.Windows.Media.Imaging;
     using Terraria;
     using Terraria.Map;
-    using TerraBuilder.WorldGeneration;
 
     /// <summary>
-    /// ワールドを画像に変換する。
+    /// ワールドを画像に変換する.
     /// </summary>
     public static class WorldToImage
     {
         /// <summary>
-        /// タイルを画像にする。
+        /// タイルを画像にする.
         /// </summary>
         /// <param name="sandbox">ワールドサンドボックス</param>
         /// <returns>画像</returns>
@@ -58,7 +57,7 @@
         }
 
         /// <summary>
-        /// タイルを画像にする。
+        /// タイルを画像にする.
         /// </summary>
         /// <param name="tiles">タイル</param>
         /// <returns>画像</returns>

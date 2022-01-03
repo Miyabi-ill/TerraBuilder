@@ -1,6 +1,5 @@
 ﻿namespace TerraBuilder.WorldGeneration.Chests
 {
-    using System.ComponentModel;
     using Newtonsoft.Json;
 
     public class ChestProbably

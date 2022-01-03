@@ -13,10 +13,9 @@
     using System.Windows;
     using System.Windows.Media.Imaging;
     using Newtonsoft.Json;
-    using Terraria;
-    using Terraria.ID;
     using TerraBuilder.BuildingGenerator.Parts;
     using TerraBuilder.BuildingGenerator.UI;
+    using Terraria;
 
     public class BuildingCache
     {
@@ -64,7 +63,7 @@
         private Dictionary<string, (string name, ObservableCollection<string> tags)> TileTags { get; set; } = new Dictionary<string, (string name, ObservableCollection<string> tags)>();
 
         /// <summary>
-        /// キャッシュディレクトリの辞書。ファイル名(の拡張子を除いた名前)に対し、建物名とハッシュを保存する。Jsonに書き込み/読み込みする。
+        /// キャッシュディレクトリの辞書.ファイル名(の拡張子を除いた名前)に対し、建物名とハッシュを保存する.Jsonに書き込み/読み込みする.
         /// </summary>
         private Dictionary<string, (string name, string hash, ObservableCollection<string> tags)> CacheFileNameDictionary { get; set; } = new Dictionary<string, (string name, string hash, ObservableCollection<string> tags)>();
 
@@ -315,7 +314,7 @@
             }
             catch
             {
-                MessageBox.Show("キャッシュフォルダの削除に失敗しました。ファイルが開かれている可能性があります。");
+                MessageBox.Show("キャッシュフォルダの削除に失敗しました.ファイルが開かれている可能性があります.");
             }
         }
 
@@ -605,7 +604,7 @@
             // ファイルからの読み込みに失敗
             if (TileTags == null)
             {
-                if (MessageBox.Show("タイルタグファイル(tileTag.json)の読み込みに失敗しました。初期状態に戻しますか？", "読み込みに失敗", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                if (MessageBox.Show("タイルタグファイル(tileTag.json)の読み込みに失敗しました.初期状態に戻しますか？", "読み込みに失敗", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
                 {
                     regenerateCacheFile = false;
                 }
@@ -618,7 +617,7 @@
                 Dictionary<int, object> tileIdsAlreadyAdd = new Dictionary<int, object>();
                 Dictionary<int, object> wallIdsAlreadyAdd = new Dictionary<int, object>();
 
-                // まずアイテム名からタイル、壁を取得。
+                // まずアイテム名からタイル、壁を取得.
                 foreach (var item in TerrariaNameDict.ItemNameToItem)
                 {
                     if (item.Value.createTile != -1)

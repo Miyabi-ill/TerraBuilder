@@ -2,11 +2,10 @@
 {
     using System;
     using System.ComponentModel;
-    using Terraria;
-    using Terraria.ID;
     using TerraBuilder.Utils;
     using TerraBuilder.WorldGeneration;
     using TerraBuilder.WorldGeneration.Chests;
+    using Terraria;
 
     /// <summary>
     /// 第二層にランダムにチェストを置くためのクラス
@@ -71,19 +70,19 @@
         public class RandomCavernChestContext : ActionContext
         {
             /// <summary>
-            /// チェストを1つ設置するまでのリトライ回数。チェストが設置できないとき=下が斜めブロックなどのときにリトライされる。
+            /// チェストを1つ設置するまでのリトライ回数.チェストが設置できないとき=下が斜めブロックなどのときにリトライされる.
             /// </summary>
             [Category("地下チェスト生成")]
             [DisplayName("1チェストあたり最大リトライ数")]
-            [Description("チェストを1つ設置するまでのリトライ回数。チェストが設置できないとき=下が斜めブロックなどのときにリトライされる。")]
+            [Description("チェストを1つ設置するまでのリトライ回数.チェストが設置できないとき=下が斜めブロックなどのときにリトライされる.")]
             public int MaxRetryForOneChest { get; set; } = 100;
 
             /// <summary>
-            /// チェストを設置する数。もしリトライに失敗した場合、この数より少なく生成される。
+            /// チェストを設置する数.もしリトライに失敗した場合、この数より少なく生成される.
             /// </summary>
             [Category("地下チェスト生成")]
             [DisplayName("チェスト設置数")]
-            [Description("チェストを設置する数。もしリトライに失敗した場合、この数より少なく生成される。")]
+            [Description("チェストを設置する数.もしリトライに失敗した場合、この数より少なく生成される.")]
             public int ChestCount { get; set; } = 50;
 
             /// <summary>

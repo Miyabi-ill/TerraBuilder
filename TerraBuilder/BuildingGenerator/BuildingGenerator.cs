@@ -1,10 +1,9 @@
 ﻿namespace TerraBuilder.BuildingGenerator
 {
     using System;
-    using System.Linq;
     using Newtonsoft.Json;
-    using Terraria;
     using TerraBuilder.BuildingGenerator.Parts;
+    using Terraria;
 
     /// <summary>
     /// 建築ジェネレータ
@@ -24,7 +23,7 @@
         public BuildRoot Root { get; set; }
 
         /// <summary>
-        /// <see cref="Root"/>から生成された建築物。
+        /// <see cref="Root"/>から生成された建築物.
         /// </summary>
         public Tile[,] Result { get; private set; }
 
@@ -44,7 +43,7 @@
         public BuildingsDict BuildingsDict { get; } = new BuildingsDict();
 
         /// <summary>
-        /// 建築を現在のツリーから生成し、<see cref="Result"/>に格納する。
+        /// 建築を現在のツリーから生成し、<see cref="Result"/>に格納する.
         /// </summary>
         public void Build()
         {
@@ -113,7 +112,7 @@
                         }
                     }
 
-                    // Xを優先で登録する。
+                    // Xを優先で登録する.
                     if (lastSameX >= lastSameY)
                     {
                         lastSameY = y;
@@ -140,7 +139,7 @@
                         }
                     }
 
-                    // Y優先で登録する。
+                    // Y優先で登録する.
                     else
                     {
                         bool fail = false;
@@ -206,8 +205,8 @@
         }
 
         /// <summary>
-        /// Jsonからツリーを生成する。
-        /// タイルを取得するためには、<see cref="Build"/>を呼び出す。
+        /// Jsonからツリーを生成する.
+        /// タイルを取得するためには、<see cref="Build"/>を呼び出す.
         /// </summary>
         /// <param name="text">Jsonテキスト</param>
         public void ImportJson(string text)

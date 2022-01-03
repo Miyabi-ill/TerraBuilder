@@ -3,8 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -31,14 +29,14 @@
         private object value;
 
         /// <summary>
-        /// 固定値を返すクラスのコンストラクタ。
+        /// 固定値を返すクラスのコンストラクタ.
         /// </summary>
         public ConstantValue()
         {
         }
 
         /// <summary>
-        /// 固定値を返すクラスのコンストラクタ。
+        /// 固定値を返すクラスのコンストラクタ.
         /// </summary>
         /// <param name="value">返す固定値</param>
         public ConstantValue(object value)
@@ -73,7 +71,7 @@
         /// <summary>
         /// 固定値を取得する
         /// </summary>
-        /// <param name="rand">乱数生成インスタンス。使わない</param>
+        /// <param name="rand">乱数生成インスタンス.使わない</param>
         /// <returns>Valueを帰す</returns>
         public override object GetValue(Random rand)
         {
@@ -88,7 +86,7 @@
     }
 
     /// <summary>
-    /// 範囲内の値を生成する。intかdouble以外が必要な場合、SelectValueを使う。
+    /// 範囲内の値を生成する.intかdouble以外が必要な場合、SelectValueを使う.
     /// </summary>
     [JsonConverter(typeof(RandomValueConverter))]
     public class RangeValue : RandomValue
@@ -98,15 +96,15 @@
         private object maxValue;
 
         /// <summary>
-        /// 範囲内の値を生成するクラスのコンストラクタ。
-        /// このコンストラクタを使用する場合、DataTypeを自分で指定する必要がある。
+        /// 範囲内の値を生成するクラスのコンストラクタ.
+        /// このコンストラクタを使用する場合、DataTypeを自分で指定する必要がある.
         /// </summary>
         public RangeValue()
         {
         }
 
         /// <summary>
-        /// 範囲内の値を生成するクラスのコンストラクタ。
+        /// 範囲内の値を生成するクラスのコンストラクタ.
         /// </summary>
         /// <param name="minValue">最小値</param>
         /// <param name="maxValue">最大値</param>

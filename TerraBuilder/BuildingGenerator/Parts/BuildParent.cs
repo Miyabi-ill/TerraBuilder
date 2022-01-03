@@ -1,17 +1,12 @@
 ﻿namespace TerraBuilder.BuildingGenerator.Parts
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.ComponentModel;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using Newtonsoft.Json;
     using Terraria;
 
     /// <summary>
-    /// 子を持つ建築の基底クラス。
+    /// 子を持つ建築の基底クラス.
     /// </summary>
     [JsonConverter(typeof(PartsConverter))]
     public class BuildParent : BuildBase
@@ -59,7 +54,7 @@
         }
 
         /// <summary>
-        /// 建築のサイズ。
+        /// 建築のサイズ.
         /// </summary>
         [JsonProperty]
         public Size Size
