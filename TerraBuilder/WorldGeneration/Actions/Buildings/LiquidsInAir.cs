@@ -105,7 +105,7 @@
             return true;
         }
 
-        public class LiquidsInAirContext : ActionContext
+        public class LiquidsInAirContext : ActionConfig
         {
             /// <summary>
             /// 空中に設置する液体の最小幅を設定する.実際に生成されるサイズは液体幅+2(左右にバブルブロックが設置されるため)となる

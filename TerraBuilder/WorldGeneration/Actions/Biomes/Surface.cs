@@ -213,7 +213,7 @@
         /// <summary>
         /// 地表生成に使われるコンテキスト.
         /// </summary>
-        public class SurfaceContext : ActionContext
+        public class SurfaceContext : ActionConfig
         {
             /// <summary>
             /// 地表の高さ.この高さ以上(数値的には以下)が地表.

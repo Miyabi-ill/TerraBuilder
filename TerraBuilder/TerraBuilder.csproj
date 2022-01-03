@@ -181,7 +181,7 @@
     <Compile Include="UI\TileEditor.xaml.cs">
       <DependentUpon>TileEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WorldGeneration\ActionContext.cs" />
+    <Compile Include="WorldGeneration\ActionConfig.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Caverns.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\CavernWater.cs" />
     <Compile Include="WorldGeneration\Actions\Biomes\Desert.cs" />

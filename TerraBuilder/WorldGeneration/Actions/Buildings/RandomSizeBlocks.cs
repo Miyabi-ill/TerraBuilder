@@ -304,7 +304,7 @@
             return true;
         }
 
-        public class RandomSizeBlockContext : ActionContext
+        public class RandomSizeBlockContext : ActionConfig
         {
             [Category("部屋")]
             [DisplayName("部屋の最小幅(壁含む)")]

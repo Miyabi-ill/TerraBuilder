@@ -216,7 +216,7 @@
         /// <summary>
         /// 洞窟の生成に使われるコンテキスト.
         /// </summary>
-        public class CavernContext : ActionContext
+        public class CavernContext : ActionConfig
         {
             /// <summary>
             /// 洞窟の最小の高さ.

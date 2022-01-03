@@ -175,7 +175,7 @@
             return true;
         }
 
-        public class TunnelContext : ActionContext
+        public class TunnelContext : ActionConfig
         {
             /// <summary>
             /// トンネルの数

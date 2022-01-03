@@ -124,7 +124,7 @@
             return true;
         }
 
-        public class WellContext : ActionContext
+        public class WellContext : ActionConfig
         {
             [Category("井戸設置")]
             [DisplayName("井戸設置数")]

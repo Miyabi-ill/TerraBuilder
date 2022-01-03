@@ -45,7 +45,7 @@
             return true;
         }
 
-        public class RandomRopeContext : ActionContext
+        public class RandomRopeContext : ActionConfig
         {
             [Category("ロープ生成")]
             [DisplayName("ロープ設置数")]

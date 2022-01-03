@@ -1,10 +1,14 @@
-﻿namespace TerraBuilder.WorldGeneration
+﻿// Copyright (c) Miyabi. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+namespace TerraBuilder.WorldGeneration
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.IO;
     using Newtonsoft.Json;
+    using TerraBuilder.WorldEdit;
 
     /// <summary>
     /// ワールド生成を行うクラス.
@@ -17,7 +21,7 @@
             {
                 if (type.GetCustomAttributes(typeof(ActionAttribute), false).Length > 0)
                 {
-                    AvailableActions.Add(type.Name, () => type.GetConstructor(Type.EmptyTypes).Invoke(null) as IWorldGenerationAction<ActionContext>);
+                    AvailableActions.Add(type.Name, () => type.GetConstructor(Type.EmptyTypes).Invoke(null) as IWorldGenerationAction<ActionConfig>);
                 }
             }
         }
@@ -30,36 +34,37 @@
         {
             CurrentRunner = this;
 
-            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.Caverns)].Invoke());
-            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.Surface)].Invoke());
-            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.Wells)].Invoke());
-            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.Tunnel)].Invoke());
-            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomSizeBlocks)].Invoke());
-            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomSizeBlockWithArea)].Invoke());
-            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomCavernChests)].Invoke());
-            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.CavernWater)].Invoke());
-            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomRope)].Invoke());
-            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.LiquidsInAir)].Invoke());
-            WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.SpawnArea)].Invoke());
+            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.Caverns)].Invoke());
+            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.Surface)].Invoke());
+            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.Wells)].Invoke());
+            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.Tunnel)].Invoke());
+            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomSizeBlocks)].Invoke());
+            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomSizeBlockWithArea)].Invoke());
+            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomCavernChests)].Invoke());
+            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.CavernWater)].Invoke());
+            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomRope)].Invoke());
+            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.LiquidsInAir)].Invoke());
+            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.SpawnArea)].Invoke());
 
-            // TODO: Load from json
-            GlobalContext = new GlobalContext();
+            // TODO: jsonから読み込み？
+            this.GlobalContext = new GlobalContext();
         }
 
         /// <summary>
         /// 利用可能なアクションの名前と生成用関数の辞書.
         /// </summary>
-        public static Dictionary<string, Func<IWorldGenerationAction<ActionContext>>> AvailableActions { get; } = new Dictionary<string, Func<IWorldGenerationAction<ActionContext>>>();
+        public static Dictionary<string, Func<IWorldGenerationAction<ActionConfig>>> AvailableActions { get; } = new Dictionary<string, Func<IWorldGenerationAction<ActionConfig>>>();
 
         /// <summary>
-        /// 現在のインスタンス
+        /// 現在のインスタンス.
+        /// TODO: 並列化にネガティブなため、構成を要検討.
         /// </summary>
         public static WorldGenerationRunner CurrentRunner { get; private set; }
 
         /// <summary>
         /// ワールド生成アクションリスト.このリスト順で生成が実行される.
         /// </summary>
-        public ObservableCollection<IWorldGenerationAction<ActionContext>> WorldGenerationActions { get; private set; } = new ObservableCollection<IWorldGenerationAction<ActionContext>>();
+        public ObservableCollection<IWorldGenerationAction<ActionConfig>> WorldGenerationActions { get; } = new ObservableCollection<IWorldGenerationAction<ActionConfig>>();
 
         /// <summary>
         /// 全体から参照されるコンテキスト.
@@ -70,12 +75,12 @@
         /// <summary>
         /// 登録されている全てのアクションを実行し、ワールド生成を行う.
         /// </summary>
-        /// <param name="sandbox">ワールド生成を行うサンドボックス</param>
-        /// <returns>アクションが全て成功すればtrue</returns>
+        /// <param name="sandbox">ワールド生成を行うサンドボックス.</param>
+        /// <returns>アクションが全て成功すればtrue.1つでも失敗すれば、その時点で失敗しfalseを返す.</returns>
         public bool Run(WorldSandbox sandbox)
         {
-            sandbox.Reset();
-            foreach (var action in WorldGenerationActions)
+            _ = sandbox.Reset();
+            foreach (IWorldGenerationAction<ActionConfig> action in this.WorldGenerationActions)
             {
                 lock (sandbox)
                 {
@@ -100,15 +105,15 @@
         }
 
         /// <summary>
-        /// 現在のワールド生成アクションを保存する
+        /// 現在のワールド生成アクションを保存する.
         /// </summary>
-        /// <param name="path">保存先のパス</param>
+        /// <param name="path">保存先のパス.</param>
         public void Save(string path)
         {
-            using (var sw = new StreamWriter(path))
+            using (StreamWriter sw = new StreamWriter(path))
             {
                 sw.Write(JsonConvert.SerializeObject(
-                    new ValueTuple<GlobalContext, ObservableCollection<IWorldGenerationAction<ActionContext>>>(GlobalContext, WorldGenerationActions),
+                    new ValueTuple<GlobalContext, ObservableCollection<IWorldGenerationAction<ActionConfig>>>(this.GlobalContext, this.WorldGenerationActions),
                     new JsonSerializerSettings()
                     {
                         TypeNameHandling = TypeNameHandling.Auto,
@@ -118,26 +123,26 @@
         }
 
         /// <summary>
-        /// ワールド生成アクションを読み込む
+        /// ワールド生成アクションを読み込む.
         /// </summary>
-        /// <param name="path">読み込むパス</param>
+        /// <param name="path">読み込むパス.</param>
         public void Load(string path)
         {
             if (File.Exists(path))
             {
-                using (var sr = new StreamReader(path))
+                using (StreamReader sr = new StreamReader(path))
                 {
-                    var tuple = JsonConvert.DeserializeObject<ValueTuple<GlobalContext, ObservableCollection<IWorldGenerationAction<ActionContext>>>>(
+                    (GlobalContext, ObservableCollection<IWorldGenerationAction<ActionConfig>>) tuple = JsonConvert.DeserializeObject<ValueTuple<GlobalContext, ObservableCollection<IWorldGenerationAction<ActionConfig>>>>(
                         sr.ReadToEnd(),
                         new JsonSerializerSettings()
                         {
                             TypeNameHandling = TypeNameHandling.Auto,
                         });
-                    GlobalContext = tuple.Item1;
-                    WorldGenerationActions.Clear();
-                    foreach (var item in tuple.Item2)
+                    this.GlobalContext = tuple.Item1;
+                    this.WorldGenerationActions.Clear();
+                    foreach (IWorldGenerationAction<ActionConfig> item in tuple.Item2)
                     {
-                        WorldGenerationActions.Add(item);
+                        this.WorldGenerationActions.Add(item);
                     }
                 }
 

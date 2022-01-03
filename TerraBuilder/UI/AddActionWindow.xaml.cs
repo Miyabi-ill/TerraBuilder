@@ -23,11 +23,11 @@
         /// <summary>
         /// 生成したアクション.
         /// </summary>
-        public IWorldGenerationAction<ActionContext> Action { get; private set; }
+        public IWorldGenerationAction<ActionConfig> Action { get; private set; }
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ActionsComboBox.SelectedItem is KeyValuePair<string, Func<IWorldGenerationAction<ActionContext>>> pair)
+            if (ActionsComboBox.SelectedItem is KeyValuePair<string, Func<IWorldGenerationAction<ActionConfig>>> pair)
             {
                 Action = pair.Value();
             }

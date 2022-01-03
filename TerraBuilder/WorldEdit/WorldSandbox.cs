@@ -43,7 +43,7 @@ namespace TerraBuilder.WorldEdit
                 isInitializedTerrariaInstance = true;
             }
 
-            _ = this.Sync();
+            _ = this.Reset();
         }
 
         /// <summary>
@@ -114,10 +114,10 @@ namespace TerraBuilder.WorldEdit
         }
 
         /// <summary>
-        /// テラリアと同期を取る.
+        /// 環境のリセットを行う.
         /// </summary>
-        /// <returns>同期に成功したらtrue.失敗したらfalse.</returns>
-        public bool Sync()
+        /// <returns>リセットに成功したらtrue.失敗したらfalse.</returns>
+        public bool Reset()
         {
             lock (this.locker)
             {

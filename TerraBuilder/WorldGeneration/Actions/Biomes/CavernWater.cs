@@ -47,7 +47,7 @@
             return true;
         }
 
-        public class CavernWaterContext : ActionContext
+        public class CavernWaterContext : ActionConfig
         {
             /// <summary>
             /// 水の塊の設置数

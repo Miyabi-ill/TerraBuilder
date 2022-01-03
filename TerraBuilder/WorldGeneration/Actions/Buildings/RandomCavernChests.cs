@@ -67,7 +67,7 @@
             return false;
         }
 
-        public class RandomCavernChestContext : ActionContext
+        public class RandomCavernChestContext : ActionConfig
         {
             /// <summary>
             /// チェストを1つ設置するまでのリトライ回数.チェストが設置できないとき=下が斜めブロックなどのときにリトライされる.

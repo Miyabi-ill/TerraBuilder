@@ -62,7 +62,7 @@
         /// <summary>
         /// スポーン地点の生成に使われるコンテキスト.
         /// </summary>
-        public class SpawnAreaContext : ActionContext
+        public class SpawnAreaContext : ActionConfig
         {
         }
     }

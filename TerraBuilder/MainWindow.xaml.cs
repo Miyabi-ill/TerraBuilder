@@ -114,7 +114,7 @@
 
         private async void RunActionButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.DataContext is IWorldGenerationAction<ActionContext> generationAction)
+            if (sender is Button button && button.DataContext is IWorldGenerationAction<ActionConfig> generationAction)
             {
                 RunningOverlay.Visibility = Visibility.Visible;
                 bool success = await Task.Run(() => generationAction.Run(Sandbox)).ConfigureAwait(true);
@@ -125,7 +125,7 @@
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.DataContext is IWorldGenerationAction<ActionContext> generationAction)
+            if (sender is Button button && button.DataContext is IWorldGenerationAction<ActionConfig> generationAction)
             {
                 LocalContextProperty.SelectedObject = generationAction.Context;
                 LocalContextExpander.Header = generationAction.Name;
