@@ -15,12 +15,19 @@ namespace TerraBuilder.WorldEdit
         /// タイル保護マップのコンストラクタ.
         /// </summary>
         /// <param name="sandbox">ワールドサンドボックス.</param>
+        /// <exception cref="ArgumentNullException"><see cref="sandbox"/>がnullのとき.</exception>
         public TileProtectionMap(WorldSandbox sandbox)
         {
+            if (sandbox == null)
+            {
+                throw new ArgumentNullException(nameof(sandbox));
+            }
+
             this.MapSizeX = sandbox.TileCountX;
             this.MapSizeY = sandbox.TileCountY;
 
             this.TileProtectionTypes = new TileProtectionType[this.MapSizeX, this.MapSizeY];
+            this.Sandbox = sandbox;
         }
 
         /// <summary>
@@ -32,27 +39,27 @@ namespace TerraBuilder.WorldEdit
             /// <summary>
             /// タイル保護なし
             /// </summary>
-            None = 0x0,
+            None = 0,
 
             /// <summary>
             /// 上面設置可(Platformなど)なら置き換え可
             /// </summary>
-            TopSolid = 0x1,
+            TopSolid = 1,
 
             /// <summary>
             /// 下面設置可なら置き換え可
             /// </summary>
-            BottomSolid = 0x2,
+            BottomSolid = 1 << 1,
 
             /// <summary>
             /// 左面設置可なら置き換え可
             /// </summary>
-            LeftSolid = 0x4,
+            LeftSolid = 1 << 2,
 
             /// <summary>
             /// 右面設置可なら置き換え可
             /// </summary>
-            RightSolid = 0x8,
+            RightSolid = 1 << 3,
 
             /// <summary>
             /// 固形ブロック（土など）
@@ -62,37 +69,37 @@ namespace TerraBuilder.WorldEdit
             /// <summary>
             /// 壁紙置き換え可
             /// </summary>
-            Wall = 0x10,
+            Wall = 1 << 4,
 
             /// <summary>
             /// 液体種類、量置き換え可
             /// </summary>
-            Liquid = 0x20,
+            Liquid = 1 << 5,
 
             /// <summary>
             /// ワイヤ全種類置き換え可
             /// </summary>
-            Wire = 0x30,
+            Wire = 1 << 6,
 
             /// <summary>
             /// アクチュエーター置き換え可
             /// </summary>
-            Actuator = 0x40,
+            Actuator = 1 << 7,
 
             /// <summary>
             /// タイル形状（ハーフ、斜め）変更可
             /// </summary>
-            TileShape = 0x80,
+            TileShape = 1 << 8,
 
             /// <summary>
             /// タイルID一致なら変更可
             /// </summary>
-            TileType = 0x100,
+            TileType = 1 << 9,
 
             /// <summary>
             /// タイルフレーム（スタイル）一致なら変更可
             /// </summary>
-            TileFrame = 0x200,
+            TileFrame = 1 << 10,
 
             /// <summary>
             /// 設置するアイテムが一致（タイルIDとスタイル一致）なら変更可
@@ -104,6 +111,8 @@ namespace TerraBuilder.WorldEdit
             /// </summary>
             All = TopSolid | BottomSolid | LeftSolid | RightSolid | Wall | Liquid | Wire | Actuator | TileShape | TileType | TileFrame,
         }
+
+        private WorldSandbox Sandbox { get; }
 
         private int MapSizeX { get; }
 
@@ -141,25 +150,24 @@ namespace TerraBuilder.WorldEdit
         /// タイルをサンドボックスに設置する.
         /// タイルが保護されていた場合、保護部分以外が設置できるなら設置する.
         /// </summary>
-        /// <param name="sandbox">設置先サンドボックス.</param>
         /// <param name="coordinate">設置先座標.</param>
         /// <param name="tile">設置するタイル.</param>
         /// <returns>設置できたタイル（`sandbox.Tiles[coordinate.X, coordinate.Y]`と同一）.</returns>
-        public Tile PlaceTile(WorldSandbox sandbox, Coordinate coordinate, Tile tile)
+        public Tile PlaceTile(Coordinate coordinate, Tile tile)
         {
             TileProtectionType type = this.TileProtectionTypes[coordinate.X, coordinate.Y];
             if (type == TileProtectionType.None)
             {
-                sandbox.Tiles[coordinate.X, coordinate.Y] = tile;
+                this.Sandbox[coordinate] = tile;
                 return tile;
             }
 
-            if (sandbox.Tiles[coordinate.X, coordinate.Y] == null)
+            if (this.Sandbox[coordinate] == null)
             {
-                sandbox.Tiles[coordinate.X, coordinate.Y] = new Tile();
+                this.Sandbox[coordinate] = new Tile();
             }
 
-            Tile sandboxTile = (Tile)sandbox.Tiles[coordinate.X, coordinate.Y];
+            Tile sandboxTile = this.Sandbox[coordinate];
 
             bool rejectTilePlace = false;
             bool rejectWallPlace = false;
@@ -267,50 +275,6 @@ namespace TerraBuilder.WorldEdit
             }
 
             return sandboxTile;
-        }
-
-        public bool PlaceTiles(WorldSandbox sandbox, TileProtectionType[,] protectionMap, Tile[,] tiles, int x, int y)
-        {
-            if (protectionMap.GetLength(0) != tiles.GetLength(0)
-                || protectionMap.GetLength(1) != tiles.GetLength(1))
-            {
-                return false;
-            }
-
-            int width = tiles.GetLength(0);
-            int height = tiles.GetLength(1);
-
-            for (int tx = x; tx < x + width; tx++)
-            {
-                for (int ty = y; ty < y + height; ty++)
-                {
-                    this.PlaceTile(sandbox, tiles[tx - x, ty - y], tx, ty);
-                    this.TileProtectionTypes[tx, ty] |= protectionMap[tx - x, ty - y];
-                }
-            }
-
-            return true;
-        }
-
-        public void SetProtection(TileProtectionType type, int minX, int minY, int maxX, int maxY)
-        {
-            if (minX > maxX)
-            {
-                throw new ArgumentException("minX must be less than maxX.");
-            }
-
-            if (minY > maxY)
-            {
-                throw new ArgumentException("minY must be less than maxY.");
-            }
-
-            for (int x = minX; x < maxX + 1; x++)
-            {
-                for (int y = minY; y < maxY + 1; y++)
-                {
-                    this.TileProtectionTypes[x, y] = type;
-                }
-            }
         }
     }
 }

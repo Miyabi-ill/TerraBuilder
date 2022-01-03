@@ -4,6 +4,7 @@
 namespace TerraBuilder.WorldEdit
 {
     using System;
+    using System.Globalization;
     using System.IO;
     using OTAPI.Tile;
     using Terraria;
@@ -16,7 +17,7 @@ namespace TerraBuilder.WorldEdit
     /// </summary>
     public class WorldSandbox
     {
-        private static bool isInitializedTerrariaInstance = false;
+        private static bool isInitializedTerrariaInstance;
 
         private readonly string locker = string.Empty;
 
@@ -29,7 +30,9 @@ namespace TerraBuilder.WorldEdit
         {
             if (!isInitializedTerrariaInstance)
             {
-                // Initialize Terraria Instance.
+                // テラリアの必要なクラスを初期化していく
+                // TODO: 自前の管理システムを用意し、テラリアのデータが必要なもの（例：チェストのテクスチャ位置、IDなど）のみ残す。
+                // これにより並列アクセスを実現したい.
                 MapHelper.Initialize();
                 Lang.InitializeLegacyLocalization();
                 LanguageManager.Instance.SetLanguage(GameCulture.DefaultCulture);
@@ -40,7 +43,7 @@ namespace TerraBuilder.WorldEdit
                 isInitializedTerrariaInstance = true;
             }
 
-            this.Sync();
+            _ = this.Sync();
         }
 
         /// <summary>
@@ -100,6 +103,17 @@ namespace TerraBuilder.WorldEdit
         private ITileCollection Tiles { get; set; }
 
         /// <summary>
+        /// ワールドにあるタイルを取得/変更する.
+        /// </summary>
+        /// <param name="coordinate">タイルを取得/編集する座標.</param>
+        /// <returns>取得したタイル.</returns>
+        public Tile this[Coordinate coordinate]
+        {
+            get => (Tile)this.Tiles[coordinate.X, coordinate.Y];
+            set => this.Tiles[coordinate.X, coordinate.Y] = value;
+        }
+
+        /// <summary>
         /// テラリアと同期を取る.
         /// </summary>
         /// <returns>同期に成功したらtrue.失敗したらfalse.</returns>
@@ -144,17 +158,17 @@ namespace TerraBuilder.WorldEdit
         /// <returns>保存したパス.</returns>
         public string Save(string path)
         {
-            lock (locker)
+            lock (this.locker)
             {
                 if (string.IsNullOrEmpty(path))
                 {
-                    string fileName = DateTime.Now.ToString("yy-MM-dd HH-mm-ss") + ".wld";
+                    string fileName = DateTime.Now.ToString("yy-MM-dd HH:mm:ss", DateTimeFormatInfo.InvariantInfo) + ".wld";
                     path = Path.Combine(Main.SavePath, "Worlds", fileName);
                 }
 
-                for (int x = 0; x < TileCountX; x++)
+                for (int x = 0; x < this.TileCountX; x++)
                 {
-                    for (int y = 0; y < TileCountY; y++)
+                    for (int y = 0; y < this.TileCountY; y++)
                     {
                         if (Main.tile[x, y] == null)
                         {
@@ -172,16 +186,18 @@ namespace TerraBuilder.WorldEdit
                     Metadata = Main.WorldFileMetadata,
                 };
 
-                Main.ActiveWorldFileData.SetSeed(Seed.ToString());
+                Main.ActiveWorldFileData.SetSeed(this.Seed.ToString(NumberFormatInfo.CurrentInfo));
+
+                // TODO: 値を決め打ちするのをやめる.
                 Main.worldID = 42;
 
-                Main.treeX[0] = TileCountX;
-                Main.treeX[1] = TileCountX;
-                Main.treeX[2] = TileCountX;
+                Main.treeX[0] = this.TileCountX;
+                Main.treeX[1] = this.TileCountX;
+                Main.treeX[2] = this.TileCountX;
 
-                Main.caveBackX[0] = TileCountX;
-                Main.caveBackX[1] = TileCountX;
-                Main.caveBackX[2] = TileCountX;
+                Main.caveBackX[0] = this.TileCountX;
+                Main.caveBackX[1] = this.TileCountX;
+                Main.caveBackX[2] = this.TileCountX;
 
                 Main.worldSurface = 400;
                 Main.rockLayer = 800;
@@ -189,36 +205,36 @@ namespace TerraBuilder.WorldEdit
                 Main.worldName = string.IsNullOrEmpty(Main.worldName) ? "TerraBuild" : Main.worldName;
 
                 using (FileStream stream = File.OpenWrite(path))
+                using (BinaryWriter binaryWriter = new BinaryWriter(stream))
                 {
-                    using (BinaryWriter binaryWriter = new BinaryWriter(stream))
-                    {
-                        WorldFile.SaveWorld_Version2(binaryWriter);
-                    }
+                    WorldFile.SaveWorld_Version2(binaryWriter);
                 }
 
                 return path;
             }
         }
 
+        /// <summary>
+        /// ワールドを指定したパスから読み込む.
+        /// </summary>
+        /// <param name="path">ワールドのパス.</param>
         public void Load(string path)
         {
             if (File.Exists(path))
             {
-                lock (locker)
+                lock (this.locker)
                 {
                     using (FileStream stream = File.OpenRead(path))
+                    using (BinaryReader binaryWriter = new BinaryReader(stream))
                     {
-                        using (BinaryReader binaryWriter = new BinaryReader(stream))
-                        {
-                            WorldFile.LoadWorld_Version2(binaryWriter);
-                        }
+                        _ = WorldFile.LoadWorld_Version2(binaryWriter);
                     }
 
-                    TileCountX = Main.maxTilesX;
-                    TileCountY = Main.maxTilesY;
+                    this.TileCountX = Main.maxTilesX;
+                    this.TileCountY = Main.maxTilesY;
 
-                    Tiles = Main.tile;
-                    Chests = Main.chest;
+                    this.Tiles = Main.tile;
+                    this.Chests = Main.chest;
 
                     // Seedの再設定により、Randomインスタンスを生成しなおす.
                     // 追加のコンテキストもクリアしておく
@@ -228,7 +244,7 @@ namespace TerraBuilder.WorldEdit
                         WorldGenerationRunner.CurrentRunner.GlobalContext.ClearAdditionalContext();
                     }
 
-                    TileProtectionMap = new TileProtectionMap(this);
+                    this.TileProtectionMap = new TileProtectionMap(this);
                 }
             }
         }
