@@ -8,6 +8,8 @@
   "$schema": "https://raw.githubusercontent.com/DotNetAnalyzers/StyleCopAnalyzers/master/StyleCop.Analyzers/StyleCop.Analyzers/Settings/stylecop.schema.json",
   "settings": {
     "documentationRules": {
+      "documentationCulture": "en-US", // 将来的にja-JPに変更
+      "xmlHeader": false,
       "copyrightText": "Copyright (c) {author}. All rights reserved.\nLicensed under the {licenseName} license. See {licenseFile} file in the project root for full license information.",
       "variables": {
         "licenseName": "MIT",

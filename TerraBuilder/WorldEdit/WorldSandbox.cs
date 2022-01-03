@@ -1,4 +1,7 @@
-﻿namespace TerraBuilder.WorldGeneration
+﻿// Copyright (c) Miyabi. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+namespace TerraBuilder.WorldEdit
 {
     using System;
     using System.IO;
@@ -9,7 +12,7 @@
     using Terraria.Map;
 
     /// <summary>
-    /// ワールド生成に必要なテラリアのプロパティをひとまとめにしたクラス。
+    /// テラリアのワールドの干渉に必要な情報をまとめたクラス。
     /// </summary>
     public class WorldSandbox
     {
@@ -41,22 +44,22 @@
         }
 
         /// <summary>
-        /// ワールドに存在するタイル
+        /// ワールドに存在するタイル.
         /// </summary>
         public ITileCollection Tiles { get; private set; }
 
         /// <summary>
-        /// タイル保護マップ
+        /// タイル保護マップ.
         /// </summary>
         public TileProtectionMap TileProtectionMap { get; private set; }
 
         /// <summary>
-        /// ワールドにあるチェスト
+        /// ワールドにあるチェスト.
         /// </summary>
         public Chest[] Chests { get; private set; }
 
         /// <summary>
-        /// ワールドの横幅。
+        /// ワールドの横幅.
         /// </summary>
         public int TileCountX
         {
@@ -65,7 +68,7 @@
         }
 
         /// <summary>
-        /// ワールドの縦。
+        /// ワールドの縦幅.
         /// </summary>
         public int TileCountY
         {
@@ -90,6 +93,11 @@
             get => Main.spawnTileY;
             set => Main.spawnTileY = value;
         }
+
+        /// <summary>
+        /// ワールドのシード値
+        /// </summary>
+        public int Seed { get; set; } = 42;
 
         /// <summary>
         /// プロパティをリセットして読み込みなおす
@@ -121,14 +129,6 @@
                 for (int i = 0; i < Main.chest.Length; i++)
                 {
                     Main.chest[i] = null;
-                }
-
-                // Seedの再設定により、Randomインスタンスを生成しなおす。
-                // 追加のコンテキストもクリアしておく
-                if (WorldGenerationRunner.CurrentRunner != null)
-                {
-                    WorldGenerationRunner.CurrentRunner.GlobalContext.Seed = WorldGenerationRunner.CurrentRunner.GlobalContext.Seed;
-                    WorldGenerationRunner.CurrentRunner.GlobalContext.ClearAdditionalContext();
                 }
 
                 TileProtectionMap = new TileProtectionMap(this);
@@ -172,7 +172,7 @@
                     Metadata = Main.WorldFileMetadata,
                 };
 
-                Main.ActiveWorldFileData.SetSeed(WorldGenerationRunner.CurrentRunner.GlobalContext.Seed.ToString());
+                Main.ActiveWorldFileData.SetSeed(Seed.ToString());
                 Main.worldID = 42;
 
                 Main.treeX[0] = TileCountX;
@@ -183,7 +183,7 @@
                 Main.caveBackX[1] = TileCountX;
                 Main.caveBackX[2] = TileCountX;
 
-                Main.worldSurface = WorldGenerationRunner.CurrentRunner.GlobalContext.SurfaceLevel;
+                Main.worldSurface = 400;
                 Main.rockLayer = 800;
 
                 Main.worldName = string.IsNullOrEmpty(Main.worldName) ? "TerraBuild" : Main.worldName;

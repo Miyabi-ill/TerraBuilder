@@ -1,17 +1,32 @@
-﻿namespace TerraBuilder.WorldGeneration
+﻿// Copyright (c) Miyabi. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+namespace TerraBuilder.WorldEdit
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using Terraria;
 
+    /// <summary>
+    /// タイルを保護するマップ。このマップを参照して、タイルの設置可否が決まる。
+    /// </summary>
     public class TileProtectionMap
     {
         /// <summary>
+        /// タイル保護マップのコンストラクタ。
+        /// </summary>
+        /// <param name="sandbox">ワールドサンドボックス</param>
+        public TileProtectionMap(WorldSandbox sandbox)
+        {
+            this.MapSizeX = sandbox.TileCountX;
+            this.MapSizeY = sandbox.TileCountY;
+
+            this.TileProtectionTypes = new TileProtectionType[this.MapSizeX, this.MapSizeY];
+        }
+
+        /// <summary>
         /// タイル保護の種類
         /// </summary>
+        [Flags]
         public enum TileProtectionType
         {
             /// <summary>
@@ -40,7 +55,7 @@
             RightSolid = 0x8,
 
             /// <summary>
-            /// 固形ブロック(土など)
+            /// 固形ブロック（土など）
             /// </summary>
             Solid = TopSolid | BottomSolid | LeftSolid | RightSolid,
 
@@ -65,7 +80,7 @@
             Actuator = 0x40,
 
             /// <summary>
-            /// タイル形状(ハーフ、斜め)変更可
+            /// タイル形状（ハーフ、斜め）変更可
             /// </summary>
             TileShape = 0x80,
 
@@ -75,27 +90,19 @@
             TileType = 0x100,
 
             /// <summary>
-            /// タイルフレーム(スタイル)一致なら変更可
+            /// タイルフレーム（スタイル）一致なら変更可
             /// </summary>
             TileFrame = 0x200,
 
             /// <summary>
-            /// 設置するアイテムが一致(タイルIDとスタイル一致)なら変更可
+            /// 設置するアイテムが一致（タイルIDとスタイル一致）なら変更可
             /// </summary>
             SameTileItem = TileType | TileFrame,
 
             /// <summary>
-            /// 変更不可(完全一致なら変更可)
+            /// 変更不可（完全一致＝同じもの同士の置き換えなら変更可）
             /// </summary>
             All = TopSolid | BottomSolid | LeftSolid | RightSolid | Wall | Liquid | Wire | Actuator | TileShape | TileType | TileFrame,
-        }
-
-        public TileProtectionMap(WorldSandbox sandbox)
-        {
-            MapSizeX = sandbox.TileCountX;
-            MapSizeY = sandbox.TileCountY;
-
-            TileProtectionTypes = new TileProtectionType[MapSizeX, MapSizeY];
         }
 
         private int MapSizeX { get; }
@@ -104,33 +111,35 @@
 
         private TileProtectionType[,] TileProtectionTypes { get; }
 
-        public TileProtectionType this[int x, int y]
+        /// <summary>
+        /// 指定した座標のタイル保護タイプを取得する。
+        /// </summary>
+        /// <param name="coordinate">タイル座標。</param>
+        /// <returns>指定した座標のタイル保護タイプ。</returns>
+        public TileProtectionType this[Coordinate coordinate]
         {
-            get
-            {
-                return TileProtectionTypes[x, y];
-            }
+            get => this.TileProtectionTypes[coordinate.X, coordinate.Y];
 
-            set
-            {
-                TileProtectionTypes[x, y] = value;
-            }
+            set => this.TileProtectionTypes[coordinate.X, coordinate.Y] = value;
         }
 
-        public void ClearMap()
+        /// <summary>
+        /// タイル保護マップを全てクリアする（全てのタイルを保護されていない状態にする）。
+        /// </summary>
+        public void Clear()
         {
-            for (int i = 0; i < MapSizeX; i++)
+            for (int i = 0; i < this.MapSizeX; i++)
             {
-                for (int j = 0; j < MapSizeY; j++)
+                for (int j = 0; j < this.MapSizeY; j++)
                 {
-                    TileProtectionTypes[i, j] = TileProtectionType.None;
+                    this.TileProtectionTypes[i, j] = TileProtectionType.None;
                 }
             }
         }
 
         public Tile PlaceTile(WorldSandbox sandbox, Tile tile, int x, int y)
         {
-            TileProtectionType type = TileProtectionTypes[x, y];
+            TileProtectionType type = this.TileProtectionTypes[x, y];
             if (type == TileProtectionType.None)
             {
                 sandbox.Tiles[x, y] = tile;
@@ -267,8 +276,8 @@
             {
                 for (int ty = y; ty < y + height; ty++)
                 {
-                    PlaceTile(sandbox, tiles[tx - x, ty - y], tx, ty);
-                    TileProtectionTypes[tx, ty] |= protectionMap[tx - x, ty - y];
+                    this.PlaceTile(sandbox, tiles[tx - x, ty - y], tx, ty);
+                    this.TileProtectionTypes[tx, ty] |= protectionMap[tx - x, ty - y];
                 }
             }
 
@@ -291,7 +300,7 @@
             {
                 for (int y = minY; y < maxY + 1; y++)
                 {
-                    TileProtectionTypes[x, y] = type;
+                    this.TileProtectionTypes[x, y] = type;
                 }
             }
         }

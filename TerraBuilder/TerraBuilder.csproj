@@ -42,6 +42,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -148,6 +149,8 @@
       <DependentUpon>ChestSimulatorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Configs.cs" />
+    <Compile Include="Coordinate.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="UI\WorldGenerationWindow.xaml.cs">
       <DependentUpon>WorldGenerationWindow.xaml</DependentUpon>
     </Compile>
@@ -200,9 +203,9 @@
     <Compile Include="WorldGeneration\Chests\ItemSlotOrItemProbablyAndStack.cs" />
     <Compile Include="WorldGeneration\GlobalContext.cs" />
     <Compile Include="WorldGeneration\IWorldGenerationAction.cs" />
-    <Compile Include="WorldGeneration\TileProtectionMap.cs" />
+    <Compile Include="WorldEdit\TileProtectionMap.cs" />
     <Compile Include="WorldGeneration\WorldGenerationRunner.cs" />
-    <Compile Include="WorldGeneration\WorldSandbox.cs" />
+    <Compile Include="WorldEdit\WorldSandbox.cs" />
     <Page Include="BuildingGenerator\UI\BuildingFinderControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -294,7 +297,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include=".editorconfig" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
