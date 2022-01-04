@@ -1,4 +1,4 @@
-﻿namespace TerraBuilder.WorldGeneration.Actions.Biomes
+﻿namespace TerraBuilder.WorldGeneration.Layers.Biomes
 {
     using System;
     using System.Collections.Generic;
@@ -9,7 +9,7 @@
     /// トンネルを生成するクラス.
     /// </summary>
     [Action]
-    public class Tunnel : IWorldGenerationAction<Tunnel.TunnelContext>
+    public class Tunnel : IWorldGenerationLayer<Tunnel.TunnelContext>
     {
         /// <inheritdoc/>
         public string Name => nameof(Tunnel);
@@ -23,7 +23,7 @@
         /// <inheritdoc/>
         public bool Run(WorldSandbox sandbox)
         {
-            GlobalContext globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
+            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
             var random = globalContext.Random;
 
             var createdTunnels = new List<int>();
@@ -74,7 +74,7 @@
             return true;
         }
 
-        private bool GenerateTunnel(WorldSandbox sandbox, int i, int j, GlobalContext context)
+        private bool GenerateTunnel(WorldSandbox sandbox, int i, int j, GlobalConfig context)
         {
             Random random = context.Random;
             double[] cavernTop;
@@ -175,7 +175,7 @@
             return true;
         }
 
-        public class TunnelContext : ActionConfig
+        public class TunnelContext : LayerConfig
         {
             /// <summary>
             /// トンネルの数

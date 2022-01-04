@@ -1,4 +1,4 @@
-﻿namespace TerraBuilder.WorldGeneration.Actions.Buildings
+﻿namespace TerraBuilder.WorldGeneration.Layers.Buildings
 {
     using System.ComponentModel;
     using TerraBuilder.Utils;
@@ -9,7 +9,7 @@
     /// 空中に水を生成する
     /// </summary>
     [Action]
-    class LiquidsInAir : IWorldGenerationAction<LiquidsInAir.LiquidsInAirContext>
+    class LiquidsInAir : IWorldGenerationLayer<LiquidsInAir.LiquidsInAirContext>
     {
         public string Name => nameof(LiquidsInAir);
 
@@ -19,7 +19,7 @@
 
         public bool Run(WorldSandbox sandbox)
         {
-            var globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
+            var globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
 
             const int xPadding = 5;
             for (int i = 0; i < Context.LiquidCount; i++)
@@ -105,7 +105,7 @@
             return true;
         }
 
-        public class LiquidsInAirContext : ActionConfig
+        public class LiquidsInAirContext : LayerConfig
         {
             /// <summary>
             /// 空中に設置する液体の最小幅を設定する.実際に生成されるサイズは液体幅+2(左右にバブルブロックが設置されるため)となる

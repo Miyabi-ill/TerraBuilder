@@ -1,4 +1,4 @@
-﻿namespace TerraBuilder.WorldGeneration.Actions.Biomes
+﻿namespace TerraBuilder.WorldGeneration.Layers.Biomes
 {
     using Terraria;
     using Terraria.ID;
@@ -7,7 +7,7 @@
     /// スポーン地点を作成する.
     /// </summary>
     [Action]
-    public class SpawnArea : IWorldGenerationAction<SpawnArea.SpawnAreaContext>
+    public class SpawnArea : IWorldGenerationLayer<SpawnArea.SpawnAreaContext>
     {
         /// <inheritdoc/>
         public string Name => nameof(SpawnArea);
@@ -21,7 +21,7 @@
         /// <inheritdoc/>
         public bool Run(WorldSandbox sandbox)
         {
-            var globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
+            var globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
 
             sandbox.SpawnTileX = sandbox.TileCountX / 2;
             sandbox.SpawnTileY = globalContext.RespawnLevel;
@@ -62,7 +62,7 @@
         /// <summary>
         /// スポーン地点の生成に使われるコンテキスト.
         /// </summary>
-        public class SpawnAreaContext : ActionConfig
+        public class SpawnAreaContext : LayerConfig
         {
         }
     }

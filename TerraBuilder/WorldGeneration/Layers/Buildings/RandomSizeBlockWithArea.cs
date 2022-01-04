@@ -1,17 +1,17 @@
-﻿namespace TerraBuilder.WorldGeneration.Actions.Buildings
+﻿namespace TerraBuilder.WorldGeneration.Layers.Buildings
 {
     using System.Collections.Generic;
     using System.ComponentModel;
     using TerraBuilder.WorldGeneration;
     using Terraria;
     using Terraria.DataStructures;
-    using static TerraBuilder.WorldGeneration.Actions.Buildings.RandomSizeBlocks;
+    using static TerraBuilder.WorldGeneration.Layers.Buildings.RandomSizeBlocks;
 
     /// <summary>
     /// ランダムなサイズのブロックをある程度まとまった量ワールド地表に設置するクラス
     /// </summary>
     [Action]
-    public class RandomSizeBlockWithArea : IWorldGenerationAction<RandomSizeBlockWithArea.RandomSizeBlockWithAreaContext>
+    public class RandomSizeBlockWithArea : IWorldGenerationLayer<RandomSizeBlockWithArea.RandomSizeBlockWithAreaContext>
     {
         private enum ActiveWallDirection : int
         {
@@ -33,7 +33,7 @@
         /// <inheritdoc/>
         public bool Run(WorldSandbox sandbox)
         {
-            GlobalContext globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
+            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
             var random = globalContext.Random;
             var area = new List<Point16>();
             for (int i = 0; i < Context.AreaCount; i++)
@@ -90,8 +90,8 @@
                     }
                     else if (Context.PlaceBiome == PlaceBiome.Cavern)
                     {
-                        double[] cavernTop = (double[])WorldGenerationRunner.CurrentRunner.GlobalContext["CavernTop"];
-                        double[] cavernBottom = (double[])WorldGenerationRunner.CurrentRunner.GlobalContext["CavernBottom"];
+                        double[] cavernTop = (double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernTop"];
+                        double[] cavernBottom = (double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernBottom"];
                         for (int c = 0; c < Context.BlockCount; c++)
                         {
                             for (int retry = 0; retry < Context.MaxPlaceRetry; retry++)

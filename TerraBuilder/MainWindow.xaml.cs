@@ -38,7 +38,7 @@
 
             this.Title = "TerraBuilder - v" + Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-            ActionList.ItemsSource = Runner.WorldGenerationActions;
+            ActionList.ItemsSource = Runner.WorldGenerationLayers;
 
             TileEditor.Sandbox = Sandbox;
 
@@ -47,7 +47,7 @@
             Configs.RecoverConfigsFromSaved();
 
             // グローバルコンテキストをプロパティグリッドに表示
-            GlobalContextProperty.SelectedObject = Runner.GlobalContext;
+            GlobalContextProperty.SelectedObject = Runner.GlobalConfig;
 
             BuildingCache = new BuildingCache(new BuildingGenerator.BuildingGenerator() { BuildingsRootPath = Configs.LastBuildingsPath });
         }
@@ -114,7 +114,7 @@
 
         private async void RunActionButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.DataContext is IWorldGenerationAction<ActionConfig> generationAction)
+            if (sender is Button button && button.DataContext is IWorldGenerationLayer<LayerConfig> generationAction)
             {
                 RunningOverlay.Visibility = Visibility.Visible;
                 bool success = await Task.Run(() => generationAction.Run(Sandbox)).ConfigureAwait(true);
@@ -125,7 +125,7 @@
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.DataContext is IWorldGenerationAction<ActionConfig> generationAction)
+            if (sender is Button button && button.DataContext is IWorldGenerationLayer<LayerConfig> generationAction)
             {
                 LocalContextProperty.SelectedObject = generationAction.Context;
                 LocalContextExpander.Header = generationAction.Name;
@@ -149,7 +149,7 @@
             if (dialog.ShowDialog().GetValueOrDefault())
             {
                 // ダイアログがtrueを返せば、dialog.Actionはnon-nullを保証する
-                WorldGenerationRunner.CurrentRunner.WorldGenerationActions.Add(dialog.Action);
+                WorldGenerationRunner.CurrentRunner.WorldGenerationLayers.Add(dialog.Action);
             }
         }
 
@@ -157,7 +157,7 @@
         {
             if (ActionList.SelectedIndex != -1)
             {
-                WorldGenerationRunner.CurrentRunner.WorldGenerationActions.RemoveAt(ActionList.SelectedIndex);
+                WorldGenerationRunner.CurrentRunner.WorldGenerationLayers.RemoveAt(ActionList.SelectedIndex);
             }
         }
 
@@ -165,15 +165,15 @@
         {
             if (ActionList.SelectedIndex >= 1)
             {
-                WorldGenerationRunner.CurrentRunner.WorldGenerationActions.Move(ActionList.SelectedIndex, ActionList.SelectedIndex - 1);
+                WorldGenerationRunner.CurrentRunner.WorldGenerationLayers.Move(ActionList.SelectedIndex, ActionList.SelectedIndex - 1);
             }
         }
 
         private void DownActionButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ActionList.SelectedIndex != -1 && ActionList.SelectedIndex != WorldGenerationRunner.CurrentRunner.WorldGenerationActions.Count - 1)
+            if (ActionList.SelectedIndex != -1 && ActionList.SelectedIndex != WorldGenerationRunner.CurrentRunner.WorldGenerationLayers.Count - 1)
             {
-                WorldGenerationRunner.CurrentRunner.WorldGenerationActions.Move(ActionList.SelectedIndex, ActionList.SelectedIndex + 1);
+                WorldGenerationRunner.CurrentRunner.WorldGenerationLayers.Move(ActionList.SelectedIndex, ActionList.SelectedIndex + 1);
             }
         }
 
@@ -189,8 +189,8 @@
             {
                 Runner.Load(dialog.FileName);
                 Configs.LastActionConfigPath = dialog.FileName;
-                ActionList.ItemsSource = Runner.WorldGenerationActions;
-                GlobalContextProperty.SelectedObject = Runner.GlobalContext;
+                ActionList.ItemsSource = Runner.WorldGenerationLayers;
+                GlobalContextProperty.SelectedObject = Runner.GlobalConfig;
                 LocalContextProperty.SelectedObject = null;
                 LocalContextExpander.Header = "Local Config";
             }
@@ -241,7 +241,7 @@
 
         private void RandomSeedButton_Click(object sender, RoutedEventArgs e)
         {
-            WorldGenerationRunner.CurrentRunner.GlobalContext.Seed = new Random().Next();
+            WorldGenerationRunner.CurrentRunner.GlobalConfig.Seed = new Random().Next();
         }
 
         private void BuildingSearchWindowMenuItem_Click(object sender, RoutedEventArgs e)

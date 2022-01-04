@@ -1,4 +1,4 @@
-﻿namespace TerraBuilder.WorldGeneration.Actions.Buildings
+﻿namespace TerraBuilder.WorldGeneration.Layers.Buildings
 {
     using System;
     using System.ComponentModel;
@@ -8,7 +8,7 @@
     /// ロープをランダムに配置する
     /// </summary>
     [Action]
-    public class RandomRope : IWorldGenerationAction<RandomRope.RandomRopeContext>
+    public class RandomRope : IWorldGenerationLayer<RandomRope.RandomRopeContext>
     {
         public string Name => nameof(RandomRope);
 
@@ -18,10 +18,10 @@
 
         public bool Run(WorldSandbox sandbox)
         {
-            GlobalContext globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
+            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
 
-            double[] cavernTop = (double[])WorldGenerationRunner.CurrentRunner.GlobalContext["CavernTop"];
-            double[] cavernBottom = (double[])WorldGenerationRunner.CurrentRunner.GlobalContext["CavernBottom"];
+            double[] cavernTop = (double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernTop"];
+            double[] cavernBottom = (double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernBottom"];
             for (int i = 0; i < Context.RopeCount; i++)
             {
                 int x = globalContext.Random.Next(100, sandbox.TileCountX - 100);
@@ -45,7 +45,7 @@
             return true;
         }
 
-        public class RandomRopeContext : ActionConfig
+        public class RandomRopeContext : LayerConfig
         {
             [Category("ロープ生成")]
             [DisplayName("ロープ設置数")]

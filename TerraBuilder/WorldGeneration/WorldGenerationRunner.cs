@@ -21,7 +21,7 @@ namespace TerraBuilder.WorldGeneration
             {
                 if (type.GetCustomAttributes(typeof(ActionAttribute), false).Length > 0)
                 {
-                    AvailableActions.Add(type.Name, () => type.GetConstructor(Type.EmptyTypes).Invoke(null) as IWorldGenerationAction<ActionConfig>);
+                    AvailableActions.Add(type.Name, () => type.GetConstructor(Type.EmptyTypes).Invoke(null) as IWorldGenerationLayer<LayerConfig>);
                 }
             }
         }
@@ -34,26 +34,27 @@ namespace TerraBuilder.WorldGeneration
         {
             CurrentRunner = this;
 
-            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.Caverns)].Invoke());
-            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.Surface)].Invoke());
-            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.Wells)].Invoke());
-            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.Tunnel)].Invoke());
-            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomSizeBlocks)].Invoke());
-            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomSizeBlockWithArea)].Invoke());
-            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomCavernChests)].Invoke());
-            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.CavernWater)].Invoke());
-            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.RandomRope)].Invoke());
-            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Buildings.LiquidsInAir)].Invoke());
-            this.WorldGenerationActions.Add(AvailableActions[nameof(Actions.Biomes.SpawnArea)].Invoke());
+            // TODO: テンプレートクラスを作り切り分け？
+            this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Biomes.Caverns)].Invoke());
+            this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Biomes.Surface)].Invoke());
+            this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Buildings.Wells)].Invoke());
+            this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Biomes.Tunnel)].Invoke());
+            this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Buildings.RandomSizeBlocks)].Invoke());
+            this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Buildings.RandomSizeBlockWithArea)].Invoke());
+            this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Buildings.RandomCavernChests)].Invoke());
+            this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Biomes.CavernWater)].Invoke());
+            this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Buildings.RandomRope)].Invoke());
+            this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Buildings.LiquidsInAir)].Invoke());
+            this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Biomes.SpawnArea)].Invoke());
 
             // TODO: jsonから読み込み？
-            this.GlobalContext = new GlobalContext();
+            this.GlobalConfig = new GlobalConfig();
         }
 
         /// <summary>
         /// 利用可能なアクションの名前と生成用関数の辞書.
         /// </summary>
-        public static Dictionary<string, Func<IWorldGenerationAction<ActionConfig>>> AvailableActions { get; } = new Dictionary<string, Func<IWorldGenerationAction<ActionConfig>>>();
+        public static Dictionary<string, Func<IWorldGenerationLayer<LayerConfig>>> AvailableActions { get; } = new Dictionary<string, Func<IWorldGenerationLayer<LayerConfig>>>();
 
         /// <summary>
         /// 現在のインスタンス.
@@ -64,29 +65,29 @@ namespace TerraBuilder.WorldGeneration
         /// <summary>
         /// ワールド生成アクションリスト.このリスト順で生成が実行される.
         /// </summary>
-        public ObservableCollection<IWorldGenerationAction<ActionConfig>> WorldGenerationActions { get; } = new ObservableCollection<IWorldGenerationAction<ActionConfig>>();
+        public ObservableCollection<IWorldGenerationLayer<LayerConfig>> WorldGenerationLayers { get; } = new ObservableCollection<IWorldGenerationLayer<LayerConfig>>();
 
         /// <summary>
-        /// 全体から参照されるコンテキスト.
-        /// 通常は`WorldGenerationRunner.CurrentRunner.GlobalContext`でアクセスされる.
+        /// サンドボックス全体に関わるコンフィグ項目.
         /// </summary>
-        public GlobalContext GlobalContext { get; private set; }
+        public GlobalConfig GlobalConfig { get; private set; }
 
         /// <summary>
-        /// 登録されている全てのアクションを実行し、ワールド生成を行う.
+        /// 登録されている全てのレイヤーを実行し、ワールド生成を行う.
         /// </summary>
         /// <param name="sandbox">ワールド生成を行うサンドボックス.</param>
-        /// <returns>アクションが全て成功すればtrue.1つでも失敗すれば、その時点で失敗しfalseを返す.</returns>
+        /// <returns>レイヤーの適用が全て成功すればtrue.1つでも失敗すれば、その時点で失敗しfalseを返す.</returns>
         public bool Run(WorldSandbox sandbox)
         {
+            throw new NotImplementedException();
             _ = sandbox.Reset();
-            foreach (IWorldGenerationAction<ActionConfig> action in this.WorldGenerationActions)
+            foreach (IWorldGenerationLayer<LayerConfig> action in this.WorldGenerationLayers)
             {
                 lock (sandbox)
                 {
                     try
                     {
-                        bool success = action.Run(sandbox);
+                        bool success = action.Apply(sandbox);
                         if (!success)
                         {
                             MainWindow.Window.ShowErrorMessage($"アクション`{action.Name}`で生成に失敗しました.");
@@ -105,15 +106,16 @@ namespace TerraBuilder.WorldGeneration
         }
 
         /// <summary>
-        /// 現在のワールド生成アクションを保存する.
+        /// 現在のワールド生成レイヤー群とその設定を保存する.
         /// </summary>
         /// <param name="path">保存先のパス.</param>
         public void Save(string path)
         {
+            throw new NotImplementedException();
             using (StreamWriter sw = new StreamWriter(path))
             {
                 sw.Write(JsonConvert.SerializeObject(
-                    new ValueTuple<GlobalContext, ObservableCollection<IWorldGenerationAction<ActionConfig>>>(this.GlobalContext, this.WorldGenerationActions),
+                    new ValueTuple<GlobalConfig, ObservableCollection<IWorldGenerationLayer<LayerConfig>>>(this.GlobalConfig, this.WorldGenerationLayers),
                     new JsonSerializerSettings()
                     {
                         TypeNameHandling = TypeNameHandling.Auto,
@@ -128,21 +130,22 @@ namespace TerraBuilder.WorldGeneration
         /// <param name="path">読み込むパス.</param>
         public void Load(string path)
         {
+            throw new NotImplementedException();
             if (File.Exists(path))
             {
                 using (StreamReader sr = new StreamReader(path))
                 {
-                    (GlobalContext, ObservableCollection<IWorldGenerationAction<ActionConfig>>) tuple = JsonConvert.DeserializeObject<ValueTuple<GlobalContext, ObservableCollection<IWorldGenerationAction<ActionConfig>>>>(
+                    (GlobalConfig, ObservableCollection<IWorldGenerationLayer<LayerConfig>>) tuple = JsonConvert.DeserializeObject<ValueTuple<GlobalConfig, ObservableCollection<IWorldGenerationLayer<LayerConfig>>>>(
                         sr.ReadToEnd(),
                         new JsonSerializerSettings()
                         {
                             TypeNameHandling = TypeNameHandling.Auto,
                         });
-                    this.GlobalContext = tuple.Item1;
-                    this.WorldGenerationActions.Clear();
-                    foreach (IWorldGenerationAction<ActionConfig> item in tuple.Item2)
+                    this.GlobalConfig = tuple.Item1;
+                    this.WorldGenerationLayers.Clear();
+                    foreach (IWorldGenerationLayer<LayerConfig> item in tuple.Item2)
                     {
-                        this.WorldGenerationActions.Add(item);
+                        this.WorldGenerationLayers.Add(item);
                     }
                 }
 

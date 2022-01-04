@@ -1,4 +1,4 @@
-﻿namespace TerraBuilder.WorldGeneration.Actions.Biomes
+﻿namespace TerraBuilder.WorldGeneration.Layers.Biomes
 {
     using System;
     using System.ComponentModel;
@@ -9,7 +9,7 @@
     /// 地表の生成を行う.
     /// </summary>
     [Action]
-    public class Surface : IWorldGenerationAction<Surface.SurfaceContext>
+    public class Surface : IWorldGenerationLayer<Surface.SurfaceContext>
     {
         /// <summary>
         /// 地表生成のパターン.ランダムな区間ごとに選ばれ、変更される
@@ -36,7 +36,7 @@
         public bool Run(WorldSandbox sandbox)
         {
             // Terraria.GameContent.Biomes.TerrainPassに近い生成を行う.
-            GlobalContext globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
+            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
             Random rand = globalContext.Random;
 
             int maxSurfaceLevel = Context.SurfaceLevel - Context.SurfaceMaxHeight;
@@ -213,13 +213,13 @@
         /// <summary>
         /// 地表生成に使われるコンテキスト.
         /// </summary>
-        public class SurfaceContext : ActionConfig
+        public class SurfaceContext : LayerConfig
         {
             /// <summary>
             /// 地表の高さ.この高さ以上(数値的には以下)が地表.
             /// </summary>
             [Browsable(false)]
-            public int SurfaceLevel => WorldGenerationRunner.CurrentRunner.GlobalContext.SurfaceLevel;
+            public int SurfaceLevel => WorldGenerationRunner.CurrentRunner.GlobalConfig.SurfaceLevel;
 
             /// <summary>
             /// 地表生成を行う最大の高さ.

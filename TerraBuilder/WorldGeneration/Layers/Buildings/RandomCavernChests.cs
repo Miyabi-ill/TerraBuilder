@@ -1,4 +1,4 @@
-﻿namespace TerraBuilder.WorldGeneration.Actions.Buildings
+﻿namespace TerraBuilder.WorldGeneration.Layers.Buildings
 {
     using System;
     using System.ComponentModel;
@@ -11,7 +11,7 @@
     /// 第二層にランダムにチェストを置くためのクラス
     /// </summary>
     [Action]
-    public class RandomCavernChests : IWorldGenerationAction<RandomCavernChests.RandomCavernChestContext>
+    public class RandomCavernChests : IWorldGenerationLayer<RandomCavernChests.RandomCavernChestContext>
     {
         /// <inheritdoc/>
         public string Name => nameof(RandomCavernChests);
@@ -30,8 +30,8 @@
                 return false;
             }
 
-            Random random = WorldGenerationRunner.CurrentRunner.GlobalContext.Random;
-            double[] cavernTop = (double[])WorldGenerationRunner.CurrentRunner.GlobalContext["CavernTop"];
+            Random random = WorldGenerationRunner.CurrentRunner.GlobalConfig.Random;
+            double[] cavernTop = (double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernTop"];
             const int worldEdgeTiles = 100;
             for (int i = 0; i < Context.ChestCount; i++)
             {
@@ -55,7 +55,7 @@
             {
                 if (sandbox.Tiles[x, y]?.active() == true && sandbox.Tiles[x + 1, y]?.active() == true)
                 {
-                    bool success = GenerateChest.PlaceChest(sandbox, x, y - 2, WorldGenerationRunner.CurrentRunner.GlobalContext.Random, chestContext);
+                    bool success = GenerateChest.PlaceChest(sandbox, x, y - 2, WorldGenerationRunner.CurrentRunner.GlobalConfig.Random, chestContext);
                     if (success)
                     {
                         sandbox.TileProtectionMap.SetProtection(TileProtectionMap.TileProtectionType.All, x, y - 2, x + 1, y - 1);
@@ -67,7 +67,7 @@
             return false;
         }
 
-        public class RandomCavernChestContext : ActionConfig
+        public class RandomCavernChestContext : LayerConfig
         {
             /// <summary>
             /// チェストを1つ設置するまでのリトライ回数.チェストが設置できないとき=下が斜めブロックなどのときにリトライされる.

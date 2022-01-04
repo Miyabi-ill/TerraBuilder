@@ -1,4 +1,4 @@
-﻿namespace TerraBuilder.WorldGeneration.Actions.Buildings
+﻿namespace TerraBuilder.WorldGeneration.Layers.Buildings
 {
     using System;
     using System.Collections.Generic;
@@ -10,7 +10,7 @@
     /// 井戸を設置する
     /// </summary>
     [Action]
-    public class Wells : IWorldGenerationAction<Wells.WellContext>
+    public class Wells : IWorldGenerationLayer<Wells.WellContext>
     {
         public string Name => nameof(Wells);
 
@@ -20,7 +20,7 @@
 
         public bool Run(WorldSandbox sandbox)
         {
-            var globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
+            var globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
 
             double[] cavernTop = (double[])globalContext["CavernTop"];
             List<int> placedWellX = new List<int>();
@@ -124,7 +124,7 @@
             return true;
         }
 
-        public class WellContext : ActionConfig
+        public class WellContext : LayerConfig
         {
             [Category("井戸設置")]
             [DisplayName("井戸設置数")]

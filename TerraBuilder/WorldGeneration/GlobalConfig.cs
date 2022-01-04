@@ -10,12 +10,11 @@ namespace TerraBuilder.WorldGeneration
     /// ワールド生成の全体を通じて使われる設定.
     /// TODO: これはサンドボックスによって提供されるべき？サンドボックスの肥大化を考慮してこの実装になっている.
     /// </summary>
-    public class GlobalContext : ActionConfig, INotifyPropertyChanged
+    public class GlobalConfig : LayerConfig, INotifyPropertyChanged
     {
         private int seed = 42;
         private int surfaceLevel = 250;
         private int respawnLevel = 100;
-        private Random rand = new Random(42);
 
         /// <inheritdoc/>
         public event PropertyChangedEventHandler PropertyChanged;
@@ -73,14 +72,6 @@ namespace TerraBuilder.WorldGeneration
         /// ワールド生成に使われるランダムインスタンス.
         /// </summary>
         [Browsable(false)]
-        public Random Random
-        {
-            get => this.rand;
-            set
-            {
-                this.rand = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Random)));
-            }
-        }
+        public Random Random { get; private set; } = new Random(42);
     }
 }

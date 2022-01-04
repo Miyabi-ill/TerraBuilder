@@ -1,4 +1,4 @@
-﻿namespace TerraBuilder.WorldGeneration.Actions.Biomes
+﻿namespace TerraBuilder.WorldGeneration.Layers.Biomes
 {
     using System.ComponentModel;
     using System.Linq;
@@ -8,7 +8,7 @@
     /// 地下に水を生成する生成アクション.
     /// </summary>
     [Action]
-    public class CavernWater : IWorldGenerationAction<CavernWater.CavernWaterContext>
+    public class CavernWater : IWorldGenerationLayer<CavernWater.CavernWaterContext>
     {
         public string Name => nameof(CavernWater);
 
@@ -18,9 +18,9 @@
 
         public bool Run(WorldSandbox sandbox)
         {
-            GlobalContext globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
-            int cavernTop = (int)((double[])WorldGenerationRunner.CurrentRunner.GlobalContext["CavernTop"]).Min();
-            int cavernBottom = (int)((double[])WorldGenerationRunner.CurrentRunner.GlobalContext["CavernBottom"]).Max();
+            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
+            int cavernTop = (int)((double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernTop"]).Min();
+            int cavernBottom = (int)((double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernBottom"]).Max();
 
             for (int i = 0; i < Context.RandomWaterBlockCount; i++)
             {
@@ -47,7 +47,7 @@
             return true;
         }
 
-        public class CavernWaterContext : ActionConfig
+        public class CavernWaterContext : LayerConfig
         {
             /// <summary>
             /// 水の塊の設置数

@@ -1,4 +1,4 @@
-﻿namespace TerraBuilder.WorldGeneration.Actions.Biomes
+﻿namespace TerraBuilder.WorldGeneration.Layers.Biomes
 {
     using System;
     using System.ComponentModel;
@@ -11,7 +11,7 @@
     /// 洞窟(第二層)の生成を行う.
     /// </summary>
     [Action]
-    public class Caverns : IWorldGenerationAction<Caverns.CavernContext>
+    public class Caverns : IWorldGenerationLayer<Caverns.CavernContext>
     {
         /// <inheritdoc/>
         public string Name => nameof(Caverns);
@@ -25,7 +25,7 @@
         /// <inheritdoc/>
         public bool Run(WorldSandbox sandbox)
         {
-            GlobalContext globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
+            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
 
             int tileLengthX = sandbox.TileCountX;
 
@@ -216,7 +216,7 @@
         /// <summary>
         /// 洞窟の生成に使われるコンテキスト.
         /// </summary>
-        public class CavernContext : ActionConfig
+        public class CavernContext : LayerConfig
         {
             /// <summary>
             /// 洞窟の最小の高さ.

@@ -11,7 +11,7 @@ namespace TerraBuilder.WorldGeneration
     /// <summary>
     /// 各アクション毎の設定項目の基底クラス.
     /// </summary>
-    public abstract class ActionConfig
+    public abstract class LayerConfig
     {
         private readonly Dictionary<string, PropertyInfo> propertyDictionary = new Dictionary<string, PropertyInfo>();
 
@@ -21,7 +21,7 @@ namespace TerraBuilder.WorldGeneration
         /// コンストラクタ.
         /// プロパティを全て辞書に追加する.
         /// </summary>
-        protected ActionConfig()
+        protected LayerConfig()
         {
             foreach (PropertyInfo property in this.GetType().GetProperties())
             {

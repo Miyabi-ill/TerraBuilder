@@ -1,4 +1,4 @@
-﻿namespace TerraBuilder.WorldGeneration.Actions.Buildings
+﻿namespace TerraBuilder.WorldGeneration.Layers.Buildings
 {
     using System.ComponentModel;
     using TerraBuilder.Utils;
@@ -10,7 +10,7 @@
     /// ランダムなサイズのブロックをワールド地表に設置するクラス
     /// </summary>
     [Action]
-    public class RandomSizeBlocks : IWorldGenerationAction<RandomSizeBlocks.RandomSizeBlockContext>
+    public class RandomSizeBlocks : IWorldGenerationLayer<RandomSizeBlocks.RandomSizeBlockContext>
     {
         public enum PlaceBiome
         {
@@ -38,7 +38,7 @@
         /// <inheritdoc/>
         public bool Run(WorldSandbox sandbox)
         {
-            GlobalContext globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
+            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
             var random = globalContext.Random;
 
             if (Context.PlaceBiome == PlaceBiome.Surface)
@@ -63,8 +63,8 @@
             }
             else if (Context.PlaceBiome == PlaceBiome.Cavern)
             {
-                double[] cavernTop = (double[])WorldGenerationRunner.CurrentRunner.GlobalContext["CavernTop"];
-                double[] cavernBottom = (double[])WorldGenerationRunner.CurrentRunner.GlobalContext["CavernBottom"];
+                double[] cavernTop = (double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernTop"];
+                double[] cavernBottom = (double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernBottom"];
 
                 for (int c = 0; c < Context.BlockCount; c++)
                 {
@@ -96,7 +96,7 @@
 
         public static bool PlaceBlockToSurface(WorldSandbox sandbox, RandomSizeBlockContext context, int sizeX, int sizeY, int x)
         {
-            GlobalContext globalContext = WorldGenerationRunner.CurrentRunner.GlobalContext;
+            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
             for (int y = 0; y < globalContext.SurfaceLevel; y++)
             {
                 bool foundActiveTile = false;
@@ -193,7 +193,7 @@
 
         public static bool PlaceBlock(WorldSandbox sandbox, RandomSizeBlockContext context, int sizeX, int sizeY, int x, int y)
         {
-            var random = WorldGenerationRunner.CurrentRunner.GlobalContext.Random;
+            var random = WorldGenerationRunner.CurrentRunner.GlobalConfig.Random;
 
             Tile[,] tiles = new Tile[sizeX, sizeY];
             TileProtectionMap.TileProtectionType[,] tileProtectionTypes = new TileProtectionMap.TileProtectionType[sizeX, sizeY];
@@ -304,7 +304,7 @@
             return true;
         }
 
-        public class RandomSizeBlockContext : ActionConfig
+        public class RandomSizeBlockContext : LayerConfig
         {
             [Category("部屋")]
             [DisplayName("部屋の最小幅(壁含む)")]

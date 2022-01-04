@@ -6,11 +6,11 @@ namespace TerraBuilder.WorldGeneration
     using TerraBuilder.WorldEdit;
 
     /// <summary>
-    /// ワールド生成アクションの基底インターフェース.
+    /// ワールド生成レイヤーの基底インターフェース.
     /// </summary>
-    /// <typeparam name="T">使用するコンテキストのクラス.</typeparam>
-    public interface IWorldGenerationAction<out T>
-        where T : ActionConfig
+    /// <typeparam name="T">使用するコンフィグクラス.</typeparam>
+    public interface IWorldGenerationLayer<out T>
+        where T : LayerConfig
     {
         /// <summary>
         /// アクション名.
@@ -28,10 +28,10 @@ namespace TerraBuilder.WorldGeneration
         T Context { get; }
 
         /// <summary>
-        /// アクションを実行する.
+        /// このレイヤーをサンドボックスに適用する.
         /// </summary>
         /// <param name="sandbox">ワールドサンドボックス.</param>
         /// <returns>実行の成否.成功した場合true.失敗した場合false.</returns>
-        bool Run(WorldSandbox sandbox);
+        bool Apply(WorldSandbox sandbox);
     }
 }
