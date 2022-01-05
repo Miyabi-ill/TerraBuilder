@@ -26,7 +26,7 @@ namespace TerraBuilder.WorldGeneration.Layers.Vanilla
         /// <returns>生成に成功したらtrue</returns>
         public bool Run(WorldSandbox sandbox)
         {
-            Random random = WorldGenerationRunner.CurrentRunner.GlobalContext.Random;
+            Random random = runner.GlobalContext.Random;
             int count = Context.Count;
             int maxRetry = Context.MaxRetry;
             for (int i = 0; i < count; i++)
@@ -43,7 +43,7 @@ namespace TerraBuilder.WorldGeneration.Layers.Vanilla
 
         private bool PlaceMarble(WorldSandbox sandbox, int originX, int originY)
         {
-            Random random = WorldGenerationRunner.CurrentRunner.GlobalContext.Random;
+            Random random = runner.GlobalContext.Random;
             int width = random.Next(80, 150) / 3;
             int height = random.Next(40, 60) / 3;
 

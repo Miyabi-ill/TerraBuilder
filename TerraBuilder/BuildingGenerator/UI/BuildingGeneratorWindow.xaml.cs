@@ -287,7 +287,7 @@
 
         private void RegenerateFromMetaDataButton_Click(object sender, RoutedEventArgs e)
         {
-            Random rand = WorldGeneration.WorldGenerationRunner.CurrentRunner.GlobalConfig.Random;
+            Random rand = WorldGeneration.runner.GlobalConfig.Random;
             int width = (int)BuildingMetaData.Size.Width.GetValue(rand);
             int height = (int)BuildingMetaData.Size.Height.GetValue(rand);
 

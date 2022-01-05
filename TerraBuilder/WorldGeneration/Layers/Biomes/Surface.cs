@@ -1,7 +1,12 @@
-﻿namespace TerraBuilder.WorldGeneration.Layers.Biomes
+﻿// Copyright (c) Miyabi. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+namespace TerraBuilder.WorldGeneration.Layers.Biomes
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
+    using TerraBuilder.WorldEdit;
     using Terraria;
     using Terraria.ID;
 
@@ -12,15 +17,15 @@
     public class Surface : IWorldGenerationLayer<Surface.SurfaceContext>
     {
         /// <summary>
-        /// 地表生成のパターン.ランダムな区間ごとに選ばれ、変更される
+        /// 地表生成のパターン.ランダムな区間ごとに選ばれ、変更される.
         /// </summary>
-        private enum SurfaceType : int
+        private enum SurfaceType
         {
             Flat = 0,
-            Up,
-            Down,
-            StrongUp,
-            StrongDown,
+            Up = 1,
+            Down = 2,
+            StrongUp = 3,
+            StrongDown = 4,
         }
 
         /// <inheritdoc/>
@@ -30,26 +35,26 @@
         public string Description => "地表生成を行う";
 
         /// <inheritdoc/>
-        public SurfaceContext Context { get; set; } = new SurfaceContext();
+        public SurfaceContext Config { get; set; } = new SurfaceContext();
 
         /// <inheritdoc/>
-        public bool Run(WorldSandbox sandbox)
+        public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
             // Terraria.GameContent.Biomes.TerrainPassに近い生成を行う.
-            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
+            GlobalConfig globalContext = runner.GlobalConfig;
             Random rand = globalContext.Random;
 
-            int maxSurfaceLevel = Context.SurfaceLevel - Context.SurfaceMaxHeight;
+            int maxSurfaceLevel = runner.SurfaceLevel - this.Config.SurfaceMaxHeight;
 
             int nextTypeChangeSpan = rand.Next(5, 40);
-            int currentPosition = rand.Next(maxSurfaceLevel, Context.SurfaceLevel);
+            int currentPosition = rand.Next(maxSurfaceLevel, runner.SurfaceLevel);
             SurfaceType currentSurface = SurfaceType.Flat;
             for (int x = 0; x < sandbox.TileCountX; x++)
             {
                 // 次の地表タイプを選定、区間も決定する
                 if (nextTypeChangeSpan == 0)
                 {
-                    double currentPercentileY = (currentPosition - maxSurfaceLevel) / (double)Context.SurfaceLevel;
+                    double currentPercentileY = (currentPosition - maxSurfaceLevel) / (double)runner.SurfaceLevel;
                     nextTypeChangeSpan = rand.Next(5, 40);
 
                     // 下に行き過ぎ
@@ -193,20 +198,22 @@
 
                 // 丸め込み
                 currentPosition = Math.Max(currentPosition, maxSurfaceLevel);
-                currentPosition = Math.Min(currentPosition, Context.SurfaceLevel);
+                currentPosition = Math.Min(currentPosition, runner.SurfaceLevel);
 
                 // タイル設置
-                for (int y = currentPosition; y < Context.SurfaceLevel; y++)
+                for (int y = currentPosition; y < runner.SurfaceLevel; y++)
                 {
-                    sandbox.Tiles[x, y] = new Tile()
+                    Tile baseTile = new Tile()
                     {
                         type = TileID.Dirt,
                     };
+                    baseTile.active(true);
 
-                    sandbox.Tiles[x, y].active(true);
+                    _ = sandbox.PlaceTile(new Coordinate(x, y), baseTile);
                 }
             }
 
+            generatedValueDict = new Dictionary<string, object>();
             return true;
         }
 
@@ -216,14 +223,8 @@
         public class SurfaceContext : LayerConfig
         {
             /// <summary>
-            /// 地表の高さ.この高さ以上(数値的には以下)が地表.
-            /// </summary>
-            [Browsable(false)]
-            public int SurfaceLevel => WorldGenerationRunner.CurrentRunner.GlobalConfig.SurfaceLevel;
-
-            /// <summary>
             /// 地表生成を行う最大の高さ.
-            /// <see cref="SurfaceLevel"/>からこの値を減算した高さが実際に地表生成を行う最大の高さになる
+            /// 地表の高さからこの値を減算した高さが実際に地表生成を行う最大の高さになる.
             /// </summary>
             [Category("地表生成")]
             [DisplayName("地表最大高さ")]

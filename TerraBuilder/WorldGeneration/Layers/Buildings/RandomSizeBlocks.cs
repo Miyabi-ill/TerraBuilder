@@ -1,7 +1,9 @@
 ﻿namespace TerraBuilder.WorldGeneration.Layers.Buildings
 {
+    using System.Collections.Generic;
     using System.ComponentModel;
     using TerraBuilder.Utils;
+    using TerraBuilder.WorldEdit;
     using TerraBuilder.WorldGeneration;
     using Terraria;
     using Terraria.ID;
@@ -33,26 +35,26 @@
         public virtual string Description => "ランダムな大きさ、形のブロックを配置する";
 
         /// <inheritdoc/>
-        public virtual RandomSizeBlockContext Context { get; } = new RandomSizeBlockContext();
+        public virtual RandomSizeBlockContext Config { get; } = new RandomSizeBlockContext();
 
         /// <inheritdoc/>
-        public bool Run(WorldSandbox sandbox)
+        public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
-            var random = globalContext.Random;
+            GlobalConfig globalContext = runner.GlobalConfig;
+            System.Random random = globalContext.Random;
 
-            if (Context.PlaceBiome == PlaceBiome.Surface)
+            if (this.Config.PlaceBiome == PlaceBiome.Surface)
             {
-                for (int c = 0; c < Context.BlockCount; c++)
+                for (int c = 0; c < this.Config.BlockCount; c++)
                 {
-                    for (int retry = 0; retry < Context.MaxPlaceRetry; retry++)
+                    for (int retry = 0; retry < this.Config.MaxPlaceRetry; retry++)
                     {
                         int x = random.Next(100, sandbox.TileCountX - 100);
                         bool success = PlaceBlockToSurface(
                             sandbox,
-                            Context,
-                            sizeX: random.Next(Context.BlockMinX, Context.BlockMaxX),
-                            sizeY: random.Next(Context.BlockMinY, Context.BlockMaxY),
+                            this.Config,
+                            sizeX: random.Next(this.Config.BlockMinX, this.Config.BlockMaxX),
+                            sizeY: random.Next(this.Config.BlockMinY, this.Config.BlockMaxY),
                             x);
                         if (success)
                         {
@@ -61,14 +63,14 @@
                     }
                 }
             }
-            else if (Context.PlaceBiome == PlaceBiome.Cavern)
+            else if (this.Config.PlaceBiome == PlaceBiome.Cavern)
             {
-                double[] cavernTop = (double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernTop"];
-                double[] cavernBottom = (double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernBottom"];
+                double[] cavernTop = runner.GetGeneratedValue<Biomes.Caverns, double[]>("CavernTop");
+                double[] cavernBottom = runner.GetGeneratedValue<Biomes.Caverns, double[]>("CavernBottom");
 
-                for (int c = 0; c < Context.BlockCount; c++)
+                for (int c = 0; c < this.Config.BlockCount; c++)
                 {
-                    for (int retry = 0; retry < Context.MaxPlaceRetry; retry++)
+                    for (int retry = 0; retry < this.Config.MaxPlaceRetry; retry++)
                     {
                         int x = random.Next(100, sandbox.TileCountX - 100);
                         int y = random.Next((int)cavernTop[x], (int)cavernBottom[x]);
@@ -76,9 +78,9 @@
                         int? maxY = placeToTop ? (int?)((int)cavernTop[x] - 2) : null;
                         bool success = PlaceBlockToCavern(
                             sandbox,
-                            Context,
-                            sizeX: random.Next(Context.BlockMinX, Context.BlockMaxX),
-                            sizeY: random.Next(Context.BlockMinY, Context.BlockMaxY),
+                            this.Config,
+                            sizeX: random.Next(this.Config.BlockMinX, this.Config.BlockMaxX),
+                            sizeY: random.Next(this.Config.BlockMinY, this.Config.BlockMaxY),
                             x,
                             y,
                             placeToTop,
@@ -91,12 +93,13 @@
                 }
             }
 
+            generatedValueDict = new Dictionary<string, object>();
             return true;
         }
 
         public static bool PlaceBlockToSurface(WorldSandbox sandbox, RandomSizeBlockContext context, int sizeX, int sizeY, int x)
         {
-            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
+            GlobalConfig globalContext = runner.GlobalConfig;
             for (int y = 0; y < globalContext.SurfaceLevel; y++)
             {
                 bool foundActiveTile = false;
@@ -193,7 +196,7 @@
 
         public static bool PlaceBlock(WorldSandbox sandbox, RandomSizeBlockContext context, int sizeX, int sizeY, int x, int y)
         {
-            var random = WorldGenerationRunner.CurrentRunner.GlobalConfig.Random;
+            var random = runner.GlobalConfig.Random;
 
             Tile[,] tiles = new Tile[sizeX, sizeY];
             TileProtectionMap.TileProtectionType[,] tileProtectionTypes = new TileProtectionMap.TileProtectionType[sizeX, sizeY];

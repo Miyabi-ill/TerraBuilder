@@ -1,39 +1,50 @@
 ﻿namespace TerraBuilder.WorldGeneration.Layers.Buildings
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
+    using TerraBuilder.WorldEdit;
+    using Terraria;
     using Terraria.ID;
 
     /// <summary>
-    /// ロープをランダムに配置する
+    /// ロープをランダムに配置する.
     /// </summary>
     [Action]
-    public class RandomRope : IWorldGenerationLayer<RandomRope.RandomRopeContext>
+    public class RandomRope : IWorldGenerationLayer<RandomRope.RandomRopeConfig>
     {
+        /// <inheritdoc/>
         public string Name => nameof(RandomRope);
 
+        /// <inheritdoc/>
         public string Description => "地下にロープをランダムに配置する";
 
-        public RandomRopeContext Context { get; set; } = new RandomRopeContext();
+        /// <inheritdoc/>
+        public RandomRopeConfig Config { get; set; } = new RandomRopeConfig();
 
-        public bool Run(WorldSandbox sandbox)
+        /// <inheritdoc/>
+        public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
+            GlobalConfig globalContext = runner.GlobalConfig;
 
-            double[] cavernTop = (double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernTop"];
-            double[] cavernBottom = (double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernBottom"];
-            for (int i = 0; i < Context.RopeCount; i++)
+            double[] cavernTop = runner.GetGeneratedValue<Biomes.Caverns, double[]>("CavernTop");
+            double[] cavernBottom = runner.GetGeneratedValue<Biomes.Caverns, double[]>("CavernBottom");
+            for (int i = 0; i < this.Config.RopeCount; i++)
             {
                 int x = globalContext.Random.Next(100, sandbox.TileCountX - 100);
-                int length = globalContext.Random.Next(Context.RopeMinLength, Context.RopeMaxLength + 1);
-                int y = globalContext.Random.Next((int)cavernTop[x], Math.Max((int)cavernBottom[x] - length - 1, (int)cavernTop[x] + 1));
+                int ropeLength = globalContext.Random.Next(this.Config.RopeMinLength, this.Config.RopeMaxLength + 1);
+                int y = globalContext.Random.Next((int)cavernTop[x], Math.Max((int)cavernBottom[x] - ropeLength - 1, (int)cavernTop[x] + 1));
 
-                for (int cy = y; cy < y + length; cy++)
+                for (int cy = y; cy < y + ropeLength; cy++)
                 {
-                    if (!sandbox.Tiles[x, cy].active())
+                    Coordinate coordinate = new Coordinate(x, cy);
+                    if (!sandbox[coordinate].active())
                     {
-                        sandbox.Tiles[x, cy].type = TileID.Rope;
-                        sandbox.Tiles[x, cy].active(true);
+                        Tile tile = sandbox[coordinate];
+                        tile = (Tile)tile.Clone();
+                        tile.type = TileID.Rope;
+                        tile.active(true);
+                        _ = sandbox.PlaceTile(coordinate, tile);
                     }
                     else
                     {
@@ -42,21 +53,34 @@
                 }
             }
 
+            generatedValueDict = new Dictionary<string, object>();
             return true;
         }
 
-        public class RandomRopeContext : LayerConfig
+        /// <summary>
+        /// ランダムにロープを設置するクラスのコンフィグ.
+        /// </summary>
+        public class RandomRopeConfig : LayerConfig
         {
+            /// <summary>
+            /// ロープを設置する数.
+            /// </summary>
             [Category("ロープ生成")]
             [DisplayName("ロープ設置数")]
             [Description("ロープを設置する数")]
             public int RopeCount { get; set; } = 300;
 
+            /// <summary>
+            /// ロープ最小長さ.
+            /// </summary>
             [Category("ロープ生成")]
             [DisplayName("ロープ最小長さ")]
             [Description("ロープの最小長さ")]
             public int RopeMinLength { get; set; } = 15;
 
+            /// <summary>
+            /// ロープの最大長さ.
+            /// </summary>
             [Category("ロープ生成")]
             [DisplayName("ロープ最大長さ")]
             [Description("ロープの最大長さ")]

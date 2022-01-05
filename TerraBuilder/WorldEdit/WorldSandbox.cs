@@ -107,11 +107,15 @@ namespace TerraBuilder.WorldEdit
         /// </summary>
         /// <param name="coordinate">タイルを取得/編集する座標.</param>
         /// <returns>取得したタイル.</returns>
-        public Tile this[Coordinate coordinate]
-        {
-            get => (Tile)this.Tiles[coordinate.X, coordinate.Y];
-            set => this.Tiles[coordinate.X, coordinate.Y] = value;
-        }
+        public Tile this[Coordinate coordinate] => (Tile)this.Tiles[coordinate.X, coordinate.Y];
+
+        /// <summary>
+        /// タイルをサンドボックスに設置する.タイル保護が適用される.
+        /// </summary>
+        /// <param name="coordinate">設置先座標.</param>
+        /// <param name="tile">設置するタイル.</param>
+        /// <returns>設置後タイル.</returns>
+        public Tile PlaceTile(Coordinate coordinate, Tile tile) => this.TileProtectionMap.PlaceTile(coordinate, tile);
 
         /// <summary>
         /// 環境のリセットを行う.
@@ -238,10 +242,10 @@ namespace TerraBuilder.WorldEdit
 
                     // Seedの再設定により、Randomインスタンスを生成しなおす.
                     // 追加のコンテキストもクリアしておく
-                    if (WorldGenerationRunner.CurrentRunner != null)
+                    if (runner != null)
                     {
-                        WorldGenerationRunner.CurrentRunner.GlobalContext.Seed = Main.ActiveWorldFileData.Seed;
-                        WorldGenerationRunner.CurrentRunner.GlobalContext.ClearAdditionalContext();
+                        runner.GlobalContext.Seed = Main.ActiveWorldFileData.Seed;
+                        runner.GlobalContext.ClearAdditionalContext();
                     }
 
                     this.TileProtectionMap = new TileProtectionMap(this);

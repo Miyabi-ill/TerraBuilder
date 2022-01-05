@@ -3,6 +3,7 @@
 
 namespace TerraBuilder.WorldGeneration
 {
+    using System.Collections.Generic;
     using TerraBuilder.WorldEdit;
 
     /// <summary>
@@ -25,13 +26,16 @@ namespace TerraBuilder.WorldGeneration
         /// <summary>
         /// アクションのコンテキスト.
         /// </summary>
-        T Context { get; }
+        T Config { get; }
 
         /// <summary>
         /// このレイヤーをサンドボックスに適用する.
         /// </summary>
+        /// <param name="runner">ワールド生成ランナー.</param>
         /// <param name="sandbox">ワールドサンドボックス.</param>
+        /// <param name="generatedValueDict">レイヤーを適用した時に生成された値で、
+        /// 後のレイヤーが<see cref="WorldGenerationRunner.GetGeneratedValue{TLayer, TValue}(string)"/>から利用できるようにする値.</param>
         /// <returns>実行の成否.成功した場合true.失敗した場合false.</returns>
-        bool Apply(WorldSandbox sandbox);
+        bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict);
     }
 }

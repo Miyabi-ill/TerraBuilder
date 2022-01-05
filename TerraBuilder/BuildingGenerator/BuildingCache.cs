@@ -99,7 +99,7 @@
                         var build = JsonConvert.DeserializeObject<BuildRoot>(text, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto });
                         if (!string.IsNullOrEmpty(build.Name))
                         {
-                            BitmapImage image = TileToImage.CreateBitmap(build.Build(WorldGeneration.WorldGenerationRunner.CurrentRunner.GlobalConfig.Random));
+                            BitmapImage image = TileToImage.CreateBitmap(build.Build(WorldGeneration.runner.GlobalConfig.Random));
                             BuildingNameBitmapDictionary.Add(buildingFileName, image);
                             BuildingNameBuildDictionary.Add(buildingFileName, build);
 
@@ -342,7 +342,7 @@
             }
             else if (TileTags.ContainsKey(name))
             {
-                Random rand = WorldGeneration.WorldGenerationRunner.CurrentRunner.GlobalConfig.Random;
+                Random rand = WorldGeneration.runner.GlobalConfig.Random;
                 Tile[,] tiles = new Parts.TileObject() { ItemName = new ConstantValue(name.Substring(5)) }.Build(rand);
                 if (tiles.GetLength(0) > 0)
                 {

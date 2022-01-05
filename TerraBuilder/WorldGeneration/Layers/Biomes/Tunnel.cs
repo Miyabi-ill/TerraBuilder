@@ -1,15 +1,20 @@
-﻿namespace TerraBuilder.WorldGeneration.Layers.Biomes
+﻿// Copyright (c) Miyabi. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+namespace TerraBuilder.WorldGeneration.Layers.Biomes
 {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using Microsoft.Xna.Framework;
+    using TerraBuilder.WorldEdit;
+    using Terraria;
 
     /// <summary>
     /// トンネルを生成するクラス.
     /// </summary>
     [Action]
-    public class Tunnel : IWorldGenerationLayer<Tunnel.TunnelContext>
+    public class Tunnel : IWorldGenerationLayer<Tunnel.TunnelConfig>
     {
         /// <inheritdoc/>
         public string Name => nameof(Tunnel);
@@ -18,16 +23,16 @@
         public string Description => "第二層と地表を繋ぐトンネルを生成する";
 
         /// <inheritdoc/>
-        public TunnelContext Context { get; set; } = new TunnelContext();
+        public TunnelConfig Config { get; set; } = new TunnelConfig();
 
         /// <inheritdoc/>
-        public bool Run(WorldSandbox sandbox)
+        public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
-            var random = globalContext.Random;
+            GlobalConfig globalContext = runner.GlobalConfig;
+            Random random = globalContext.Random;
 
-            var createdTunnels = new List<int>();
-            for (int i = 0; i < Context.TunnelCount; i++)
+            List<int> createdTunnels = new List<int>();
+            for (int i = 0; i < this.Config.TunnelCount; i++)
             {
                 int x = 0;
                 bool check = false;
@@ -36,8 +41,8 @@
                     x = random.Next(100, sandbox.TileCountX - 100);
                     foreach (int tx in createdTunnels)
                     {
-                        if (x + Context.MinDistanceFromNearbyTunnel > tx
-                            && tx > x - Context.MinDistanceFromNearbyTunnel)
+                        if (x + this.Config.MinDistanceFromNearbyTunnel > tx
+                            && tx > x - this.Config.MinDistanceFromNearbyTunnel)
                         {
                             check = true;
                             break;
@@ -57,11 +62,14 @@
 
                 for (int y = 0; y < sandbox.TileCountY; y++)
                 {
-                    if (sandbox.Tiles[x, y] != null && sandbox.Tiles[x, y].active())
+                    Coordinate coordinate = new Coordinate(x, y);
+                    if (sandbox[coordinate]?.active() == true)
                     {
-                        bool result = GenerateTunnel(sandbox, x, y, globalContext);
+                        bool result = this.GenerateTunnel(runner, sandbox, coordinate, globalContext);
                         if (!result)
                         {
+                            // Cavernが生成されていないなら、return
+                            generatedValueDict = new Dictionary<string, object>() { ["CreatedTunnels"] = createdTunnels };
                             return false;
                         }
 
@@ -71,16 +79,17 @@
                 }
             }
 
+            generatedValueDict = new Dictionary<string, object>() { ["CreatedTunnels"] = createdTunnels };
             return true;
         }
 
-        private bool GenerateTunnel(WorldSandbox sandbox, int i, int j, GlobalConfig context)
+        private bool GenerateTunnel(WorldGenerationRunner runner, WorldSandbox sandbox, Coordinate coordinate, GlobalConfig context)
         {
             Random random = context.Random;
             double[] cavernTop;
             try
             {
-                cavernTop = (double[])context["CavernTop"];
+                cavernTop = runner.GetGeneratedValue<Caverns, double[]>("CavernTop");
             }
             catch (KeyNotFoundException)
             {
@@ -95,19 +104,19 @@
             }
 
             Vector2 currentPosition;
-            currentPosition.X = (float)i;
-            currentPosition.Y = (float)j;
+            currentPosition.X = coordinate.X;
+            currentPosition.Y = coordinate.Y;
             int k = random.Next(20, 40);
             Vector2 nextVector;
             nextVector.Y = random.Next(10, 20) * 0.01f;
-            nextVector.X = (float)tunnelDirection;
+            nextVector.X = tunnelDirection;
             while (k > 0)
             {
                 k--;
-                int minX = (int)((double)currentPosition.X - (tunnelWidth * 0.5));
-                int maxX = (int)((double)currentPosition.X + (tunnelWidth * 0.5));
-                int minY = (int)((double)currentPosition.Y - (tunnelWidth * 0.5));
-                int maxY = (int)((double)currentPosition.Y + (tunnelWidth * 0.5));
+                int minX = (int)(currentPosition.X - (tunnelWidth * 0.5));
+                int maxX = (int)(currentPosition.X + (tunnelWidth * 0.5));
+                int minY = (int)(currentPosition.Y - (tunnelWidth * 0.5));
+                int maxY = (int)(currentPosition.Y + (tunnelWidth * 0.5));
                 if (minX < 0)
                 {
                     minX = 0;
@@ -125,7 +134,7 @@
 
                 if (maxY > sandbox.TileCountY)
                 {
-                    maxY = sandbox.TileCountY;
+                    // maxY = sandbox.TileCountY;
                     return true;
                 }
 
@@ -134,11 +143,19 @@
                 {
                     for (int m = minY; m < maxY; m++)
                     {
-                        float a = Math.Abs((float)l - currentPosition.X);
-                        float b = Math.Abs((float)m - currentPosition.Y);
-                        if (Math.Sqrt((double)(a * a + b * b)) < tunnelCircle)
+                        float a = Math.Abs(l - currentPosition.X);
+                        float b = Math.Abs(m - currentPosition.Y);
+                        if (Math.Sqrt((a * a) + (b * b)) < tunnelCircle)
                         {
-                            sandbox.Tiles[l, m]?.active(false);
+                            Coordinate tunnelCoordinate = new Coordinate(l, m);
+                            Tile tile = sandbox[tunnelCoordinate];
+                            if (tile != null)
+                            {
+                                Tile cloned = (Tile)tile.Clone();
+                                cloned.type = 0;
+                                cloned.active(false);
+                                _ = sandbox.PlaceTile(tunnelCoordinate, cloned);
+                            }
                         }
                     }
                 }
@@ -146,14 +163,14 @@
                 currentPosition += nextVector;
                 nextVector.X += random.Next(-10, 11) * 0.05f;
                 nextVector.Y += random.Next(-10, 11) * 0.05f;
-                if (nextVector.X > (float)tunnelDirection + 0.5f)
+                if (nextVector.X > tunnelDirection + 0.5f)
                 {
-                    nextVector.X = (float)tunnelDirection + 0.5f;
+                    nextVector.X = tunnelDirection + 0.5f;
                 }
 
-                if (nextVector.X < (float)tunnelDirection - 0.5f)
+                if (nextVector.X < tunnelDirection - 0.5f)
                 {
-                    nextVector.X = (float)tunnelDirection - 0.5f;
+                    nextVector.X = tunnelDirection - 0.5f;
                 }
 
                 if (nextVector.Y > 2f)
@@ -169,16 +186,19 @@
 
             if (currentPosition.Y < cavernTop[(int)currentPosition.X])
             {
-                return GenerateTunnel(sandbox, (int)currentPosition.X, (int)currentPosition.Y, context);
+                return this.GenerateTunnel(runner, sandbox, new Coordinate((int)currentPosition.X, (int)currentPosition.Y), context);
             }
 
             return true;
         }
 
-        public class TunnelContext : LayerConfig
+        /// <summary>
+        /// トンネル生成のコンフィグ.
+        /// </summary>
+        public class TunnelConfig : LayerConfig
         {
             /// <summary>
-            /// トンネルの数
+            /// トンネルの数.
             /// </summary>
             [Category("トンネル生成")]
             [DisplayName("トンネル数")]
@@ -186,7 +206,7 @@
             public int TunnelCount { get; set; } = 10;
 
             /// <summary>
-            /// 近くのトンネルとの最小距離
+            /// 近くのトンネルとの最小距離.
             /// </summary>
             [Category("トンネル生成")]
             [DisplayName("近くのトンネルからの最小距離")]

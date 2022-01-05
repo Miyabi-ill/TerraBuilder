@@ -1,17 +1,21 @@
-﻿namespace TerraBuilder.WorldGeneration.Layers.Buildings
+﻿// Copyright (c) Miyabi. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+namespace TerraBuilder.WorldGeneration.Layers.Buildings
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
+    using TerraBuilder.Chests;
     using TerraBuilder.Utils;
+    using TerraBuilder.WorldEdit;
     using TerraBuilder.WorldGeneration;
-    using TerraBuilder.WorldGeneration.Chests;
-    using Terraria;
 
     /// <summary>
-    /// 第二層にランダムにチェストを置くためのクラス
+    /// 第二層にランダムにチェストを置くためのクラス.
     /// </summary>
     [Action]
-    public class RandomCavernChests : IWorldGenerationLayer<RandomCavernChests.RandomCavernChestContext>
+    public class RandomCavernChests : IWorldGenerationLayer<RandomCavernChests.RandomCavernChestConfig>
     {
         /// <inheritdoc/>
         public string Name => nameof(RandomCavernChests);
@@ -20,32 +24,34 @@
         public string Description => "第二層にランダムにチェストを配置する";
 
         /// <inheritdoc/>
-        public RandomCavernChestContext Context { get; set; } = new RandomCavernChestContext();
+        public RandomCavernChestConfig Config { get; set; } = new RandomCavernChestConfig();
 
         /// <inheritdoc/>
-        public bool Run(WorldSandbox sandbox)
+        public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            if (string.IsNullOrEmpty(Context.ChestGroupName))
+            if (string.IsNullOrEmpty(this.Config.ChestGroupName))
             {
+                generatedValueDict = new Dictionary<string, object>();
                 return false;
             }
 
-            Random random = WorldGenerationRunner.CurrentRunner.GlobalConfig.Random;
-            double[] cavernTop = (double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernTop"];
+            Random random = runner.GlobalConfig.Random;
+            double[] cavernTop = runner.GetGeneratedValue<Biomes.Caverns, double[]>("CavernTop");
             const int worldEdgeTiles = 100;
-            for (int i = 0; i < Context.ChestCount; i++)
+            for (int i = 0; i < this.Config.ChestCount; i++)
             {
-                ChestContext chestContext = GenerateChest.GetChestContextByRandom(random, Context.ChestGroupName);
-                for (int retry = 0; retry < Context.MaxRetryForOneChest; retry++)
+                ChestContext chestContext = GenerateChest.GetChestContextByRandom(random, this.Config.ChestGroupName);
+                for (int retry = 0; retry < this.Config.MaxRetryForOneChest; retry++)
                 {
                     int x = random.Next(worldEdgeTiles, sandbox.TileCountX - worldEdgeTiles);
-                    if (PlaceChest(sandbox, x, (int)cavernTop[x] + 2, chestContext))
+                    if (this.PlaceChest(sandbox, x, (int)cavernTop[x] + 2, chestContext))
                     {
                         break;
                     }
                 }
             }
 
+            generatedValueDict = new Dictionary<string, object>();
             return true;
         }
 
@@ -53,12 +59,15 @@
         {
             for (int y = startY; y < sandbox.TileCountY; y++)
             {
-                if (sandbox.Tiles[x, y]?.active() == true && sandbox.Tiles[x + 1, y]?.active() == true)
+                if (sandbox[new Coordinate(x, y)]?.active() == true && sandbox[new Coordinate(x + 1, y)]?.active() == true)
                 {
-                    bool success = GenerateChest.PlaceChest(sandbox, x, y - 2, WorldGenerationRunner.CurrentRunner.GlobalConfig.Random, chestContext);
+                    bool success = GenerateChest.PlaceChest(sandbox, x, y - 2, runner.GlobalConfig.Random, chestContext);
                     if (success)
                     {
-                        sandbox.TileProtectionMap.SetProtection(TileProtectionMap.TileProtectionType.All, x, y - 2, x + 1, y - 1);
+                        sandbox.TileProtectionMap.AddProtection(new Coordinate(x, y - 2), TileProtectionMap.TileProtectionType.All);
+                        sandbox.TileProtectionMap.AddProtection(new Coordinate(x, y - 1), TileProtectionMap.TileProtectionType.All);
+                        sandbox.TileProtectionMap.AddProtection(new Coordinate(x + 1, y - 2), TileProtectionMap.TileProtectionType.All);
+                        sandbox.TileProtectionMap.AddProtection(new Coordinate(x + 1, y - 1), TileProtectionMap.TileProtectionType.All);
                         return success;
                     }
                 }
@@ -67,7 +76,10 @@
             return false;
         }
 
-        public class RandomCavernChestContext : LayerConfig
+        /// <summary>
+        /// 地下にランダムにチェストを置くクラスのコンフィグ.
+        /// </summary>
+        public class RandomCavernChestConfig : LayerConfig
         {
             /// <summary>
             /// チェストを1つ設置するまでのリトライ回数.チェストが設置できないとき=下が斜めブロックなどのときにリトライされる.
@@ -86,7 +98,7 @@
             public int ChestCount { get; set; } = 50;
 
             /// <summary>
-            /// 地下に設置するチェストのチェストグループ名
+            /// 地下に設置するチェストのチェストグループ名.
             /// </summary>
             [Category("地下チェスト生成")]
             [DisplayName("設置するチェストグループ名")]

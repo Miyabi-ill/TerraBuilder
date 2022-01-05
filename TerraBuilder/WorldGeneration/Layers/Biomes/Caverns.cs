@@ -1,9 +1,14 @@
-﻿namespace TerraBuilder.WorldGeneration.Layers.Biomes
+﻿// Copyright (c) Miyabi. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+namespace TerraBuilder.WorldGeneration.Layers.Biomes
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using Microsoft.Xna.Framework;
     using TerraBuilder.Utils;
+    using TerraBuilder.WorldEdit;
     using Terraria;
     using Terraria.ID;
 
@@ -11,7 +16,7 @@
     /// 洞窟(第二層)の生成を行う.
     /// </summary>
     [Action]
-    public class Caverns : IWorldGenerationLayer<Caverns.CavernContext>
+    public class Caverns : IWorldGenerationLayer<Caverns.CavernConfig>
     {
         /// <inheritdoc/>
         public string Name => nameof(Caverns);
@@ -20,21 +25,21 @@
         public string Description => "地下に洞窟を生成する.";
 
         /// <inheritdoc/>
-        public CavernContext Context { get; } = new CavernContext();
+        public CavernConfig Config { get; } = new CavernConfig();
 
         /// <inheritdoc/>
-        public bool Run(WorldSandbox sandbox)
+        public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
+            GlobalConfig globalContext = runner.GlobalConfig;
 
             int tileLengthX = sandbox.TileCountX;
 
             // Surface: topPerlinの振幅
-            int diffSurface = Context.CavernMaxDistanceFromSurface - Context.CavernMinDistanceFromSurface;
+            int diffSurface = this.Config.CavernMaxDistanceFromSurface - this.Config.CavernMinDistanceFromSurface;
 
-            var rand = globalContext.Random;
-            var topPerlin = PerlinNoise.NormalizeOctave1D(128, tileLengthX, 8, 2, rand);
-            var bottomPerlin = PerlinNoise.NormalizeOctave1D(128, tileLengthX, 8, 2, rand);
+            Random rand = globalContext.Random;
+            double[] topPerlin = PerlinNoise.NormalizeOctave1D(128, tileLengthX, 8, 2, rand);
+            double[] bottomPerlin = PerlinNoise.NormalizeOctave1D(128, tileLengthX, 8, 2, rand);
 
             int minIndex = 0;
             double minValue = double.MaxValue;
@@ -55,9 +60,10 @@
             }
 
             // 空間のminとmaxから波の増幅量を決定、適用.タイルで使うために四捨五入しておく.
-            double bottomAmplifier = Context.CavernMaxHeight - diffSurface - Context.CavernMinHeight;
+            double bottomAmplifier = this.Config.CavernMaxHeight - diffSurface - this.Config.CavernMinHeight;
             if (bottomAmplifier < 0)
             {
+                generatedValueDict = new Dictionary<string, object>();
                 return false;
             }
 
@@ -67,10 +73,8 @@
                 bottomPerlin[i] = Math.Round(bottomPerlin[i] * bottomAmplifier);
             }
 
-            var tiles = sandbox.Tiles;
-
-            int cavernStart = globalContext.SurfaceLevel + Context.CavernMinDistanceFromSurface;
-            int bottomPerlinBaseTopLine = (int)topPerlin[minIndex] - (int)bottomPerlin[minIndex] + Context.CavernMinHeight;
+            int cavernStart = globalContext.SurfaceLevel + this.Config.CavernMinDistanceFromSurface;
+            int bottomPerlinBaseTopLine = (int)topPerlin[minIndex] - (int)bottomPerlin[minIndex] + this.Config.CavernMinHeight;
             double[] cavernTop = new double[topPerlin.Length];
             double[] cavernBottom = new double[bottomPerlin.Length];
 
@@ -80,76 +84,86 @@
                 cavernBottom[x] = cavernStart + bottomPerlinBaseTopLine + bottomPerlin[x];
                 for (int y = globalContext.SurfaceLevel; y < sandbox.TileCountY; y++)
                 {
+                    Coordinate coordinate = new Coordinate(x, y);
                     if (y < cavernStart + topPerlin[x])
                     {
-                        tiles[x, y] = new Tile()
+                        Tile tile = new Tile()
                         {
                             type = TileID.GrayBrick,
                             wall = WallID.GrayBrick,
                         };
-                        tiles[x, y].active(true);
+                        tile.active(true);
+                        _ = sandbox.PlaceTile(coordinate, tile);
                     }
                     else if (y > cavernStart + bottomPerlinBaseTopLine + bottomPerlin[x])
                     {
-                        tiles[x, y] = new Tile()
+                        Tile tile = new Tile()
                         {
                             type = TileID.GrayBrick,
                             wall = WallID.GrayBrick,
                         };
-                        tiles[x, y].active(true);
+                        tile.active(true);
+                        _ = sandbox.PlaceTile(coordinate, tile);
                     }
                     else
                     {
-                        tiles[x, y] = new Tile()
+                        Tile tile = new Tile()
                         {
                             wall = WallID.GrayBrick,
                         };
+                        _ = sandbox.PlaceTile(coordinate, tile);
                     }
                 }
             }
 
-            for (int i = 0; i < Context.BlockCount; i++)
+            int generatedBlockCount = 0;
+            for (int i = 0; i < this.Config.BlockCount; i++)
             {
                 int x = rand.Next(100, sandbox.TileCountX - 100);
-                if ((int)cavernTop[x] + Context.MinDistanceFromCavernTopAndBottom < (int)cavernBottom[x] - Context.MinDistanceFromCavernTopAndBottom)
+                if ((int)cavernTop[x] + this.Config.MinDistanceFromCavernTopAndBottom < (int)cavernBottom[x] - this.Config.MinDistanceFromCavernTopAndBottom)
                 {
-                    int y = rand.Next((int)cavernTop[x] + Context.MinDistanceFromCavernTopAndBottom, (int)cavernBottom[x] - Context.MinDistanceFromCavernTopAndBottom);
-                    int repeat = rand.Next(Context.MinRepeatForStroke, Context.MaxRepeatForStroke + 1);
-                    GenerateBlock(sandbox, x, y, rand, repeat);
+                    int y = rand.Next((int)cavernTop[x] + this.Config.MinDistanceFromCavernTopAndBottom, (int)cavernBottom[x] - this.Config.MinDistanceFromCavernTopAndBottom);
+                    int repeat = rand.Next(this.Config.MinRepeatForStroke, this.Config.MaxRepeatForStroke + 1);
+                    this.GenerateBlock(sandbox, x, y, rand, repeat);
+                    generatedBlockCount++;
                 }
             }
 
-            globalContext["CavernTop"] = cavernTop;
-            globalContext["CavernBottom"] = cavernBottom;
+            generatedValueDict = new Dictionary<string, object>()
+            {
+                ["CavernTop"] = cavernTop,
+                ["CavernBottom"] = cavernBottom,
+                ["GeneratedBlockCount"] = generatedBlockCount,
+            };
 
             return true;
         }
 
-        public void GenerateBlock(WorldSandbox sandbox, int x, int y, Random random, int repeat = 0)
+        private void GenerateBlock(WorldSandbox sandbox, int x, int y, Random random, int repeat = 0)
         {
             if (repeat < 0)
             {
                 return;
             }
 
-            double blockDiameter = random.Next(Context.BlockStrokeMinDiameter, Context.BlockStrokeMaxDiameter + 1);
+            double blockDiameter = random.Next(this.Config.BlockStrokeMinDiameter, this.Config.BlockStrokeMaxDiameter + 1);
             int blockDirection = random.Next(2) == 0 ? 1 : -1;
 
             Vector2 currentPosition;
             currentPosition.X = x;
             currentPosition.Y = y;
-            int k = random.Next(Context.MinRepeatPerStroke, Context.MaxRepeatPerStroke);
+            int k = random.Next(this.Config.MinRepeatPerStroke, this.Config.MaxRepeatPerStroke);
             Vector2 velocity;
             velocity.Y = random.Next(10, 20) * 0.01f;
             velocity.Y = random.Next(2) == 0 ? velocity.Y : -velocity.Y;
-            velocity.X = (float)blockDirection;
+            velocity.X = blockDirection;
             while (k > 0)
             {
                 k--;
-                int minX = (int)((double)currentPosition.X - (blockDiameter * 0.5));
-                int maxX = (int)((double)currentPosition.X + (blockDiameter * 0.5));
-                int minY = (int)((double)currentPosition.Y - (blockDiameter * 0.5));
-                int maxY = (int)((double)currentPosition.Y + (blockDiameter * 0.5));
+                int minX = (int)(currentPosition.X - (blockDiameter * 0.5));
+                int maxX = (int)(currentPosition.X + (blockDiameter * 0.5));
+                int minY = (int)(currentPosition.Y - (blockDiameter * 0.5));
+                int maxY = (int)(currentPosition.Y + (blockDiameter * 0.5));
                 if (minX < 0)
                 {
                     minX = 0;
@@ -167,7 +181,7 @@
 
                 if (maxY > sandbox.TileCountY)
                 {
-                    maxY = sandbox.TileCountY;
+                    // maxY = sandbox.TileCountY;
                     return;
                 }
 
@@ -176,12 +190,13 @@
                 {
                     for (int m = minY; m < maxY; m++)
                     {
-                        float a = Math.Abs((float)l - currentPosition.X);
-                        float b = Math.Abs((float)m - currentPosition.Y);
-                        if (Math.Sqrt((double)(a * a + b * b)) < realRadius)
+                        float a = Math.Abs(l - currentPosition.X);
+                        float b = Math.Abs(m - currentPosition.Y);
+                        if (Math.Sqrt((a * a) + (b * b)) < realRadius)
                         {
-                            sandbox.Tiles[l, m].type = TileID.GrayBrick;
-                            sandbox.Tiles[l, m].active(true);
+                            Coordinate coordinate = new Coordinate(l, m);
+                            sandbox[coordinate].type = TileID.GrayBrick;
+                            sandbox[coordinate].active(true);
                         }
                     }
                 }
@@ -189,14 +204,14 @@
                 currentPosition += velocity;
                 velocity.X += random.Next(-10, 11) * 0.05f;
                 velocity.Y += random.Next(-10, 11) * 0.05f;
-                if (velocity.X > (float)blockDirection + 0.5f)
+                if (velocity.X > blockDirection + 0.5f)
                 {
-                    velocity.X = (float)blockDirection + 0.5f;
+                    velocity.X = blockDirection + 0.5f;
                 }
 
-                if (velocity.X < (float)blockDirection - 0.5f)
+                if (velocity.X < blockDirection - 0.5f)
                 {
-                    velocity.X = (float)blockDirection - 0.5f;
+                    velocity.X = blockDirection - 0.5f;
                 }
 
                 if (velocity.Y > 0.5f)
@@ -210,13 +225,13 @@
                 }
             }
 
-            GenerateBlock(sandbox, x, y, random, repeat - 1);
+            this.GenerateBlock(sandbox, x, y, random, repeat - 1);
         }
 
         /// <summary>
         /// 洞窟の生成に使われるコンテキスト.
         /// </summary>
-        public class CavernContext : LayerConfig
+        public class CavernConfig : LayerConfig
         {
             /// <summary>
             /// 洞窟の最小の高さ.
@@ -240,7 +255,7 @@
             [Category("洞窟生成")]
             [DisplayName("最小地表距離")]
             [Description("地表から洞窟の天井までの最小距離")]
-            public int CavernMinDistanceFromSurface { get; set; } = 0;
+            public int CavernMinDistanceFromSurface { get; set; }
 
             /// <summary>
             /// 地表からの最大距離.
@@ -251,7 +266,7 @@
             public int CavernMaxDistanceFromSurface { get; set; } = 100;
 
             /// <summary>
-            /// 空中に設置されるブロック塊のブラシ最小サイズ
+            /// 空中に設置されるブロック塊のブラシ最小サイズ.
             /// </summary>
             [Category("洞窟内空中ブロック")]
             [DisplayName("ブロック最小直径")]
@@ -259,7 +274,7 @@
             public int BlockStrokeMinDiameter { get; set; } = 7;
 
             /// <summary>
-            /// 空中に設置されるブロック塊のブラシ最大サイズ
+            /// 空中に設置されるブロック塊のブラシ最大サイズ.
             /// </summary>
             [Category("洞窟内空中ブロック")]
             [DisplayName("ブロック最大直径")]
@@ -267,7 +282,7 @@
             public int BlockStrokeMaxDiameter { get; set; } = 15;
 
             /// <summary>
-            /// 空中に設置されるブロック塊のブラシの1ストロークあたりの最小移動距離
+            /// 空中に設置されるブロック塊のブラシの1ストロークあたりの最小移動距離.
             /// </summary>
             [Category("洞窟内空中ブロック")]
             [DisplayName("ブロック塊の最小移動距離")]
@@ -275,7 +290,7 @@
             public int MinRepeatPerStroke { get; set; } = 15;
 
             /// <summary>
-            /// 空中に設置されるブロック塊のブラシの1ストロークあたりの最大移動距離
+            /// 空中に設置されるブロック塊のブラシの1ストロークあたりの最大移動距離.
             /// </summary>
             [Category("洞窟内空中ブロック")]
             [DisplayName("ブロック塊の最大移動距離")]
@@ -283,7 +298,7 @@
             public int MaxRepeatPerStroke { get; set; } = 25;
 
             /// <summary>
-            /// 空中に設置されるブロック塊のブラシのストローク最小繰り返し回数
+            /// 空中に設置されるブロック塊のブラシのストローク最小繰り返し回数.
             /// </summary>
             [Category("洞窟内空中ブロック")]
             [DisplayName("ブロック塊の移動最小繰り返し回数")]
@@ -291,7 +306,7 @@
             public int MinRepeatForStroke { get; set; } = 3;
 
             /// <summary>
-            /// 空中に設置されるブロック塊のブラシのストローク最大繰り返し回数
+            /// 空中に設置されるブロック塊のブラシのストローク最大繰り返し回数.
             /// </summary>
             [Category("洞窟内空中ブロック")]
             [DisplayName("ブロック塊の移動最大繰り返し回数")]
@@ -307,7 +322,7 @@
             public int MinDistanceFromCavernTopAndBottom { get; set; } = 15;
 
             /// <summary>
-            /// 空中に設置されるブロック塊の設置個数
+            /// 空中に設置されるブロック塊の設置個数.
             /// </summary>
             [Category("洞窟内空中ブロック")]
             [DisplayName("ブロック塊設置個数")]

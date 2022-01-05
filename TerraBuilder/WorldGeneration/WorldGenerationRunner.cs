@@ -32,8 +32,6 @@ namespace TerraBuilder.WorldGeneration
         /// </summary>
         public WorldGenerationRunner()
         {
-            CurrentRunner = this;
-
             // TODO: テンプレートクラスを作り切り分け？
             this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Biomes.Caverns)].Invoke());
             this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Biomes.Surface)].Invoke());
@@ -57,20 +55,38 @@ namespace TerraBuilder.WorldGeneration
         public static Dictionary<string, Func<IWorldGenerationLayer<LayerConfig>>> AvailableActions { get; } = new Dictionary<string, Func<IWorldGenerationLayer<LayerConfig>>>();
 
         /// <summary>
-        /// 現在のインスタンス.
-        /// TODO: 並列化にネガティブなため、構成を要検討.
-        /// </summary>
-        public static WorldGenerationRunner CurrentRunner { get; private set; }
-
-        /// <summary>
         /// ワールド生成アクションリスト.このリスト順で生成が実行される.
         /// </summary>
         public ObservableCollection<IWorldGenerationLayer<LayerConfig>> WorldGenerationLayers { get; } = new ObservableCollection<IWorldGenerationLayer<LayerConfig>>();
 
+        private Dictionary<Type, Dictionary<string, object>> GeneratedValueDict { get; } = new Dictionary<Type, Dictionary<string, object>>();
+
         /// <summary>
-        /// サンドボックス全体に関わるコンフィグ項目.
+        /// ワールド生成レイヤーの適用時に生成された値を取得する.
+        /// 特にint等structを取得するとき、unboxingが発生するため、パフォーマンスオーバーヘッドがあることに注意する.
         /// </summary>
-        public GlobalConfig GlobalConfig { get; private set; }
+        /// <example>ピラミッドの数がピラミッドレイヤー適用時に決まり、ピラミッドの数に応じた空島を生成する.</example>
+        /// <typeparam name="TLayer">取得する値を含むレイヤーの型.</typeparam>
+        /// <typeparam name="TValue">取得する値の型.</typeparam>
+        /// <param name="generatedValueName">取得する値の名前（プロパティ名）.</param>
+        /// <returns>ワールド生成レイヤーによって作成された値.</returns>
+        /// <exception cref="ArgumentNullException"><see cref="generatedValueName"/>がnullか空文字のとき.</exception>
+        /// <exception cref="KeyNotFoundException"><see cref="TLayer"/>がこの生成中に適用されていないとき.<see cref="TLayer"/>の中に<see cref="generatedValueName"/>が含まれていないとき.</exception>
+        public TValue GetGeneratedValue<TLayer, TValue>(string generatedValueName)
+            where TLayer : IWorldGenerationLayer<LayerConfig>
+        {
+            if (string.IsNullOrEmpty(generatedValueName))
+            {
+                throw new ArgumentNullException(nameof(generatedValueName));
+            }
+
+            if (!this.GeneratedValueDict[typeof(TValue)].ContainsKey(generatedValueName))
+            {
+                throw new KeyNotFoundException(nameof(generatedValueName));
+            }
+
+            return (TValue)this.GeneratedValueDict[typeof(TValue)][generatedValueName];
+        }
 
         /// <summary>
         /// 登録されている全てのレイヤーを実行し、ワールド生成を行う.
@@ -79,7 +95,7 @@ namespace TerraBuilder.WorldGeneration
         /// <returns>レイヤーの適用が全て成功すればtrue.1つでも失敗すれば、その時点で失敗しfalseを返す.</returns>
         public bool Run(WorldSandbox sandbox)
         {
-            throw new NotImplementedException();
+            this.GeneratedValueDict.Clear();
             _ = sandbox.Reset();
             foreach (IWorldGenerationLayer<LayerConfig> action in this.WorldGenerationLayers)
             {
@@ -87,20 +103,33 @@ namespace TerraBuilder.WorldGeneration
                 {
                     try
                     {
-                        bool success = action.Apply(sandbox);
+                        bool success = action.Apply(this, sandbox, out Dictionary<string, object> generatedValueDict);
                         if (!success)
                         {
-                            MainWindow.Window.ShowErrorMessage($"アクション`{action.Name}`で生成に失敗しました.");
                             return false;
+                        }
+
+                        if (!this.GeneratedValueDict.ContainsKey(action.GetType()))
+                        {
+                            this.GeneratedValueDict.Add(action.GetType(), generatedValueDict);
+                        }
+                        else
+                        {
+                            // 辞書をマージ
+                            foreach (KeyValuePair<string, object> generatedValuePair in generatedValueDict)
+                            {
+                                this.GeneratedValueDict[action.GetType()][generatedValuePair.Key] = generatedValuePair.Value;
+                            }
                         }
                     }
                     catch
                     {
-                        MainWindow.Window.ShowErrorMessage($"アクション`{action.Name}`で生成にエラーが発生しました.");
                         return false;
                     }
                 }
             }
+
+            this.GeneratedValueDict.Clear();
 
             return true;
         }

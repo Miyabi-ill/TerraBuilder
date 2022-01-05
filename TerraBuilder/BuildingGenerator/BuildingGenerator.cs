@@ -47,7 +47,7 @@
         /// </summary>
         public void Build()
         {
-            Random rand = WorldGeneration.WorldGenerationRunner.CurrentRunner.GlobalConfig.Random;
+            Random rand = WorldGeneration.runner.GlobalConfig.Random;
             Tile[,] tiles = Root?.Build(rand);
             if (tiles == null || tiles.GetLength(0) == 0 || tiles.GetLength(1) == 0)
             {

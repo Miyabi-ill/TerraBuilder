@@ -1,31 +1,37 @@
 ﻿namespace TerraBuilder.WorldGeneration.Layers.Biomes
 {
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
     using TerraBuilder.Utils;
+    using TerraBuilder.WorldEdit;
 
     /// <summary>
     /// 地下に水を生成する生成アクション.
     /// </summary>
     [Action]
-    public class CavernWater : IWorldGenerationLayer<CavernWater.CavernWaterContext>
+    public class CavernWater : IWorldGenerationLayer<CavernWater.CavernWaterConfig>
     {
+        /// <inheritdoc/>
         public string Name => nameof(CavernWater);
 
+        /// <inheritdoc/>
         public string Description => "地下に水を生成する.洞窟の生成が必須.";
 
-        public CavernWaterContext Context { get; set; } = new CavernWaterContext();
+        /// <inheritdoc/>
+        public CavernWaterConfig Config { get; set; } = new CavernWaterConfig();
 
-        public bool Run(WorldSandbox sandbox)
+        /// <inheritdoc/>
+        public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
-            int cavernTop = (int)((double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernTop"]).Min();
-            int cavernBottom = (int)((double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernBottom"]).Max();
+            GlobalConfig globalContext = runner.GlobalConfig;
+            int cavernTop = (int)runner.GetGeneratedValue<Caverns, double[]>("CavernTop").Min();
+            int cavernBottom = (int)runner.GetGeneratedValue<Caverns, double[]>("CavernBottom").Max();
 
-            for (int i = 0; i < Context.RandomWaterBlockCount; i++)
+            for (int i = 0; i < this.Config.RandomWaterBlockCount; i++)
             {
-                int sizeX = globalContext.Random.Next(Context.RandomWaterBlockMinX, Context.RandomWaterBlockMaxX + 1);
-                int sizeY = globalContext.Random.Next(Context.RandomWaterBlockMinY, Context.RandomWaterBlockMaxY + 1);
+                int sizeX = globalContext.Random.Next(this.Config.RandomWaterBlockMinX, this.Config.RandomWaterBlockMaxX + 1);
+                int sizeY = globalContext.Random.Next(this.Config.RandomWaterBlockMinY, this.Config.RandomWaterBlockMaxY + 1);
                 if (cavernTop >= cavernBottom - sizeY)
                 {
                     sizeY = cavernBottom - cavernTop - 1;
@@ -37,27 +43,28 @@
                 {
                     for (int cy = y; cy < y + sizeY; cy++)
                     {
-                        sandbox.Tiles[cx, cy].liquid = 255;
+                        sandbox[new Coordinate(cx, cy)].liquid = 255;
                     }
                 }
             }
 
             Liquids.Settle(sandbox);
 
+            generatedValueDict = new Dictionary<string, object>();
             return true;
         }
 
-        public class CavernWaterContext : LayerConfig
+        public class CavernWaterConfig : LayerConfig
         {
             /// <summary>
-            /// 水の塊の設置数
+            /// 水の塊の設置数.
             /// </summary>
             [Category("水の塊")]
             [DisplayName("設置数")]
             public int RandomWaterBlockCount { get; set; } = 15;
 
             /// <summary>
-            /// 水の塊の最小の幅
+            /// 水の塊の最小の幅.
             /// </summary>
             [Category("水の塊")]
             [DisplayName("水の塊の最小幅")]
@@ -65,7 +72,7 @@
             public int RandomWaterBlockMinX { get; set; } = 10;
 
             /// <summary>
-            /// 水の塊の最大の幅
+            /// 水の塊の最大の幅.
             /// </summary>
             [Category("水の塊")]
             [DisplayName("水の塊の最大幅")]
@@ -73,7 +80,7 @@
             public int RandomWaterBlockMaxX { get; set; } = 50;
 
             /// <summary>
-            /// 水の塊の最小の高さ
+            /// 水の塊の最小の高さ.
             /// </summary>
             [Category("水の塊")]
             [DisplayName("水の塊の最小高さ")]
@@ -81,7 +88,7 @@
             public int RandomWaterBlockMinY { get; set; } = 10;
 
             /// <summary>
-            /// 水の塊の最大の高さ
+            /// 水の塊の最大の高さ.
             /// </summary>
             [Category("水の塊")]
             [DisplayName("水の塊の最大高さ")]

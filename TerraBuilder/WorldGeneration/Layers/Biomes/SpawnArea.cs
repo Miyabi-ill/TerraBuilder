@@ -1,5 +1,7 @@
 ﻿namespace TerraBuilder.WorldGeneration.Layers.Biomes
 {
+    using System.Collections.Generic;
+    using TerraBuilder.WorldEdit;
     using Terraria;
     using Terraria.ID;
 
@@ -16,19 +18,19 @@
         public string Description => "スポーン地点の作成";
 
         /// <inheritdoc/>
-        public SpawnAreaContext Context { get; set; } = new SpawnAreaContext();
+        public SpawnAreaContext Config { get; set; } = new SpawnAreaContext();
 
         /// <inheritdoc/>
-        public bool Run(WorldSandbox sandbox)
+        public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            var globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
+            var globalContext = runner.GlobalConfig;
 
             sandbox.SpawnTileX = sandbox.TileCountX / 2;
             sandbox.SpawnTileY = globalContext.RespawnLevel;
 
             for (int x = 0; x < sandbox.TileCountX; x++)
             {
-                var asphalt = new Tile()
+                Tile asphalt = new Tile()
                 {
                     type = TileID.Asphalt,
                 };
@@ -36,9 +38,10 @@
                 asphalt.wire(true);
                 asphalt.actuator(true);
 
-                sandbox.Tiles[x, globalContext.RespawnLevel] = asphalt;
+                Coordinate asphaltCoord = new Coordinate(x, globalContext.RespawnLevel);
+                _ = sandbox.PlaceTile(asphaltCoord, asphalt);
 
-                var nodestroy = new Tile()
+                Tile nodestroy = new Tile()
                 {
                     type = TileID.Titanium,
                 };
@@ -46,16 +49,22 @@
                 nodestroy.wire(true);
                 nodestroy.actuator(true);
 
-                sandbox.Tiles[x, globalContext.RespawnLevel + 1] = nodestroy;
+                Coordinate nodestroyCoord = new Coordinate(x, globalContext.RespawnLevel + 1);
+                _ = sandbox.PlaceTile(nodestroyCoord, nodestroy);
 
-                sandbox.TileProtectionMap[x, globalContext.RespawnLevel] = TileProtectionMap.TileProtectionType.All;
-                sandbox.TileProtectionMap[x, globalContext.RespawnLevel + 1] = TileProtectionMap.TileProtectionType.All;
+                sandbox.TileProtectionMap.AddProtection(asphaltCoord, TileProtectionMap.TileProtectionType.All);
+                sandbox.TileProtectionMap.AddProtection(nodestroyCoord, TileProtectionMap.TileProtectionType.All);
             }
 
-            sandbox.Tiles[5, globalContext.RespawnLevel - 1] = new Tile() { wall = WallID.Wood };
-            WorldGen.PlaceTile(5, globalContext.RespawnLevel - 1, TileID.Switches, forced: true);
-            sandbox.Tiles[5, globalContext.RespawnLevel - 1].wire(true);
+            Coordinate switchCoord = new Coordinate(5, globalContext.RespawnLevel - 1);
+            Tile switchTile = new Tile() { wall = WallID.Wood };
+            switchTile.wire(true);
+            _ = sandbox.PlaceTile(switchCoord, switchTile);
 
+            // TODO: sandboxへの呼び出し？
+            WorldGen.PlaceTile(5, globalContext.RespawnLevel - 1, TileID.Switches, forced: true);
+
+            generatedValueDict = new Dictionary<string, object>();
             return true;
         }
 

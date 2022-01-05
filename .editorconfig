@@ -147,3 +147,6 @@ csharp_using_directive_placement = inside_namespace
 
 # CA1822: Mark members as static
 dotnet_diagnostic.CA1822.severity = suggestion
+
+# IDE0046: Convert to conditional expression
+dotnet_style_prefer_conditional_expression_over_return = false

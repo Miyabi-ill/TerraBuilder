@@ -129,7 +129,7 @@ namespace TerraBuilder.WorldEdit
         {
             get => this.TileProtectionTypes[coordinate.X, coordinate.Y];
 
-            set => this.TileProtectionTypes[coordinate.X, coordinate.Y] = value;
+            private set => this.TileProtectionTypes[coordinate.X, coordinate.Y] = value;
         }
 
         /// <summary>
@@ -276,5 +276,12 @@ namespace TerraBuilder.WorldEdit
 
             return sandboxTile;
         }
+
+        /// <summary>
+        /// 指定した座標にタイル保護を追加する.
+        /// </summary>
+        /// <param name="coordinate">タイル保護を追加する座標.</param>
+        /// <param name="protectionType">追加するタイル保護タイプ.</param>
+        public void AddProtection(Coordinate coordinate, TileProtectionType protectionType) => this[coordinate] |= protectionType;
     }
 }

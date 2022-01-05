@@ -176,7 +176,7 @@
 
             if (!string.IsNullOrEmpty(LastActionConfigPath))
             {
-                WorldGenerationRunner.CurrentRunner.Load(LastActionConfigPath);
+                runner.Load(LastActionConfigPath);
             }
 
             isLoading = false;

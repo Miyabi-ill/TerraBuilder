@@ -127,7 +127,7 @@
         {
             if (sender is Button button && button.DataContext is IWorldGenerationLayer<LayerConfig> generationAction)
             {
-                LocalContextProperty.SelectedObject = generationAction.Context;
+                LocalContextProperty.SelectedObject = generationAction.Config;
                 LocalContextExpander.Header = generationAction.Name;
                 LocalContextExpander.IsExpanded = true;
             }
@@ -149,7 +149,7 @@
             if (dialog.ShowDialog().GetValueOrDefault())
             {
                 // ダイアログがtrueを返せば、dialog.Actionはnon-nullを保証する
-                WorldGenerationRunner.CurrentRunner.WorldGenerationLayers.Add(dialog.Action);
+                runner.WorldGenerationLayers.Add(dialog.Action);
             }
         }
 
@@ -157,7 +157,7 @@
         {
             if (ActionList.SelectedIndex != -1)
             {
-                WorldGenerationRunner.CurrentRunner.WorldGenerationLayers.RemoveAt(ActionList.SelectedIndex);
+                runner.WorldGenerationLayers.RemoveAt(ActionList.SelectedIndex);
             }
         }
 
@@ -165,15 +165,15 @@
         {
             if (ActionList.SelectedIndex >= 1)
             {
-                WorldGenerationRunner.CurrentRunner.WorldGenerationLayers.Move(ActionList.SelectedIndex, ActionList.SelectedIndex - 1);
+                runner.WorldGenerationLayers.Move(ActionList.SelectedIndex, ActionList.SelectedIndex - 1);
             }
         }
 
         private void DownActionButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ActionList.SelectedIndex != -1 && ActionList.SelectedIndex != WorldGenerationRunner.CurrentRunner.WorldGenerationLayers.Count - 1)
+            if (ActionList.SelectedIndex != -1 && ActionList.SelectedIndex != runner.WorldGenerationLayers.Count - 1)
             {
-                WorldGenerationRunner.CurrentRunner.WorldGenerationLayers.Move(ActionList.SelectedIndex, ActionList.SelectedIndex + 1);
+                runner.WorldGenerationLayers.Move(ActionList.SelectedIndex, ActionList.SelectedIndex + 1);
             }
         }
 
@@ -241,7 +241,7 @@
 
         private void RandomSeedButton_Click(object sender, RoutedEventArgs e)
         {
-            WorldGenerationRunner.CurrentRunner.GlobalConfig.Seed = new Random().Next();
+            runner.GlobalConfig.Seed = new Random().Next();
         }
 
         private void BuildingSearchWindowMenuItem_Click(object sender, RoutedEventArgs e)

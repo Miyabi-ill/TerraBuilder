@@ -28,27 +28,27 @@
         public string Description => "ランダムな大きさ、形のブロックをワールド地表の一定のエリア内に配置する";
 
         /// <inheritdoc/>
-        public RandomSizeBlockWithAreaContext Context { get; } = new RandomSizeBlockWithAreaContext();
+        public RandomSizeBlockWithAreaContext Config { get; } = new RandomSizeBlockWithAreaContext();
 
         /// <inheritdoc/>
-        public bool Run(WorldSandbox sandbox)
+        public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            GlobalConfig globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
+            GlobalConfig globalContext = runner.GlobalConfig;
             var random = globalContext.Random;
             var area = new List<Point16>();
-            for (int i = 0; i < Context.AreaCount; i++)
+            for (int i = 0; i < Config.AreaCount; i++)
             {
-                int width = random.Next(Context.AreaMinWidth, Context.AreaMaxWidth);
+                int width = random.Next(Config.AreaMinWidth, Config.AreaMaxWidth);
                 int areaLeft = 0;
                 bool success = false;
-                for (int r = 0; r < Context.MaxAreaSelectRetry; r++)
+                for (int r = 0; r < Config.MaxAreaSelectRetry; r++)
                 {
                     areaLeft = random.Next(100, sandbox.TileCountX - 100 - width);
                     success = true;
                     foreach (Point16 areaPos in area)
                     {
-                        if (areaPos.Y < areaLeft - Context.MinDistanceFromNearbyArea
-                            || areaLeft + width + Context.MinDistanceFromNearbyArea < areaPos.X)
+                        if (areaPos.Y < areaLeft - Config.MinDistanceFromNearbyArea
+                            || areaLeft + width + Config.MinDistanceFromNearbyArea < areaPos.X)
                         {
                             // 重なっていない
                         }
@@ -68,18 +68,18 @@
                 if (success)
                 {
                     area.Add(new Point16(areaLeft, areaLeft + width));
-                    if (Context.PlaceBiome == PlaceBiome.Surface)
+                    if (Config.PlaceBiome == PlaceBiome.Surface)
                     {
-                        for (int c = 0; c < Context.BlockCount; c++)
+                        for (int c = 0; c < Config.BlockCount; c++)
                         {
-                            for (int retry = 0; retry < Context.MaxPlaceRetry; retry++)
+                            for (int retry = 0; retry < Config.MaxPlaceRetry; retry++)
                             {
                                 int x = random.Next(areaLeft, areaLeft + width);
                                 bool result = PlaceBlockToSurface(
                                     sandbox,
-                                    Context,
-                                    sizeX: random.Next(Context.BlockMinX, Context.BlockMaxX),
-                                    sizeY: random.Next(Context.BlockMinY, Context.BlockMaxY),
+                                    Config,
+                                    sizeX: random.Next(Config.BlockMinX, Config.BlockMaxX),
+                                    sizeY: random.Next(Config.BlockMinY, Config.BlockMaxY),
                                     x);
                                 if (result)
                                 {
@@ -88,13 +88,13 @@
                             }
                         }
                     }
-                    else if (Context.PlaceBiome == PlaceBiome.Cavern)
+                    else if (Config.PlaceBiome == PlaceBiome.Cavern)
                     {
-                        double[] cavernTop = (double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernTop"];
-                        double[] cavernBottom = (double[])WorldGenerationRunner.CurrentRunner.GlobalConfig["CavernBottom"];
-                        for (int c = 0; c < Context.BlockCount; c++)
+                        double[] cavernTop = (double[])runner.GlobalConfig["CavernTop"];
+                        double[] cavernBottom = (double[])runner.GlobalConfig["CavernBottom"];
+                        for (int c = 0; c < Config.BlockCount; c++)
                         {
-                            for (int retry = 0; retry < Context.MaxPlaceRetry; retry++)
+                            for (int retry = 0; retry < Config.MaxPlaceRetry; retry++)
                             {
                                 int x = random.Next(areaLeft, areaLeft + width);
                                 int y = random.Next((int)cavernTop[x], (int)cavernBottom[x]);
@@ -102,9 +102,9 @@
                                 int? maxY = placeToTop ? (int?)((int)cavernTop[x] - 2) : null;
                                 bool result = PlaceBlockToCavern(
                                     sandbox,
-                                    Context,
-                                    sizeX: random.Next(Context.BlockMinX, Context.BlockMaxX),
-                                    sizeY: random.Next(Context.BlockMinY, Context.BlockMaxY),
+                                    Config,
+                                    sizeX: random.Next(Config.BlockMinX, Config.BlockMaxX),
+                                    sizeY: random.Next(Config.BlockMinY, Config.BlockMaxY),
                                     x,
                                     y,
                                     placeToTop,

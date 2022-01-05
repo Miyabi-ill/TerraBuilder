@@ -3,37 +3,42 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using TerraBuilder.WorldEdit;
     using Terraria;
     using Terraria.ID;
 
     /// <summary>
-    /// 井戸を設置する
+    /// 井戸を設置する.
     /// </summary>
     [Action]
     public class Wells : IWorldGenerationLayer<Wells.WellContext>
     {
+        /// <inheritdoc/>
         public string Name => nameof(Wells);
 
+        /// <inheritdoc/>
         public string Description => "井戸を生成する.";
 
-        public WellContext Context { get; private set; } = new WellContext();
+        /// <inheritdoc/>
+        public WellContext Config { get; } = new WellContext();
 
-        public bool Run(WorldSandbox sandbox)
+        /// <inheritdoc/>
+        public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            var globalContext = WorldGenerationRunner.CurrentRunner.GlobalConfig;
+            var globalContext = runner.GlobalConfig;
 
             double[] cavernTop = (double[])globalContext["CavernTop"];
             List<int> placedWellX = new List<int>();
-            for (int count = 0; count < Context.Count; count++)
+            for (int count = 0; count < Config.Count; count++)
             {
-                for (int retry = 0; retry < Context.MaxRetryPerWell; retry++)
+                for (int retry = 0; retry < Config.MaxRetryPerWell; retry++)
                 {
                     int x = globalContext.Random.Next(100, sandbox.TileCountX - 100);
                     bool check = true;
                     bool placeSuccess = false;
                     foreach (int wx in placedWellX)
                     {
-                        if (wx - Context.MinDistanceFromNearbyWells <= x && x <= wx + Context.MinDistanceFromNearbyWells)
+                        if (wx - Config.MinDistanceFromNearbyWells <= x && x <= wx + Config.MinDistanceFromNearbyWells)
                         {
                             check = false;
                             break;
