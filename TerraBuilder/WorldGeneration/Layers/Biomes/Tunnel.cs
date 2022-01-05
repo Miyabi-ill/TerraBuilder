@@ -28,8 +28,7 @@ namespace TerraBuilder.WorldGeneration.Layers.Biomes
         /// <inheritdoc/>
         public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            GlobalConfig globalContext = runner.GlobalConfig;
-            Random random = globalContext.Random;
+            Random random = runner.Random;
 
             List<int> createdTunnels = new List<int>();
             for (int i = 0; i < this.Config.TunnelCount; i++)
@@ -65,7 +64,7 @@ namespace TerraBuilder.WorldGeneration.Layers.Biomes
                     Coordinate coordinate = new Coordinate(x, y);
                     if (sandbox[coordinate]?.active() == true)
                     {
-                        bool result = this.GenerateTunnel(runner, sandbox, coordinate, globalContext);
+                        bool result = this.GenerateTunnel(runner, sandbox, coordinate);
                         if (!result)
                         {
                             // Cavernが生成されていないなら、return
@@ -83,9 +82,9 @@ namespace TerraBuilder.WorldGeneration.Layers.Biomes
             return true;
         }
 
-        private bool GenerateTunnel(WorldGenerationRunner runner, WorldSandbox sandbox, Coordinate coordinate, GlobalConfig context)
+        private bool GenerateTunnel(WorldGenerationRunner runner, WorldSandbox sandbox, Coordinate coordinate)
         {
-            Random random = context.Random;
+            Random random = runner.Random;
             double[] cavernTop;
             try
             {
@@ -186,7 +185,7 @@ namespace TerraBuilder.WorldGeneration.Layers.Biomes
 
             if (currentPosition.Y < cavernTop[(int)currentPosition.X])
             {
-                return this.GenerateTunnel(runner, sandbox, new Coordinate((int)currentPosition.X, (int)currentPosition.Y), context);
+                return this.GenerateTunnel(runner, sandbox, new Coordinate((int)currentPosition.X, (int)currentPosition.Y));
             }
 
             return true;

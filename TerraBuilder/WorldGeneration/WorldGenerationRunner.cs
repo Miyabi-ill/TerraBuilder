@@ -44,9 +44,6 @@ namespace TerraBuilder.WorldGeneration
             this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Buildings.RandomRope)].Invoke());
             this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Buildings.LiquidsInAir)].Invoke());
             this.WorldGenerationLayers.Add(AvailableActions[nameof(Layers.Biomes.SpawnArea)].Invoke());
-
-            // TODO: jsonから読み込み？
-            this.GlobalConfig = new GlobalConfig();
         }
 
         /// <summary>
@@ -58,6 +55,11 @@ namespace TerraBuilder.WorldGeneration
         /// ワールド生成アクションリスト.このリスト順で生成が実行される.
         /// </summary>
         public ObservableCollection<IWorldGenerationLayer<LayerConfig>> WorldGenerationLayers { get; } = new ObservableCollection<IWorldGenerationLayer<LayerConfig>>();
+
+        /// <summary>
+        /// ワールド生成に使うランダムインスタンス.
+        /// </summary>
+        public Random Random { get; private set; }
 
         private Dictionary<Type, Dictionary<string, object>> GeneratedValueDict { get; } = new Dictionary<Type, Dictionary<string, object>>();
 
@@ -95,6 +97,7 @@ namespace TerraBuilder.WorldGeneration
         /// <returns>レイヤーの適用が全て成功すればtrue.1つでも失敗すれば、その時点で失敗しfalseを返す.</returns>
         public bool Run(WorldSandbox sandbox)
         {
+            this.Random = new Random(Seed: sandbox.WorldConfig.Seed);
             this.GeneratedValueDict.Clear();
             _ = sandbox.Reset();
             foreach (IWorldGenerationLayer<LayerConfig> action in this.WorldGenerationLayers)

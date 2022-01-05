@@ -1,4 +1,7 @@
-﻿namespace TerraBuilder.WorldGeneration.Layers.Buildings
+﻿// Copyright (c) Miyabi. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+namespace TerraBuilder.WorldGeneration.Layers.Buildings
 {
     using System;
     using System.Collections.Generic;
@@ -25,15 +28,13 @@
         /// <inheritdoc/>
         public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            GlobalConfig globalContext = runner.GlobalConfig;
-
             double[] cavernTop = runner.GetGeneratedValue<Biomes.Caverns, double[]>("CavernTop");
             double[] cavernBottom = runner.GetGeneratedValue<Biomes.Caverns, double[]>("CavernBottom");
             for (int i = 0; i < this.Config.RopeCount; i++)
             {
-                int x = globalContext.Random.Next(100, sandbox.TileCountX - 100);
-                int ropeLength = globalContext.Random.Next(this.Config.RopeMinLength, this.Config.RopeMaxLength + 1);
-                int y = globalContext.Random.Next((int)cavernTop[x], Math.Max((int)cavernBottom[x] - ropeLength - 1, (int)cavernTop[x] + 1));
+                int x = runner.Random.Next(100, sandbox.TileCountX - 100);
+                int ropeLength = runner.Random.Next(this.Config.RopeMinLength, this.Config.RopeMaxLength + 1);
+                int y = runner.Random.Next((int)cavernTop[x], Math.Max((int)cavernBottom[x] - ropeLength - 1, (int)cavernTop[x] + 1));
 
                 for (int cy = y; cy < y + ropeLength; cy++)
                 {

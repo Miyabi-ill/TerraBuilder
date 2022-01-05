@@ -1,4 +1,7 @@
-﻿namespace TerraBuilder.WorldGeneration.Layers.Biomes
+﻿// Copyright (c) Miyabi. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+namespace TerraBuilder.WorldGeneration.Layers.Biomes
 {
     using System.Collections.Generic;
     using TerraBuilder.WorldEdit;
@@ -23,10 +26,8 @@
         /// <inheritdoc/>
         public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            var globalContext = runner.GlobalConfig;
-
-            sandbox.SpawnTileX = sandbox.TileCountX / 2;
-            sandbox.SpawnTileY = globalContext.RespawnLevel;
+            sandbox.WorldConfig.SpawnTileX = sandbox.TileCountX / 2;
+            sandbox.WorldConfig.SpawnTileY = sandbox.WorldConfig.RespawnLevel;
 
             for (int x = 0; x < sandbox.TileCountX; x++)
             {
@@ -38,7 +39,7 @@
                 asphalt.wire(true);
                 asphalt.actuator(true);
 
-                Coordinate asphaltCoord = new Coordinate(x, globalContext.RespawnLevel);
+                Coordinate asphaltCoord = new Coordinate(x, sandbox.WorldConfig.RespawnLevel);
                 _ = sandbox.PlaceTile(asphaltCoord, asphalt);
 
                 Tile nodestroy = new Tile()
@@ -49,20 +50,20 @@
                 nodestroy.wire(true);
                 nodestroy.actuator(true);
 
-                Coordinate nodestroyCoord = new Coordinate(x, globalContext.RespawnLevel + 1);
+                Coordinate nodestroyCoord = new Coordinate(x, sandbox.WorldConfig.RespawnLevel + 1);
                 _ = sandbox.PlaceTile(nodestroyCoord, nodestroy);
 
                 sandbox.TileProtectionMap.AddProtection(asphaltCoord, TileProtectionMap.TileProtectionType.All);
                 sandbox.TileProtectionMap.AddProtection(nodestroyCoord, TileProtectionMap.TileProtectionType.All);
             }
 
-            Coordinate switchCoord = new Coordinate(5, globalContext.RespawnLevel - 1);
+            Coordinate switchCoord = new Coordinate(5, sandbox.WorldConfig.RespawnLevel - 1);
             Tile switchTile = new Tile() { wall = WallID.Wood };
             switchTile.wire(true);
             _ = sandbox.PlaceTile(switchCoord, switchTile);
 
             // TODO: sandboxへの呼び出し？
-            WorldGen.PlaceTile(5, globalContext.RespawnLevel - 1, TileID.Switches, forced: true);
+            _ = WorldGen.PlaceTile(5, sandbox.WorldConfig.RespawnLevel - 1, TileID.Switches, forced: true);
 
             generatedValueDict = new Dictionary<string, object>();
             return true;

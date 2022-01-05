@@ -28,18 +28,16 @@ namespace TerraBuilder.WorldGeneration.Layers.Buildings
         /// <inheritdoc/>
         public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            var globalContext = runner.GlobalConfig;
-
             const int xPadding = 5;
             for (int i = 0; i < this.Config.LiquidCount; i++)
             {
                 for (int retry = 0; retry < this.Config.MaxRetry; retry++)
                 {
-                    int width = globalContext.Random.Next(this.Config.LiquidMinWidth, this.Config.LiquidMaxWidth + 1);
-                    int height = globalContext.Random.Next(this.Config.LiquidMinHeight, this.Config.LiquidMaxHeight + 1);
+                    int width = runner.Random.Next(this.Config.LiquidMinWidth, this.Config.LiquidMaxWidth + 1);
+                    int height = runner.Random.Next(this.Config.LiquidMinHeight, this.Config.LiquidMaxHeight + 1);
 
-                    int x = RandGen.SelectPositionInRange(globalContext.Random, xPadding, sandbox.TileCountX - xPadding, width + 2);
-                    int y = RandGen.SelectPositionInRange(globalContext.Random, this.Config.PlaceAreaMinY, this.Config.PlaceAreaMaxY + 1, height + 2);
+                    int x = RandGen.SelectPositionInRange(runner.Random, xPadding, sandbox.TileCountX - xPadding, width + 2);
+                    int y = RandGen.SelectPositionInRange(runner.Random, this.Config.PlaceAreaMinY, this.Config.PlaceAreaMaxY + 1, height + 2);
 
                     if (x == -1 || y == -1)
                     {
@@ -74,7 +72,7 @@ namespace TerraBuilder.WorldGeneration.Layers.Buildings
 
                     // 設置してbreak
                     // 0: water, 1: lava, 2: honey
-                    int liquidType = WeightedRandom.SelectIndex(globalContext.Random, new double[] { this.Config.WaterWeight, this.Config.LavaWeight, this.Config.HoneyWeight });
+                    int liquidType = WeightedRandom.SelectIndex(runner.Random, new double[] { this.Config.WaterWeight, this.Config.LavaWeight, this.Config.HoneyWeight });
                     if (liquidType == -1)
                     {
                         liquidType = 0;

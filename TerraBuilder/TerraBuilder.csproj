@@ -153,6 +153,7 @@
     <Compile Include="UI\WorldGenerationWindow.xaml.cs">
       <DependentUpon>WorldGenerationWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WorldEdit\WorldConfig.cs" />
     <Compile Include="WorldGeneration\ActionAttribute.cs" />
     <Compile Include="Utils\Colors.cs" />
     <Compile Include="Utils\ErrorLogger.cs" />
@@ -200,7 +201,6 @@
     <Compile Include="Chests\ItemContext.cs" />
     <Compile Include="Chests\ItemSlotContext.cs" />
     <Compile Include="Chests\ItemSlotOrItemProbablyAndStack.cs" />
-    <Compile Include="WorldGeneration\GlobalConfig.cs" />
     <Compile Include="WorldGeneration\IWorldGenerationLayer.cs" />
     <Compile Include="WorldEdit\TileProtectionMap.cs" />
     <Compile Include="WorldGeneration\WorldGenerationRunner.cs" />

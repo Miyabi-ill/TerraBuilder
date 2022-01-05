@@ -5,7 +5,7 @@
     using System.IO;
     using Newtonsoft.Json;
     using TerraBuilder.WorldGeneration;
-    using TerraBuilder.WorldGeneration.Chests;
+    using TerraBuilder.Chests;
     using Terraria.ID;
 
     public static class Configs

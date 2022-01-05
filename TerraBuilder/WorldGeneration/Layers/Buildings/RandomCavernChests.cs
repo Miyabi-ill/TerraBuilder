@@ -35,7 +35,7 @@ namespace TerraBuilder.WorldGeneration.Layers.Buildings
                 return false;
             }
 
-            Random random = runner.GlobalConfig.Random;
+            Random random = runner.Random;
             double[] cavernTop = runner.GetGeneratedValue<Biomes.Caverns, double[]>("CavernTop");
             const int worldEdgeTiles = 100;
             for (int i = 0; i < this.Config.ChestCount; i++)
@@ -44,7 +44,7 @@ namespace TerraBuilder.WorldGeneration.Layers.Buildings
                 for (int retry = 0; retry < this.Config.MaxRetryForOneChest; retry++)
                 {
                     int x = random.Next(worldEdgeTiles, sandbox.TileCountX - worldEdgeTiles);
-                    if (this.PlaceChest(sandbox, x, (int)cavernTop[x] + 2, chestContext))
+                    if (this.PlaceChest(runner, sandbox, new Coordinate(x, (int)cavernTop[x] + 2), chestContext))
                     {
                         break;
                     }
@@ -55,19 +55,19 @@ namespace TerraBuilder.WorldGeneration.Layers.Buildings
             return true;
         }
 
-        private bool PlaceChest(WorldSandbox sandbox, int x, int startY, ChestContext chestContext)
+        private bool PlaceChest(WorldGenerationRunner runner, WorldSandbox sandbox, Coordinate coordinate, ChestContext chestContext)
         {
-            for (int y = startY; y < sandbox.TileCountY; y++)
+            for (int y = coordinate.Y; y < sandbox.TileCountY; y++)
             {
-                if (sandbox[new Coordinate(x, y)]?.active() == true && sandbox[new Coordinate(x + 1, y)]?.active() == true)
+                if (sandbox[new Coordinate(coordinate.X, y)]?.active() == true && sandbox[new Coordinate(coordinate.X + 1, y)]?.active() == true)
                 {
-                    bool success = GenerateChest.PlaceChest(sandbox, x, y - 2, runner.GlobalConfig.Random, chestContext);
+                    bool success = GenerateChest.PlaceChest(sandbox, coordinate.X, y - 2, runner.Random, chestContext);
                     if (success)
                     {
-                        sandbox.TileProtectionMap.AddProtection(new Coordinate(x, y - 2), TileProtectionMap.TileProtectionType.All);
-                        sandbox.TileProtectionMap.AddProtection(new Coordinate(x, y - 1), TileProtectionMap.TileProtectionType.All);
-                        sandbox.TileProtectionMap.AddProtection(new Coordinate(x + 1, y - 2), TileProtectionMap.TileProtectionType.All);
-                        sandbox.TileProtectionMap.AddProtection(new Coordinate(x + 1, y - 1), TileProtectionMap.TileProtectionType.All);
+                        sandbox.TileProtectionMap.AddProtection(new Coordinate(coordinate.X, y - 2), TileProtectionMap.TileProtectionType.All);
+                        sandbox.TileProtectionMap.AddProtection(new Coordinate(coordinate.X, y - 1), TileProtectionMap.TileProtectionType.All);
+                        sandbox.TileProtectionMap.AddProtection(new Coordinate(coordinate.X + 1, y - 2), TileProtectionMap.TileProtectionType.All);
+                        sandbox.TileProtectionMap.AddProtection(new Coordinate(coordinate.X + 1, y - 1), TileProtectionMap.TileProtectionType.All);
                         return success;
                     }
                 }

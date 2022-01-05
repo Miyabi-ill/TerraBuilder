@@ -1,5 +1,6 @@
 ﻿namespace TerraBuilder.WorldGeneration.Layers.Buildings
 {
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using TerraBuilder.Utils;
@@ -8,24 +9,38 @@
     using Terraria;
     using Terraria.ID;
 
+    // TODO: 建築を設置するクラスを利用する.
     /// <summary>
-    /// ランダムなサイズのブロックをワールド地表に設置するクラス
+    /// ランダムなサイズのブロックをワールド地表に設置するクラス.
     /// </summary>
     [Action]
     public class RandomSizeBlocks : IWorldGenerationLayer<RandomSizeBlocks.RandomSizeBlockContext>
     {
+        /// <summary>
+        /// ブロックを設置するバイオーム.
+        /// </summary>
         public enum PlaceBiome
         {
-            Surface,
-            Cavern,
+            /// <summary>
+            /// 地表.
+            /// </summary>
+            Surface = 0,
+
+            /// <summary>
+            /// 地下.
+            /// </summary>
+            Cavern = 1,
         }
 
-        private enum ActiveWallDirection : int
+        /// <summary>
+        /// 固形ブロックの壁を設置する方向.
+        /// </summary>
+        private enum ActiveWallDirection
         {
             Top = 0,
-            Left,
-            Bottom,
-            Right,
+            Left = 1,
+            Bottom = 2,
+            Right = 3,
         }
 
         /// <inheritdoc/>
@@ -40,8 +55,7 @@
         /// <inheritdoc/>
         public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            GlobalConfig globalContext = runner.GlobalConfig;
-            System.Random random = globalContext.Random;
+            Random random = runner.Random;
 
             if (this.Config.PlaceBiome == PlaceBiome.Surface)
             {
@@ -194,9 +208,9 @@
             }
         }
 
-        public static bool PlaceBlock(WorldSandbox sandbox, RandomSizeBlockContext context, int sizeX, int sizeY, int x, int y)
+        public static bool PlaceBlock(WorldGenerationRunner runner, WorldSandbox sandbox, RandomSizeBlockContext context, int sizeX, int sizeY, int x, int y)
         {
-            var random = runner.GlobalConfig.Random;
+            Random random = runner.Random;
 
             Tile[,] tiles = new Tile[sizeX, sizeY];
             TileProtectionMap.TileProtectionType[,] tileProtectionTypes = new TileProtectionMap.TileProtectionType[sizeX, sizeY];

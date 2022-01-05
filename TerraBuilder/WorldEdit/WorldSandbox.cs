@@ -11,6 +11,7 @@ namespace TerraBuilder.WorldEdit
     using Terraria.IO;
     using Terraria.Localization;
     using Terraria.Map;
+    using static TerraBuilder.WorldEdit.TileProtectionMap;
 
     /// <summary>
     /// テラリアのワールドの干渉に必要な情報をまとめたクラス.
@@ -43,6 +44,7 @@ namespace TerraBuilder.WorldEdit
                 isInitializedTerrariaInstance = true;
             }
 
+            this.WorldConfig = new WorldConfig();
             _ = this.Reset();
         }
 
@@ -75,27 +77,9 @@ namespace TerraBuilder.WorldEdit
         }
 
         /// <summary>
-        /// リスポーン地点X.
+        /// ワールド全体のコンフィグ.
         /// </summary>
-        public int SpawnTileX
-        {
-            get => Main.spawnTileX;
-            set => Main.spawnTileX = value;
-        }
-
-        /// <summary>
-        /// リスポーン地点Y.
-        /// </summary>
-        public int SpawnTileY
-        {
-            get => Main.spawnTileY;
-            set => Main.spawnTileY = value;
-        }
-
-        /// <summary>
-        /// ワールドのシード値.
-        /// </summary>
-        public int Seed { get; set; } = 42;
+        public WorldConfig WorldConfig { get; }
 
         /// <summary>
         /// ワールドに存在するタイル.
@@ -115,7 +99,129 @@ namespace TerraBuilder.WorldEdit
         /// <param name="coordinate">設置先座標.</param>
         /// <param name="tile">設置するタイル.</param>
         /// <returns>設置後タイル.</returns>
-        public Tile PlaceTile(Coordinate coordinate, Tile tile) => this.TileProtectionMap.PlaceTile(coordinate, tile);
+        public Tile PlaceTile(Coordinate coordinate, Tile tile)
+        {
+            TileProtectionType type = this.TileProtectionMap[coordinate];
+            if (type == TileProtectionType.None)
+            {
+                this.Tiles[coordinate.X, coordinate.Y] = tile;
+                return tile;
+            }
+
+            if (this.Tiles[coordinate.X, coordinate.Y] == null)
+            {
+                this.Tiles[coordinate.X, coordinate.Y] = new Tile();
+            }
+
+            Tile sandboxTile = (Tile)this.Tiles[coordinate.X, coordinate.Y];
+
+            bool rejectTilePlace = false;
+            bool rejectWallPlace = false;
+            bool rejectWirePlace = false;
+            bool rejectLiquidPlace = false;
+            bool rejectActuatorPlace = false;
+            if (type.HasFlag(TileProtectionType.TopSolid))
+            {
+                if (!tile.active() || !Main.tileSolidTop[tile.type])
+                {
+                    rejectTilePlace = true;
+                }
+            }
+
+            if (!rejectTilePlace
+                && (type.HasFlag(TileProtectionType.BottomSolid)
+                || type.HasFlag(TileProtectionType.LeftSolid)
+                || type.HasFlag(TileProtectionType.RightSolid)))
+            {
+                if (!tile.active() || !Main.tileSolid[tile.type])
+                {
+                    rejectTilePlace = true;
+                }
+            }
+
+            if (type.HasFlag(TileProtectionType.Wall))
+            {
+                rejectWallPlace = true;
+            }
+
+            if (type.HasFlag(TileProtectionType.Wire))
+            {
+                rejectWirePlace = true;
+            }
+
+            if (type.HasFlag(TileProtectionType.Liquid))
+            {
+                rejectLiquidPlace = true;
+            }
+
+            if (type.HasFlag(TileProtectionType.Actuator))
+            {
+                rejectActuatorPlace = true;
+            }
+
+            if (!rejectTilePlace
+                && type.HasFlag(TileProtectionType.TileType))
+            {
+                if (!tile.active() || tile.type != sandboxTile.type)
+                {
+                    rejectTilePlace = true;
+                }
+            }
+
+            if (!rejectTilePlace
+                && type.HasFlag(TileProtectionType.TileShape))
+            {
+                if (!tile.active() || tile.halfBrick() != sandboxTile.halfBrick() || tile.slope() != sandboxTile.slope())
+                {
+                    rejectTilePlace = true;
+                }
+            }
+
+            if (!rejectTilePlace
+                && type.HasFlag(TileProtectionType.TileFrame))
+            {
+                if (!tile.active() || tile.frameX != sandboxTile.frameX || tile.frameY != sandboxTile.frameY)
+                {
+                    rejectTilePlace = true;
+                }
+            }
+
+            if (!rejectTilePlace)
+            {
+                sandboxTile.type = tile.type;
+                sandboxTile.active(tile.active());
+                sandboxTile.frameX = tile.frameX;
+                sandboxTile.frameY = tile.frameY;
+                sandboxTile.slope(tile.slope());
+                sandboxTile.halfBrick(tile.halfBrick());
+            }
+
+            if (!rejectWallPlace)
+            {
+                sandboxTile.wall = tile.wall;
+            }
+
+            if (!rejectLiquidPlace)
+            {
+                sandboxTile.liquid = tile.liquid;
+                sandboxTile.liquidType(tile.liquidType());
+            }
+
+            if (!rejectWirePlace)
+            {
+                sandboxTile.wire(tile.wire());
+                sandboxTile.wire2(tile.wire2());
+                sandboxTile.wire3(tile.wire3());
+                sandboxTile.wire4(tile.wire4());
+            }
+
+            if (!rejectActuatorPlace)
+            {
+                sandboxTile.actuator(tile.actuator());
+            }
+
+            return sandboxTile;
+        }
 
         /// <summary>
         /// 環境のリセットを行う.
@@ -190,7 +296,7 @@ namespace TerraBuilder.WorldEdit
                     Metadata = Main.WorldFileMetadata,
                 };
 
-                Main.ActiveWorldFileData.SetSeed(this.Seed.ToString(NumberFormatInfo.CurrentInfo));
+                Main.ActiveWorldFileData.SetSeed(this.WorldConfig.Seed.ToString(NumberFormatInfo.CurrentInfo));
 
                 // TODO: 値を決め打ちするのをやめる.
                 Main.worldID = 42;
@@ -239,14 +345,6 @@ namespace TerraBuilder.WorldEdit
 
                     this.Tiles = Main.tile;
                     this.Chests = Main.chest;
-
-                    // Seedの再設定により、Randomインスタンスを生成しなおす.
-                    // 追加のコンテキストもクリアしておく
-                    if (runner != null)
-                    {
-                        runner.GlobalContext.Seed = Main.ActiveWorldFileData.Seed;
-                        runner.GlobalContext.ClearAdditionalContext();
-                    }
 
                     this.TileProtectionMap = new TileProtectionMap(this);
                 }

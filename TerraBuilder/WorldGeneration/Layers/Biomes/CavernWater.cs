@@ -24,21 +24,20 @@
         /// <inheritdoc/>
         public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            GlobalConfig globalContext = runner.GlobalConfig;
             int cavernTop = (int)runner.GetGeneratedValue<Caverns, double[]>("CavernTop").Min();
             int cavernBottom = (int)runner.GetGeneratedValue<Caverns, double[]>("CavernBottom").Max();
 
             for (int i = 0; i < this.Config.RandomWaterBlockCount; i++)
             {
-                int sizeX = globalContext.Random.Next(this.Config.RandomWaterBlockMinX, this.Config.RandomWaterBlockMaxX + 1);
-                int sizeY = globalContext.Random.Next(this.Config.RandomWaterBlockMinY, this.Config.RandomWaterBlockMaxY + 1);
+                int sizeX = runner.Random.Next(this.Config.RandomWaterBlockMinX, this.Config.RandomWaterBlockMaxX + 1);
+                int sizeY = runner.Random.Next(this.Config.RandomWaterBlockMinY, this.Config.RandomWaterBlockMaxY + 1);
                 if (cavernTop >= cavernBottom - sizeY)
                 {
                     sizeY = cavernBottom - cavernTop - 1;
                 }
 
-                int x = globalContext.Random.Next(100, sandbox.TileCountX - 100 - sizeX);
-                int y = globalContext.Random.Next(cavernTop, cavernBottom - sizeY);
+                int x = runner.Random.Next(100, sandbox.TileCountX - 100 - sizeX);
+                int y = runner.Random.Next(cavernTop, cavernBottom - sizeY);
                 for (int cx = x; cx < x + sizeX; cx++)
                 {
                     for (int cy = y; cy < y + sizeY; cy++)
@@ -54,6 +53,9 @@
             return true;
         }
 
+        /// <summary>
+        /// 地下に水生成を行うクラスのコンフィグ.
+        /// </summary>
         public class CavernWaterConfig : LayerConfig
         {
             /// <summary>

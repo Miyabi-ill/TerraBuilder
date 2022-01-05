@@ -9,18 +9,8 @@ namespace TerraBuilder
     /// テラリアワールドの座標用クラス.
     /// ワールドの左上をx, y = 0, 0とし、xは横方向、yは縦方向の軸を表す.
     /// </summary>
-    public struct Coordinate
+    public readonly struct Coordinate
     {
-        /// <summary>
-        /// ワールドの横方向の座標.右に行くほど大.
-        /// </summary>
-        public int X;
-
-        /// <summary>
-        /// ワールドの縦方向の座標.下に行くほど大.
-        /// </summary>
-        public int Y;
-
         /// <summary>
         /// テラリアワールドの座標コンストラクタ.
         /// yは0で設定される.
@@ -60,6 +50,16 @@ namespace TerraBuilder
             this.Y = y;
         }
 
+        /// <summary>
+        /// ワールドの横方向の座標.右に行くほど大.
+        /// </summary>
+        public int X { get; }
+
+        /// <summary>
+        /// ワールドの縦方向の座標.下に行くほど大.
+        /// </summary>
+        public int Y { get; }
+
         public static Coordinate operator +(Coordinate right, Coordinate left)
         {
             return new Coordinate(right.X + left.X, right.Y + left.Y);
@@ -85,6 +85,17 @@ namespace TerraBuilder
             return !(left == right);
         }
 
+        /// <summary>
+        /// この座標に、xとyを加算した結果の座標を返す.
+        /// xは横方向、yは縦方向の移動を表わす.
+        /// xがプラスなら右方向、マイナスなら左方向の移動を表し、yがプラスなら下方向、マイナスなら上方向への移動を表す.
+        /// </summary>
+        /// <param name="x">横方向への移動量.</param>
+        /// <param name="y">縦方向への移動量.</param>
+        /// <returns>移動後の座標.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">移動後の座標の<see cref="X"/>か<see cref="Y"/>がマイナス値のとき.</exception>
+        public Coordinate Add(int x, int y) => new Coordinate(this.X + x, this.Y + y);
+
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
@@ -93,7 +104,7 @@ namespace TerraBuilder
                 return false;
             }
 
-            var other = (Coordinate)obj;
+            Coordinate other = (Coordinate)obj;
             return this.X == other.X && this.Y == other.Y;
         }
 
@@ -106,9 +117,6 @@ namespace TerraBuilder
         }
 
         /// <inheritdoc/>
-        public override string ToString()
-        {
-            return $"X: {this.X}, Y: {this.Y}";
-        }
+        public override string ToString() => $"X: {this.X}, Y: {this.Y}";
     }
 }

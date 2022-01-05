@@ -41,20 +41,19 @@ namespace TerraBuilder.WorldGeneration.Layers.Biomes
         public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
             // Terraria.GameContent.Biomes.TerrainPassに近い生成を行う.
-            GlobalConfig globalContext = runner.GlobalConfig;
-            Random rand = globalContext.Random;
+            Random rand = runner.Random;
 
-            int maxSurfaceLevel = runner.SurfaceLevel - this.Config.SurfaceMaxHeight;
+            int maxSurfaceLevel = sandbox.WorldConfig.SurfaceLevel - this.Config.SurfaceMaxHeight;
 
             int nextTypeChangeSpan = rand.Next(5, 40);
-            int currentPosition = rand.Next(maxSurfaceLevel, runner.SurfaceLevel);
+            int currentPosition = rand.Next(maxSurfaceLevel, sandbox.WorldConfig.SurfaceLevel);
             SurfaceType currentSurface = SurfaceType.Flat;
             for (int x = 0; x < sandbox.TileCountX; x++)
             {
                 // 次の地表タイプを選定、区間も決定する
                 if (nextTypeChangeSpan == 0)
                 {
-                    double currentPercentileY = (currentPosition - maxSurfaceLevel) / (double)runner.SurfaceLevel;
+                    double currentPercentileY = (currentPosition - maxSurfaceLevel) / (double)sandbox.WorldConfig.SurfaceLevel;
                     nextTypeChangeSpan = rand.Next(5, 40);
 
                     // 下に行き過ぎ
@@ -198,10 +197,10 @@ namespace TerraBuilder.WorldGeneration.Layers.Biomes
 
                 // 丸め込み
                 currentPosition = Math.Max(currentPosition, maxSurfaceLevel);
-                currentPosition = Math.Min(currentPosition, runner.SurfaceLevel);
+                currentPosition = Math.Min(currentPosition, sandbox.WorldConfig.SurfaceLevel);
 
                 // タイル設置
-                for (int y = currentPosition; y < runner.SurfaceLevel; y++)
+                for (int y = currentPosition; y < sandbox.WorldConfig.SurfaceLevel; y++)
                 {
                     Tile baseTile = new Tile()
                     {

@@ -30,14 +30,12 @@ namespace TerraBuilder.WorldGeneration.Layers.Biomes
         /// <inheritdoc/>
         public bool Apply(WorldGenerationRunner runner, WorldSandbox sandbox, out Dictionary<string, object> generatedValueDict)
         {
-            GlobalConfig globalContext = runner.GlobalConfig;
-
             int tileLengthX = sandbox.TileCountX;
 
             // Surface: topPerlinの振幅
             int diffSurface = this.Config.CavernMaxDistanceFromSurface - this.Config.CavernMinDistanceFromSurface;
 
-            Random rand = globalContext.Random;
+            Random rand = runner.Random;
             double[] topPerlin = PerlinNoise.NormalizeOctave1D(128, tileLengthX, 8, 2, rand);
             double[] bottomPerlin = PerlinNoise.NormalizeOctave1D(128, tileLengthX, 8, 2, rand);
 
@@ -73,7 +71,7 @@ namespace TerraBuilder.WorldGeneration.Layers.Biomes
                 bottomPerlin[i] = Math.Round(bottomPerlin[i] * bottomAmplifier);
             }
 
-            int cavernStart = globalContext.SurfaceLevel + this.Config.CavernMinDistanceFromSurface;
+            int cavernStart = sandbox.WorldConfig.SurfaceLevel + this.Config.CavernMinDistanceFromSurface;
             int bottomPerlinBaseTopLine = (int)topPerlin[minIndex] - (int)bottomPerlin[minIndex] + this.Config.CavernMinHeight;
             double[] cavernTop = new double[topPerlin.Length];
             double[] cavernBottom = new double[bottomPerlin.Length];
@@ -82,7 +80,7 @@ namespace TerraBuilder.WorldGeneration.Layers.Biomes
             {
                 cavernTop[x] = cavernStart + topPerlin[x];
                 cavernBottom[x] = cavernStart + bottomPerlinBaseTopLine + bottomPerlin[x];
-                for (int y = globalContext.SurfaceLevel; y < sandbox.TileCountY; y++)
+                for (int y = sandbox.WorldConfig.SurfaceLevel; y < sandbox.TileCountY; y++)
                 {
                     Coordinate coordinate = new Coordinate(x, y);
                     if (y < cavernStart + topPerlin[x])
