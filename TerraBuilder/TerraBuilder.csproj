@@ -150,10 +150,14 @@
     <Compile Include="Configs.cs" />
     <Compile Include="Coordinate.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="ItemIdentifier.cs" />
+    <Compile Include="TileRange.cs" />
     <Compile Include="UI\WorldGenerationWindow.xaml.cs">
       <DependentUpon>WorldGenerationWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WorldEdit\WorldConfig.cs" />
+    <Compile Include="WorldEdit\Settings\DungeonSide.cs" />
+    <Compile Include="WorldEdit\Settings\OreTiers.cs" />
+    <Compile Include="WorldEdit\WorldSetting.cs" />
     <Compile Include="WorldGeneration\ActionAttribute.cs" />
     <Compile Include="Utils\Colors.cs" />
     <Compile Include="Utils\ErrorLogger.cs" />

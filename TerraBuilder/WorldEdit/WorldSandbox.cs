@@ -44,7 +44,7 @@ namespace TerraBuilder.WorldEdit
                 isInitializedTerrariaInstance = true;
             }
 
-            this.WorldConfig = new WorldConfig();
+            this.WorldSetting = new WorldSetting();
             _ = this.Reset();
         }
 
@@ -77,9 +77,9 @@ namespace TerraBuilder.WorldEdit
         }
 
         /// <summary>
-        /// ワールド全体のコンフィグ.
+        /// ワールド全体の設定.
         /// </summary>
-        public WorldConfig WorldConfig { get; }
+        public WorldSetting WorldSetting { get; private set; }
 
         /// <summary>
         /// ワールドに存在するタイル.
@@ -231,6 +231,8 @@ namespace TerraBuilder.WorldEdit
         {
             lock (this.locker)
             {
+                this.WorldSetting = new WorldSetting();
+
                 this.TileCountX = 4200;
                 this.TileCountY = 1200;
 
@@ -296,7 +298,7 @@ namespace TerraBuilder.WorldEdit
                     Metadata = Main.WorldFileMetadata,
                 };
 
-                Main.ActiveWorldFileData.SetSeed(this.WorldConfig.Seed.ToString(NumberFormatInfo.CurrentInfo));
+                Main.ActiveWorldFileData.SetSeed(this.WorldSetting.Seed.ToString(NumberFormatInfo.CurrentInfo));
 
                 // TODO: 値を決め打ちするのをやめる.
                 Main.worldID = 42;

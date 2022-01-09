@@ -97,7 +97,7 @@ namespace TerraBuilder.WorldGeneration
         /// <returns>レイヤーの適用が全て成功すればtrue.1つでも失敗すれば、その時点で失敗しfalseを返す.</returns>
         public bool Run(WorldSandbox sandbox)
         {
-            this.Random = new Random(Seed: sandbox.WorldConfig.Seed);
+            this.Random = new Random(Seed: sandbox.WorldSetting.Seed);
             this.GeneratedValueDict.Clear();
             _ = sandbox.Reset();
             foreach (IWorldGenerationLayer<LayerConfig> action in this.WorldGenerationLayers)

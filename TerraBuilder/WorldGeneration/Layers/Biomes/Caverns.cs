@@ -71,7 +71,7 @@ namespace TerraBuilder.WorldGeneration.Layers.Biomes
                 bottomPerlin[i] = Math.Round(bottomPerlin[i] * bottomAmplifier);
             }
 
-            int cavernStart = sandbox.WorldConfig.SurfaceLevel + this.Config.CavernMinDistanceFromSurface;
+            int cavernStart = sandbox.WorldSetting.SurfaceLevel + this.Config.CavernMinDistanceFromSurface;
             int bottomPerlinBaseTopLine = (int)topPerlin[minIndex] - (int)bottomPerlin[minIndex] + this.Config.CavernMinHeight;
             double[] cavernTop = new double[topPerlin.Length];
             double[] cavernBottom = new double[bottomPerlin.Length];
@@ -80,7 +80,7 @@ namespace TerraBuilder.WorldGeneration.Layers.Biomes
             {
                 cavernTop[x] = cavernStart + topPerlin[x];
                 cavernBottom[x] = cavernStart + bottomPerlinBaseTopLine + bottomPerlin[x];
-                for (int y = sandbox.WorldConfig.SurfaceLevel; y < sandbox.TileCountY; y++)
+                for (int y = sandbox.WorldSetting.SurfaceLevel; y < sandbox.TileCountY; y++)
                 {
                     Coordinate coordinate = new Coordinate(x, y);
                     if (y < cavernStart + topPerlin[x])
